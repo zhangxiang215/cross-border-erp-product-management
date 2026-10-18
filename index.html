@@ -710,5 +710,22 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   document.addEventListener('click',e=>{if(e.target.closest('#warehouseNavToggle'))setTimeout(render,0);if(e.target.closest('#warehouseView [data-warehouse-tab]')?.dataset.warehouseTab==='inbound')setTimeout(render,0);});
 })();
 </script>
+<script>
+(function(){
+  const removeReportNo=()=>{
+    document.querySelectorAll('#warehouseView .warehouse-filter input[placeholder*="报备单号"]').forEach(input=>input.remove());
+    document.querySelectorAll('#warehouseView .warehouse-table').forEach(table=>{
+      if(table.dataset.reportNoRemoved==='1')return;
+      const header=[...table.querySelectorAll('thead th')].findIndex(th=>th.textContent.includes('报备单号'));
+      if(header<0)return;
+      table.querySelectorAll('tr').forEach(row=>row.children[header]?.remove());
+      table.dataset.reportNoRemoved='1';
+    });
+    document.querySelectorAll('#warehouseDetailOverlay .warehouse-detail-item').forEach(item=>{if(item.textContent.includes('报备单号'))item.remove();});
+  };
+  removeReportNo();
+  new MutationObserver(removeReportNo).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 </html>
