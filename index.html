@@ -45,6 +45,10 @@
 <section class="form-section section-anchor" id="complianceInfo"><h3>合规信息</h3><div class="form-grid"><div class="form-item"><label>认证获取渠道</label><select class="form-select"><option>请选择</option><option>供应商提供</option><option>自主获取</option></select></div><div class="form-item"><label>认证证书</label><input class="form-input" placeholder="请输入认证证书" /></div><div class="form-item"><label>是否侵权</label><select class="form-select"><option>否</option><option>是</option></select></div><div class="form-item"><label>是否违禁</label><select class="form-select"><option>否</option><option>是</option></select></div><div class="form-item full"><label>合规备注</label><textarea class="form-textarea" placeholder="请输入合规说明"></textarea></div></div></section>
 <section class="form-section section-anchor" id="materialInfo"><h3>附件 / 图片与素材</h3><div class="form-grid"><div class="form-item full"><label class="required">商品主图</label><div class="material-list"><div class="upload-box"><span>＋<br>上传主图</span></div><div class="upload-box"><span>＋<br>添加辅图</span></div></div></div><div class="form-item full"><label>素材库</label><div class="material-list"><div class="material-chip">产品说明书.pdf ×</div><div class="material-chip">认证证书.jpg ×</div><div class="material-chip">包装图.png ×</div><button class="tool" type="button">＋ 添加素材</button></div></div><div class="form-item full"><label>附件说明</label><textarea class="form-textarea" placeholder="请输入附件说明"></textarea></div></div></section>
 </div></div><footer class="form-foot"><button class="cancel-btn" id="cancelForm">取消</button><button class="submit-btn" id="submitForm">提交</button></footer></section></div><div class="toast" id="toast">已刷新商品列表</div>
+<style>
+/* 附件修改版新增控件样式 */
+.inline-filter-input{border:0;outline:0;height:30px;min-width:150px;flex:1;color:#4f5b68;font:inherit;background:transparent;padding:0 10px}.filter.split .field-label{flex:0 0 112px}.filter.input .field-label{flex:0 0 112px;color:#53606c}.upload-group{display:flex;align-items:center;gap:10px;flex:1}.upload-group .upload-box{flex:0 0 92px}.upload-name{color:#8b96a2;font-size:12px}.inline-control{display:flex;align-items:center;gap:8px;flex:1}.inline-control .form-input,.inline-control .form-select{min-width:0}.inline-control .tool{height:34px;padding:0 12px;font-size:12px}.dynamic-list{flex:1}.dynamic-row{margin-top:10px}.supplier-block{border:1px solid #edf0f3;border-radius:7px;padding:12px 14px;margin-bottom:14px}.supplier-block h4{margin:0 0 12px;color:#4d5967;font-size:14px}.supplier-block .form-grid{row-gap:12px}.form-item>label>span.required:before{content:'*';color:#f04d4d;margin-right:4px}.form-item>label>span.required{font-weight:400}.form-item .upload-box small{font-size:11px}.remove-row{border-color:#ffb1b1!important;color:#e55a5a!important;background:#fff!important}
+</style>
 <script>
 const fields=[['SKU（精准）','双击批量查询，模糊搜索','split'],['SPU（精准）','双击批量查询，模糊搜索','split'],['商品类目','','select'],['SKU商品名称','请输入商品名称','split'],['选择类目','','select'],['是否侵权','','select'],['商品状态','','select'],['销售状态','','select'],['是否违禁','','select'],['接手标签','','select'],['是否组合商品','','select'],['是否刷单SKU','','select'],['是否工厂限价','','select'],['是否定制商品','','select'],['是否有适配车型','','select'],['销售国家','','input'],['认证获取渠道','','select'],['认证证书','','select'],['包装形态','','select'],['利润状态','','select'],['开发类型','','select'],['头程运输方式','','select'],['供应商','','input'],['请输入供应商代码','','input'],['报关状态','','select'],['清关状态','','select'],['业务类型','','select'],['商品创建来源','','select'],['采购员','','input'],['开发员','','input'],['销售负责人','','input'],['操作人','请输入','split'],['是否校准','','select'],['是否有新旧SKU关系','','select'],['运营风险','','select'],['时间','开始日期    →  结束日期','date-range'],['海外仓库存最小值','','input'],['海外仓库存最大值','','input']];
 const options={商品状态:['在售','停售','禁售'],开发类型:['试卖','精品','普通','精铺'],业务类型:['海外仓','FBA','直发'],是否侵权:['是','否'],是否组合商品:['是','否'],商品类目:['家居用品','数码配件','服饰','汽配']};
@@ -99,6 +103,88 @@ document.getElementById('closeDrawer').onclick=()=>document.getElementById('draw
 document.getElementById('resetBtn').onclick=()=>{document.querySelectorAll('.filter .field-label').forEach(x=>{const parent=x.parentElement;if(parent.dataset.label)x.textContent=parent.dataset.label;});document.getElementById('toast').textContent='筛选条件已重置';document.getElementById('toast').classList.add('show');setTimeout(()=>document.getElementById('toast').classList.remove('show'),1800)};
 document.getElementById('searchBtn').onclick=()=>{document.getElementById('toast').textContent='商品列表已刷新';document.getElementById('toast').classList.add('show');setTimeout(()=>document.getElementById('toast').classList.remove('show'),1800)};
 document.getElementById('collapseBtn').onclick=()=>{const card=document.getElementById('filterCard');card.classList.toggle('expanded');document.querySelector('#collapseBtn span').textContent=card.classList.contains('expanded')?'收起筛选':'展开全部';};document.getElementById('refreshBtn').onclick=()=>{document.getElementById('toast').classList.add('show');setTimeout(()=>document.getElementById('toast').classList.remove('show'),1800)};
+</script>
+<script>
+/* 2026-10-18 附件修改版：以附件字段为准，保留原型现有视觉样式。 */
+(function(){
+  const $=id=>document.getElementById(id);
+  const esc=v=>String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  const toast2=msg=>{const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(window.__t2);window.__t2=setTimeout(()=>el.classList.remove('show'),1800);};
+  const item=(label,control,full=false)=>`<div class="form-item${full?' full':''}"><label>${label}</label>${control}</div>`;
+  const input=(label,ph='',required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<input class="form-input" placeholder="${ph}" ${extra}>`,full);
+  const select=(label,opts,required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<select class="form-select" ${extra}>${opts.map((x,i)=>`<option value="${i?'x':''}">${x}</option>`).join('')}</select>`,full);
+  const textarea=(label,ph='',required=false,full=true)=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<textarea class="form-textarea" placeholder="${ph}"></textarea>`,full);
+  const checks=(arr,name,radio=false)=>`<div class="check-row">${arr.map((x,i)=>`<label class="form-check"><input type="${radio?'radio':'checkbox'}" name="${name}" ${i===arr.length-1&&!radio?'checked':''}>${x}</label>`).join('')}</div>`;
+  const upload=(title,multi=false)=>`<div class="upload-group"><div class="upload-box file-trigger" data-title="${title}"><span>＋<br>${multi?'上传图片':'上传文件'}</span></div><div class="upload-name">${multi?'支持单张 / 多张':'点击选择文件'}</div></div>`;
+  const linkInput=(label,ph)=>item(label,`<div class="inline-control"><input class="form-input" placeholder="${ph}"><button class="tool link-test" type="button">打开链接</button></div>`,true);
+
+  function bindEnhancedForm(){
+    document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
+    document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
+    document.querySelectorAll('.link-test').forEach(b=>b.onclick=()=>{const v=b.parentElement.querySelector('input').value.trim();toast2(v?`已打开链接：${v}`:'请先填写链接地址');});
+    document.querySelectorAll('[data-add-row]').forEach(b=>b.onclick=()=>{const box=$(b.dataset.addRow);const row=document.createElement('div');row.className='form-item full dynamic-row';row.innerHTML=`<label>新增关联</label><div class="inline-control"><input class="form-input" placeholder="请输入 ${b.dataset.addRow==='listingRows'?'平台 / 站点 / 账号 / ASIN':'供应商联系方式'}"><button type="button" class="tool remove-row">删除</button></div>`;box.appendChild(row);row.querySelector('.remove-row').onclick=()=>row.remove();});
+  }
+  function sectionNav(title,items){return `<nav class="form-nav"><div class="form-nav-title">${title}</div>${items.map((x,i)=>`<div class="form-nav-item${i?'':' active'}" data-target="${x[0]}">${x[1]}</div>`).join('')}</nav>`;}
+
+  window.buildMvpForm=function(){
+    const body=document.querySelector('.product-form .form-body');
+    const nav=sectionNav('商品管理',[['identityInfo','产品标识信息'],['descriptionInfo','产品描述信息'],['listingInfo','产品刊登信息'],['logisticsInfo','物流包装信息'],['supplierInfo','供应商管理'],['costInfo','成本与定价'],['customsInfo','海关申报']]);
+    body.innerHTML=nav+`<div class="form-content">
+      <section class="form-section section-anchor" id="identityInfo"><h3>产品标识信息</h3><div class="form-grid">
+        ${input('产品名称（中文）','请输入产品中文名称',true)}${input('产品名称（英文）','请输入产品英文名称',true)}${input('SPU','请输入或选择 SPU')}${input('SKU','请输入或生成 SKU')}
+        ${select('产品状态',['开发中','未上架','售卖中','已下架'])}${input('自定义型号','请输入自定义型号')}
+        ${item('是否有配件',checks(['无配件','有配件'], 'hasPart', true))}${item('配件SKU与数量',`<div class="inline-control"><input class="form-input" placeholder="配件 SKU"><input class="form-input" placeholder="数量"><span class="unit">个</span></div>`)}
+        ${item('是否是组合产品',checks(['是','否'],'isCombo',true))}
+      </div></section>
+      <section class="form-section section-anchor" id="descriptionInfo"><h3>产品描述信息</h3><div class="form-grid">
+        ${item('产品白底图',upload('产品白底图',true))}${item('产品尺寸标识图',upload('产品尺寸标识图',true))}${item('配件图片',upload('配件图片',true))}${item('配件尺寸标识图',upload('配件尺寸标识图',true))}
+        ${textarea('功能','请输入产品功能描述',false,false)}${input('材质','请输入材质')}${input('颜色','请输入颜色')}${input('尺寸','请输入产品尺寸')}${input('容量','请输入容量')}${input('重量（主体重量）','请输入主体重量')}${input('配件重量','请输入配件重量')}${textarea('技术参数','请输入技术参数',false,false)}${textarea('适用人群 / 适用场景','请输入适用人群或场景',false,true)}
+      </div></section>
+      <section class="form-section section-anchor" id="listingInfo"><h3>产品刊登信息</h3><div class="form-grid">
+        ${item('产品精修主图',upload('产品精修主图',true))}${item('产品详情页（A+）',upload('产品详情页（A+）',true))}
+        ${item('平台类目',checks(['Amazon'],'platformCategory'))}${input('主类目','请输入主类目')}${input('次类目','请输入次类目')}
+        ${item('售卖市场',checks(['美国站','欧洲站','中东站'],'market'))}${item('售卖方式',checks(['FBA','FBM','其他'],'saleMethod'))}
+        ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格')}${input('平台限价-大促活动价格','请输入价格')}
+        <div class="form-item full"><label>Listing映射</label><div id="listingRows" class="dynamic-list"><div class="inline-control"><input class="form-input" placeholder="平台 / 站点 / 账号 / ASIN / MSKU"><button type="button" class="tool" data-add-row="listingRows">＋增加一条</button></div></div></div>
+        ${linkInput('产品说明书超链接','请输入说明书链接')}${linkInput('产品认证证书超链接','请输入认证证书链接')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
+      </div></section>
+      <section class="form-section section-anchor" id="logisticsInfo"><h3>物流包装信息</h3><div class="form-grid">
+        ${item('包装图片',upload('包装图片',true))}${item('箱子尺寸标识图',upload('箱子尺寸标识图',true))}${item('内衬图片',upload('内衬图片',true))}
+        ${input('单个SKU包装尺寸','长 × 宽 × 高 cm')}${input('单个包装重量','请输入包装重量 kg')}${input('包装箱材质','请输入包装箱材质')}${input('内衬','请输入内衬材质')}${input('加固方式','请输入加固方式')}${input('体积重','系统计算',false,false,'readonly')}${input('计费重','系统计算',false,false,'readonly')}${item('是否有外箱',checks(['有','无'],'outerBox',true))}${input('外箱材质','请输入外箱材质')}${input('装箱规格（PCS）','请输入装箱数量')}${input('外箱尺寸','长 × 宽 × 高 cm')}${item('物流标识',checks(['带电','带磁','液体','粉末','均无'],'logisticsMark'))}${textarea('物流备注','请输入物流备注',false,true)}
+      </div></section>
+      <section class="form-section section-anchor" id="supplierInfo"><h3>供应商管理</h3><div class="supplier-block"><h4>主供应商</h4><div class="form-grid">${select('供应商',['请选择主供应商','深圳市恒温电器有限公司','义乌市优品供应链'],true)}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div><div class="supplier-block"><h4>预备供应商</h4><div class="form-grid">${select('供应商',['请选择预备供应商','深圳市恒温电器有限公司','义乌市优品供应链'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div></section>
+      <section class="form-section section-anchor" id="costInfo"><h3>成本与定价</h3><div class="form-grid">${input('采购成本','请输入采购成本')}${input('配件成本','请输入配件成本')}${input('包装成本','请输入包装成本')}${input('其他成本','请输入其他成本')}${input('单件成本合计','系统计算',false,false,'readonly')}${input('站点售价','请输入站点售价')}${input('利润状态','系统计算',false,false,'readonly')}${textarea('定价备注','请输入定价备注',false,true)}</div></section>
+      <section class="form-section section-anchor" id="customsInfo"><h3>海关申报</h3><div class="form-grid">${input('中文申报品名','请输入中文申报品名',true)}${input('英文申报品名','请输入英文申报品名',true)}${input('HS编码（中国海关编码）','请输入 HS 编码',true)}${item('申报价值',`<div class="inline-control"><select class="form-select"><option>USD</option><option>CNY</option><option>EUR</option></select><input class="form-input" placeholder="请输入金额"></div>`)}</div></section>
+    </div>`;
+    bindEnhancedForm();
+  };
+
+  window.buildPartForm=function(){
+    const body=document.querySelector('.product-form .form-body');
+    body.innerHTML=sectionNav('配件SKU管理',[['partBase','关联商品'],['partSku','配件信息'],['partSupplier','配件供应商'],['partLogistics','物流资料'],['partPackage','包装资料'],['partQuality','品控检测']])+`<div class="form-content">
+      <section class="form-section" id="partBase"><h3>关联商品</h3><div class="form-grid">${input('关联商品SKU','请选择商品 SKU',true)}${input('关联数量','请输入单个商品配件数量')}</div></section>
+      <section class="form-section" id="partSku"><h3>配件信息</h3><div class="form-grid">${input('配件SKU','系统生成或输入配件 SKU',true)}${input('配件名称','请输入配件名称',true)}${select('配件类型',['插头配件','结构配件','包装配件','其他'],true)}${select('状态',['启用','停用'])}</div></section>
+      <section class="form-section" id="partSupplier"><h3>配件供应商</h3><div class="form-grid">${select('供应商',['请选择供应商'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入备注',false,true)}</div></section>
+      <section class="form-section" id="partLogistics"><h3>物流资料</h3><div class="form-grid">${input('报关品名','请输入报关品名')}${input('材质（中文）','请输入材质')}${item('属性标识',checks(['带电','带磁','液体','粉末','均无'],'partMark'))}${input('销售国家','请选择销售国家')}</div></section>
+      <section class="form-section" id="partPackage"><h3>包装资料</h3><div class="form-grid">${select('包装形态',['标准包装','裸装'])}${input('包装尺寸','长 × 宽 × 高 cm')}${input('包装毛重','请输入包装毛重 g')}${select('基本单位',['个','件'])}</div></section>
+      <section class="form-section" id="partQuality"><h3>品控检测</h3><div class="form-grid">${select('检测等级',['B','A'])}${select('检验方式',['抽检','全检'])}${textarea('检验标准','请输入配件检查标准',false,true)}</div></section>
+    </div>`;bindEnhancedForm();
+  };
+
+  window.showForm=function(mode,p){enterProductPage();if(mode==='part')buildPartForm();else buildMvpForm();$('formTitle').textContent=mode==='part'?'新增 / 编辑配件SKU':mode==='spu'?(p?'编辑SPU':'新增SPU'):mode==='edit'?'编辑商品':'新增商品';$('formMask').classList.add('show');document.querySelector('.left-rail').classList.add('product-open');$('sideListItem').classList.toggle('active',mode!=='part');$('sidePartsItem').classList.toggle('active',mode==='part');$('sideMaterialItem')?.classList.remove('active');if(p){const n=$('formName');if(n)n.value=p.name;}};
+
+  // 按附件要求收敛商品列表筛选项，仅保留 SPU、SKU、商品名称，并互换 SPU/SKU顺序。
+  const filters=$('filters');if(filters){filters.innerHTML=`<div class="filter split input" data-label="SPU（精准）"><span class="field-label">SPU（精准）</span><input class="inline-filter-input" placeholder="输入 SPU，支持批量查询"></div><div class="filter split input" data-label="SKU（精准）"><span class="field-label">SKU（精准）</span><input class="inline-filter-input" placeholder="输入 SKU，支持批量查询"></div><div class="filter input" data-label="商品名称"><span class="field-label">商品名称</span><input class="inline-filter-input" placeholder="请输入商品名称"></div>`;}
+  const productTable=$('productTableCard');if(productTable){const sku=productTable.querySelector('#skuTabBtn'),spu=productTable.querySelector('#spuTabBtn');if(sku&&spu)spu.parentElement.insertBefore(spu,sku);}
+  ['SKU标签批量打印','GPSR标签批量打印','下载队列','刊登文件下载队列'].forEach(t=>[...document.querySelectorAll('button')].filter(b=>b.textContent.trim().includes(t)).forEach(b=>b.remove()));
+  $('sideMaterialItem')?.remove();$('materialsView')?.remove();
+  document.querySelectorAll('.tool').forEach(b=>{if(!b.onclick&&!b.id&&!b.dataset.addRow)b.onclick=()=>toast2(`${b.textContent.trim().replace('⌄','')}功能已触发`);});
+  $('collapseBtn')?.remove();
+  $('searchBtn').onclick=()=>toast2('已按 SPU、SKU、商品名称刷新商品列表');$('resetBtn').onclick=()=>{document.querySelectorAll('.inline-filter-input').forEach(i=>i.value='');toast2('筛选条件已重置');};
+  $('submitForm').onclick=()=>{const missing=[...document.querySelectorAll('#formMask .form-item')].filter(it=>it.querySelector('label .required')&&[...it.querySelectorAll('input,select,textarea')].every(c=>!String(c.value||'').trim())).map(it=>it.querySelector('label').textContent.trim());if(missing.length){toast2('请完善必填字段：'+missing.slice(0,3).join('、')+(missing.length>3?'等':''));return;}$('formMask').classList.remove('show');toast2('已保存，相关字段已记录到商品档案');};
+  document.querySelectorAll('.page').forEach(p=>p.onclick=()=>toast2(`已切换到第 ${p.textContent.trim()||'下一'} 页`));
+  const partType=[...document.querySelectorAll('#partsView select')].find(s=>s.textContent.includes('配件类型'));if(partType&&!partType.innerHTML.includes('其他'))partType.insertAdjacentHTML('beforeend','<option>其他</option>');
+})();
 </script>
 </body>
 </html>
