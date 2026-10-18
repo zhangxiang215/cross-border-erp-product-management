@@ -149,8 +149,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       </div></section>
       <section class="form-section section-anchor" id="listingInfo"><h3>产品刊登信息</h3><div class="form-grid">
         ${item('产品精修主图',upload('产品精修主图',true))}${item('产品详情页（A+）',upload('产品详情页（A+）',true))}
-        ${item('平台类目',checks(['Amazon'],'platformCategory'))}${input('主类目','请输入主类目')}${input('次类目','请输入次类目')}
-        ${item('售卖市场',checks(['美国站','欧洲站','中东站'],'market'))}${item('售卖方式',checks(['FBA','FBM','其他'],'saleMethod'))}
+        ${select('平台类目',['Amazon'])}${item('主类目','<input class="form-input listing-category-input" placeholder="请输入主类目">')}${item('次类目','<input class="form-input listing-category-input" placeholder="请输入次类目">')}
+        ${select('售卖市场',['美国站','欧洲站','中东站'])}${select('售卖方式',['FBA','FBM','其他'])}
         ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格')}${input('平台限价-大促活动价格','请输入价格')}
         <div class="form-item full"><label>Listing映射</label><div id="listingRows" class="dynamic-list"><div class="inline-control"><input class="form-input" placeholder="平台 / 站点 / 账号 / ASIN / MSKU"><button type="button" class="tool" data-add-row="listingRows">＋增加一条</button></div></div></div>
         ${linkInput('产品说明书超链接','请输入说明书链接')}${linkInput('产品认证证书超链接','请输入认证证书链接')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
@@ -270,6 +270,10 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 <style>
 /* 配件明细中的 SKU 输入框缩短 */
 .part-row .form-input:first-child{flex:0 1 260px;width:260px;max-width:260px}
+</style>
+<style>
+/* 刊登信息中的主类目、次类目输入框缩短 */
+#listingInfo .listing-category-input{flex:0 1 260px;width:260px;max-width:260px}
 </style>
 </body>
 </html>
