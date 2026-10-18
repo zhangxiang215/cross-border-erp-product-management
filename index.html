@@ -123,6 +123,12 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
     document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
     document.querySelectorAll('.link-test').forEach(b=>b.onclick=()=>{const v=b.parentElement.querySelector('input').value.trim();toast2(v?`已打开链接：${v}`:'请先填写链接地址');});
+    const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
+    if(hasPartSelect&&partRows){
+      const syncPartRows=()=>{partRows.closest('.form-item').style.display=hasPartSelect.value==='yes'?'flex':'none';};
+      const bindPartRow=row=>{row.querySelector('.add-part-row')?.addEventListener('click',()=>{const next=document.createElement('div');next.className='part-row';next.innerHTML='<input class="form-input" placeholder="配件 SKU"><input class="form-input part-qty" placeholder="数量"><span class="unit">个</span><button type="button" class="part-row-btn remove-part-row" aria-label="减少配件">−</button>';partRows.appendChild(next);bindPartRow(next);});row.querySelector('.remove-part-row')?.addEventListener('click',()=>{if(partRows.children.length>1)row.remove();});};
+      bindPartRow(partRows.querySelector('.part-row'));hasPartSelect.addEventListener('change',syncPartRows);syncPartRows();
+    }
     document.querySelectorAll('[data-add-row]').forEach(b=>b.onclick=()=>{const box=$(b.dataset.addRow);const row=document.createElement('div');row.className='form-item full dynamic-row';row.innerHTML=`<label>新增关联</label><div class="inline-control"><input class="form-input" placeholder="请输入 ${b.dataset.addRow==='listingRows'?'平台 / 站点 / 账号 / ASIN':'供应商联系方式'}"><button type="button" class="tool remove-row">删除</button></div>`;box.appendChild(row);row.querySelector('.remove-row').onclick=()=>row.remove();});
   }
   function sectionNav(title,items){return `<nav class="form-nav"><div class="form-nav-title">${title}</div>${items.map((x,i)=>`<div class="form-nav-item${i?'':' active'}" data-target="${x[0]}">${x[1]}</div>`).join('')}</nav>`;}
@@ -134,7 +140,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       <section class="form-section section-anchor" id="identityInfo"><h3>产品标识信息</h3><div class="form-grid">
         ${input('产品名称（中文）','请输入产品中文名称',true)}${input('产品名称（英文）','请输入产品英文名称',true)}${input('SPU','请输入或选择 SPU')}${input('SKU','请输入或生成 SKU')}
         ${select('产品状态',['开发中','未上架','售卖中','已下架'])}${input('自定义型号','请输入自定义型号')}
-        ${item('是否有配件',checks(['无配件','有配件'], 'hasPart', true))}${item('配件SKU与数量',`<div class="inline-control"><input class="form-input" placeholder="配件 SKU"><input class="form-input" placeholder="数量"><span class="unit">个</span></div>`)}
+        ${item('是否有配件',`<select class="form-select" id="hasPartSelect"><option value="no">否</option><option value="yes">是</option></select>`)}${item('配件SKU与数量',`<div class="part-rows" id="partRows"><div class="part-row"><input class="form-input" placeholder="配件 SKU"><input class="form-input part-qty" placeholder="数量"><span class="unit">个</span><button type="button" class="part-row-btn add-part-row" aria-label="增加配件">＋</button></div></div>`,true)}
         ${item('是否是组合产品',checks(['是','否'],'isCombo',true))}
       </div></section>
       <section class="form-section section-anchor" id="descriptionInfo"><h3>产品描述信息</h3><div class="form-grid">
@@ -206,6 +212,16 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 <style>
 /* 表单标签中的括号内容独立换行 */
 .product-form .form-item>label{white-space:normal;line-height:1.35}
+</style>
+<style>
+/* 配件明细按需展示，并支持增减行 */
+.part-rows{display:flex;flex:1;flex-direction:column;gap:8px}
+.part-row{display:flex;align-items:center;gap:8px;min-width:0}
+.part-row .form-input:first-child{min-width:0}
+.part-row .part-qty{max-width:150px;min-width:100px}
+.part-row-btn{width:30px;height:30px;border:1px solid #2876ed;border-radius:5px;background:#fff;color:#2876ed;font-size:20px;line-height:1;cursor:pointer;flex:0 0 30px}
+.part-row-btn:hover{background:#edf4ff}
+.remove-part-row{border-color:#cfd7e0;color:#6f7b88}
 </style>
 </body>
 </html>
