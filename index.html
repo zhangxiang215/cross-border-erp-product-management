@@ -727,12 +727,5 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   new MutationObserver(removeReportNo).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
-<script>
-(function(){
-  const renameOverseasInbound=()=>{document.querySelectorAll('#warehouseView, #warehouseDetailOverlay').forEach(root=>{const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{node.nodeValue=node.nodeValue.replaceAll('已入库体积(m³)','海外仓：入仓体积(m³)').replaceAll('已入库体积','海外仓：入仓体积');});});};
-  renameOverseasInbound();
-  new MutationObserver(renameOverseasInbound).observe(document.body,{childList:true,subtree:true});
-})();
-</script>
 </body>
 </html>
