@@ -252,6 +252,9 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 <style>
 /* 商品名称筛选项增加标签与输入区分隔线 */
 #filters .field-divider{color:#dfe4ea;margin:0 14px 0 4px;font-size:18px;line-height:1}
+#filters .filter:not(.split) .field-label{flex:0 0 128px}
+#filters .filter:not(.split) .inline-filter-input{flex:1 1 0}
+#filters .filter:not(.split) .field-divider{margin:0 6px 0 0}
 </style>
 </body>
 </html>
