@@ -667,5 +667,12 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 .check.checked:after{font-size:12px!important}
 .data-table th:first-child,.data-table td:first-child{width:48px}
 </style>
+<script>
+(function(){
+  const placeCompanyType=()=>{const filter=document.querySelector('#supplyView .supply-filter');if(!filter)return;const input=filter.querySelector('input');const company=[...filter.querySelectorAll('select')].find(select=>select.options[0]?.textContent==='公司类型');if(input&&company&&input.nextElementSibling!==company)input.parentNode.insertBefore(company,input.nextSibling);};
+  placeCompanyType();
+  new MutationObserver(placeCompanyType).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 </html>
