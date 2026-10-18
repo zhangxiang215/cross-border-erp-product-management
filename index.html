@@ -184,6 +184,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const filters=$('filters');if(filters){filters.innerHTML=`<div class="filter split input" data-label="SPU（精准）"><span class="field-label">SPU（精准）</span><input class="inline-filter-input" placeholder="输入 SPU，支持批量查询"></div><div class="filter split input" data-label="SKU（精准）"><span class="field-label">SKU（精准）</span><input class="inline-filter-input" placeholder="输入 SKU，支持批量查询"></div><div class="filter input" data-label="商品名称"><span class="field-label">商品名称</span><input class="inline-filter-input" placeholder="请输入商品名称"></div>`;}
   const productTable=$('productTableCard');if(productTable){const sku=productTable.querySelector('#skuTabBtn'),spu=productTable.querySelector('#spuTabBtn');if(sku&&spu)spu.parentElement.insertBefore(spu,sku);}
   if(productTable){const exportBtn=[...productTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.includes('导出'));const batchBtn=[...productTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.includes('批量更新'));if(exportBtn){exportBtn.id='exportProductBtn';exportBtn.classList.remove('primary');}if(batchBtn){batchBtn.id='batchUpdateBtn';batchBtn.innerHTML='批量更新<span class="down">⌄</span>';}}
+  const spuTable=$('spuTableCard');if(spuTable){const exportSpu=[...spuTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.trim()==='导出');if(exportSpu){exportSpu.id='exportSpuBtn';exportSpu.classList.remove('primary');}}
   if(productTable){productTable.querySelectorAll('.table-tools-right svg:not(#refreshBtn)').forEach(icon=>icon.remove());switchSkuSpu('sku');}
   ['SKU标签批量打印','GPSR标签批量打印','下载队列','刊登文件下载队列'].forEach(t=>[...document.querySelectorAll('button')].filter(b=>b.textContent.trim().includes(t)).forEach(b=>b.remove()));
   $('sideMaterialItem')?.remove();$('materialsView')?.remove();
@@ -237,6 +238,16 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 #productTableCard .table-tools-right{display:contents}
 #productTableCard #refreshBtn{order:13;margin-left:0}
 #productTableCard .table-tools-right svg:not(#refreshBtn){order:14}
+</style>
+<style>
+/* SPU视图工具栏：切换按钮在左，新增/导出/刷新在右 */
+#spuTableCard .table-toolbar{display:flex;align-items:center}
+#spuTableCard #spuBackSkuBtn{order:1}
+#spuTableCard #spuActiveBtn{order:2}
+#spuTableCard #addSpuBtn{order:10;margin-left:auto}
+#spuTableCard #exportSpuBtn{order:11;background:#fff;color:var(--blue)}
+#spuTableCard .table-tools-right{display:contents}
+#spuTableCard #spuRefreshBtn{order:12;margin-left:0}
 </style>
 </body>
 </html>
