@@ -644,5 +644,9 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   document.getElementById('warehouseNavToggle')?.addEventListener('click',()=>warehouseMount('inbound'));document.getElementById('productTopTab')?.addEventListener('click',e=>{if(e.target.closest('.x')&&document.getElementById('warehouseView')?.classList.contains('active')){document.getElementById('warehouseView').classList.remove('active');document.getElementById('homePanel').hidden=false;document.getElementById('productTopTab').classList.remove('active');document.getElementById('productTopTab').style.display='none';document.querySelectorAll('.rail-item').forEach(x=>x.classList.remove('active'));}});
 })();
 </script>
+<style>
+/* 供应模块已移除“供应商入驻”页面入口 */
+.supply-tab[data-supply-tab="onboard"]{display:none!important}
+</style>
 </body>
 </html>
