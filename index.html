@@ -648,5 +648,11 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 /* 供应模块已移除“供应商入驻”页面入口 */
 .supply-tab[data-supply-tab="onboard"]{display:none!important}
 </style>
+<script>
+(function(){
+  const openRiskReport=()=>window.openUnifiedEdit?.({title:'上报风险事件',navTitle:'供应管理',returnView:'supply',saveMessage:'风险事件已提交',sections:[['风险上报信息',`<div class="form-grid"><div class="form-item"><label class="required">供应商名称</label><select class="form-select"><option value="">请选择供应商</option><option>中粤德利科技有限公司</option><option>莆田锁亚首饰设备有限公司</option><option>东莞市波丝猫科技有限公司</option></select></div><div class="form-item"><label class="required">风险类型</label><select class="form-select"><option value="">请选择风险类型</option><option>合作风险</option><option>合规风险</option><option>财务风险</option><option>战略风险</option><option>声誉风险</option></select></div><div class="form-item"><label class="required">风险等级</label><select class="form-select"><option value="">请选择风险等级</option><option>高</option><option>中</option><option>低</option></select></div><div class="form-item"><label>申报人</label><input class="form-input" value="刘露" placeholder="请输入申报人"></div><div class="form-item"><label>风险发生时间</label><input class="form-input" placeholder="请选择风险发生时间"></div><div class="form-item"><label>关联商品 SKU</label><input class="form-input" placeholder="请输入关联商品 SKU"></div><div class="form-item full"><label class="required">风险说明</label><textarea class="form-textarea" placeholder="请详细描述风险发生经过、影响范围及当前情况"></textarea></div><div class="form-item full"><label>处理建议</label><textarea class="form-textarea" placeholder="请输入建议采取的处理措施"></textarea></div><div class="form-item full"><label>风险上报资料</label><div class="upload-box"><span>＋<br>上传文件</span></div></div></div>`]]});
+  document.addEventListener('click',e=>{if(e.target.closest('.supply-report')){e.preventDefault();e.stopImmediatePropagation();openRiskReport();}},true);
+})();
+</script>
 </body>
 </html>
