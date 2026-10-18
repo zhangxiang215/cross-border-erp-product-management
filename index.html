@@ -661,5 +661,11 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   new MutationObserver(()=>renameReporter(document.body)).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+<style>
+/* 全局列表勾选框统一收窄，避免占用过多单元格空间 */
+.check{width:16px!important;height:16px!important;border-radius:4px!important}
+.check.checked:after{font-size:12px!important}
+.data-table th:first-child,.data-table td:first-child{width:48px}
+</style>
 </body>
 </html>
