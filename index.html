@@ -348,6 +348,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 <style>
 /* 配件管理筛选区按钮收窄，避免搜索按钮占用过多空间 */
 #partsView .module-filter .action-btn{height:34px;min-width:72px;padding:0 14px;font-size:13px}
+#partsView .module-filter{grid-template-columns:minmax(260px,2fr) 160px 160px 80px}
+#partsView #partSearchBtn{width:80px;min-width:80px;padding:0}
 #partsView .module-page-head .module-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
 </style>
 </body>
