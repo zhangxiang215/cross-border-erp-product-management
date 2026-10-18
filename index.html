@@ -121,6 +121,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 
   function bindEnhancedForm(){
     document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
+    document.querySelectorAll('#logisticsInfo input[readonly]').forEach(input=>{input.readOnly=false;input.value='';input.placeholder='请输入重量';});
     document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
     document.querySelectorAll('.link-test').forEach(b=>b.onclick=()=>{const v=b.parentElement.querySelector('input').value.trim();toast2(v?`已打开链接：${v}`:'请先填写链接地址');});
     const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
