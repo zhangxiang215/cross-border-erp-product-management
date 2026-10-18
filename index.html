@@ -110,7 +110,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const $=id=>document.getElementById(id);
   const esc=v=>String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
   const toast2=msg=>{const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(window.__t2);window.__t2=setTimeout(()=>el.classList.remove('show'),1800);};
-  const item=(label,control,full=false)=>`<div class="form-item${full?' full':''}"><label>${label}</label>${control}</div>`;
+  const formatLabel=label=>String(label).replace(/（/g,'<br>（').replace(/\(/g,'<br>(');
+  const item=(label,control,full=false)=>`<div class="form-item${full?' full':''}"><label>${formatLabel(label)}</label>${control}</div>`;
   const input=(label,ph='',required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<input class="form-input" placeholder="${ph}" ${extra}>`,full);
   const select=(label,opts,required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<select class="form-select" ${extra}>${opts.map((x,i)=>`<option value="${i?'x':''}">${x}</option>`).join('')}</select>`,full);
   const textarea=(label,ph='',required=false,full=true)=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<textarea class="form-textarea" placeholder="${ph}"></textarea>`,full);
@@ -201,6 +202,10 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 /* 商品名称列主、副文字统一左对齐 */
 .data-table td:nth-child(3){text-align:left}
 .data-table td:nth-child(3) .product-name,.data-table td:nth-child(3) .product-type{text-align:left}
+</style>
+<style>
+/* 表单标签中的括号内容独立换行 */
+.product-form .form-item>label{white-space:normal;line-height:1.35}
 </style>
 </body>
 </html>
