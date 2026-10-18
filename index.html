@@ -464,5 +464,9 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 /* 顶部页签按实际打开的模块显示，关闭后回到主页 */
 #productTopTab{display:none}
 </style>
+<style>
+/* 库存新增/编辑抽屉避开展开后的左侧模块导航，避免标题和字段被遮挡 */
+.inventory-drawer-panel{inset:0 0 0 154px}
+</style>
 </body>
 </html>
