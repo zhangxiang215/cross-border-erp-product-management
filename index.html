@@ -663,9 +663,10 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 </script>
 <style>
 /* 全局列表勾选框统一收窄，避免占用过多单元格空间 */
-.check{width:16px!important;height:16px!important;border-radius:4px!important}
-.check.checked:after{font-size:12px!important}
-.data-table th:first-child,.data-table td:first-child{width:48px}
+.check{width:12px!important;height:12px!important;border-radius:3px!important}
+.check.checked:after{font-size:9px!important}
+.data-table th:first-child,.data-table td:first-child{width:42px!important;max-width:42px!important;padding-left:4px!important;padding-right:4px!important}
+.inventory-table th:first-child,.inventory-table td:first-child,.purchase-table th:first-child,.purchase-table td:first-child,.supply-table th:first-child,.supply-table td:first-child,.warehouse-table th:first-child,.warehouse-table td:first-child{width:42px!important;max-width:42px!important;padding-left:4px!important;padding-right:4px!important}
 </style>
 <script>
 (function(){
