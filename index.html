@@ -181,7 +181,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   window.showForm=function(mode,p){enterProductPage();if(mode==='part')buildPartForm();else buildMvpForm();$('formTitle').textContent=mode==='part'?'新增 / 编辑配件SKU':mode==='spu'?(p?'编辑SPU':'新增SPU'):mode==='edit'?'编辑商品':'新增商品';$('formMask').classList.add('show');document.querySelector('.left-rail').classList.add('product-open');$('sideListItem').classList.toggle('active',mode!=='part');$('sidePartsItem').classList.toggle('active',mode==='part');$('sideMaterialItem')?.classList.remove('active');if(p){const n=$('formName');if(n)n.value=p.name;}};
 
   // 按附件要求收敛商品列表筛选项，仅保留 SPU、SKU、商品名称，并互换 SPU/SKU顺序。
-  const filters=$('filters');if(filters){filters.innerHTML=`<div class="filter split input" data-label="SPU（精准）"><span class="field-label">SPU（精准）</span><input class="inline-filter-input" placeholder="输入 SPU，支持批量查询"></div><div class="filter split input" data-label="SKU（精准）"><span class="field-label">SKU（精准）</span><input class="inline-filter-input" placeholder="输入 SKU，支持批量查询"></div><div class="filter input" data-label="商品名称"><span class="field-label">商品名称</span><input class="inline-filter-input" placeholder="请输入商品名称"></div>`;}
+  const filters=$('filters');if(filters){filters.innerHTML=`<div class="filter split input" data-label="SPU"><span class="field-label">SPU</span><input class="inline-filter-input" placeholder="输入 SPU，支持批量查询"></div><div class="filter split input" data-label="SKU"><span class="field-label">SKU</span><input class="inline-filter-input" placeholder="输入 SKU，支持批量查询"></div><div class="filter input" data-label="商品名称"><span class="field-label">商品名称</span><span class="field-divider">｜</span><input class="inline-filter-input" placeholder="请输入商品名称"></div>`;}
   const productTable=$('productTableCard');if(productTable){const sku=productTable.querySelector('#skuTabBtn'),spu=productTable.querySelector('#spuTabBtn');if(sku&&spu)spu.parentElement.insertBefore(spu,sku);}
   if(productTable){const exportBtn=[...productTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.includes('导出'));const batchBtn=[...productTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.includes('批量更新'));if(exportBtn){exportBtn.id='exportProductBtn';exportBtn.classList.remove('primary');}if(batchBtn){batchBtn.id='batchUpdateBtn';batchBtn.innerHTML='批量更新<span class="down">⌄</span>';}}
   const spuTable=$('spuTableCard');if(spuTable){const exportSpu=[...spuTable.querySelectorAll('.table-toolbar .tool')].find(b=>b.textContent.trim()==='导出');if(exportSpu){exportSpu.id='exportSpuBtn';exportSpu.classList.remove('primary');}}
@@ -248,6 +248,10 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 #spuTableCard #exportSpuBtn{order:11;background:#fff;color:var(--blue)}
 #spuTableCard .table-tools-right{display:contents}
 #spuTableCard #spuRefreshBtn{order:12;margin-left:0}
+</style>
+<style>
+/* 商品名称筛选项增加标签与输入区分隔线 */
+#filters .field-divider{color:#dfe4ea;margin:0 14px 0 4px;font-size:18px;line-height:1}
 </style>
 </body>
 </html>
