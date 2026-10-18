@@ -124,6 +124,21 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     document.querySelectorAll('#logisticsInfo input[readonly]').forEach(input=>{input.readOnly=false;input.value='';input.placeholder='请输入重量';});
     document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
     document.querySelectorAll('.link-test').forEach(b=>b.onclick=()=>{const v=b.parentElement.querySelector('input').value.trim();toast2(v?`已打开链接：${v}`:'请先填写链接地址');});
+    const hasOuterBoxSelect=$('hasOuterBoxSelect');
+    if(hasOuterBoxSelect){
+      const outerLabels=['外箱材质','装箱规格（PCS）','外箱尺寸','物流标识'];
+      const outerFields=[...document.querySelectorAll('#logisticsInfo .form-item')].filter(it=>outerLabels.includes(it.querySelector('label')?.textContent.trim()));
+      const syncOuterBox=()=>outerFields.forEach(it=>{it.style.display=hasOuterBoxSelect.value==='yes'?'flex':'none';});
+      hasOuterBoxSelect.addEventListener('change',syncOuterBox);syncOuterBox();
+    }
+    const markSelect=$('logisticsMarkSelect');
+    if(markSelect){
+      const trigger=markSelect.querySelector('.multi-select-trigger');
+      const value=markSelect.querySelector('.multi-select-value');
+      trigger.addEventListener('click',e=>{e.stopPropagation();markSelect.classList.toggle('open');});
+      markSelect.querySelectorAll('.multi-select-menu input').forEach(input=>input.addEventListener('change',()=>{const values=[...markSelect.querySelectorAll('.multi-select-menu input:checked')].map(x=>x.value);value.textContent=values.length?values.join('、'):'请选择物流标识';}));
+      document.addEventListener('click',()=>markSelect.classList.remove('open'));
+    }
     const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
     if(hasPartSelect&&partRows){
       const syncPartRows=()=>{partRows.closest('.form-item').style.display=hasPartSelect.value==='yes'?'flex':'none';};
@@ -158,7 +173,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       </div></section>
       <section class="form-section section-anchor" id="logisticsInfo"><h3>物流包装信息</h3><div class="form-grid">
         ${item('包装图片',upload('包装图片',true))}${item('箱子尺寸标识图',upload('箱子尺寸标识图',true))}${item('内衬图片',upload('内衬图片',true))}
-        ${input('单个SKU包装尺寸','长 × 宽 × 高 cm')}${input('单个包装重量','请输入包装重量 kg')}${input('包装箱材质','请输入包装箱材质')}${input('内衬','请输入内衬材质')}${input('加固方式','请输入加固方式')}${input('体积重','系统计算',false,false,'readonly')}${input('计费重','系统计算',false,false,'readonly')}${item('是否有外箱',checks(['有','无'],'outerBox',true))}${input('外箱材质','请输入外箱材质')}${input('装箱规格（PCS）','请输入装箱数量')}${input('外箱尺寸','长 × 宽 × 高 cm')}${item('物流标识',checks(['带电','带磁','液体','粉末','均无'],'logisticsMark'))}${textarea('物流备注','请输入物流备注',false,true)}
+        ${input('单个SKU包装尺寸','长 × 宽 × 高 cm')}${input('单个包装重量','请输入包装重量 kg')}${input('包装箱材质','请输入包装箱材质')}${input('内衬','请输入内衬材质')}${input('加固方式','请输入加固方式')}${input('体积重','系统计算',false,false,'readonly')}${input('计费重','系统计算',false,false,'readonly')}${item('是否有外箱',`<select class="form-select" id="hasOuterBoxSelect"><option value="no">否</option><option value="yes">是</option></select>`)}${input('外箱材质','请输入外箱材质')}${input('装箱规格（PCS）','请输入装箱数量')}${input('外箱尺寸','长 × 宽 × 高 cm')}${item('物流标识',`<div class="multi-select" id="logisticsMarkSelect"><button type="button" class="multi-select-trigger"><span class="multi-select-value">请选择物流标识</span><span class="multi-select-arrow">⌄</span></button><div class="multi-select-menu"><label><input type="checkbox" value="带电">带电</label><label><input type="checkbox" value="带磁">带磁</label><label><input type="checkbox" value="液体">液体</label><label><input type="checkbox" value="粉末">粉末</label><label><input type="checkbox" value="均无">均无</label></div></div>`)}${textarea('物流备注','请输入物流备注',false,true)}
       </div></section>
       <section class="form-section section-anchor" id="supplierInfo"><h3>供应商管理</h3><div class="supplier-block"><h4>主供应商</h4><div class="form-grid">${select('供应商',['请选择主供应商','深圳市恒温电器有限公司','义乌市优品供应链'],true)}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div><div class="supplier-block"><h4>预备供应商</h4><div class="form-grid">${select('供应商',['请选择预备供应商','深圳市恒温电器有限公司','义乌市优品供应链'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div></section>
       <section class="form-section section-anchor" id="costInfo"><h3>成本与定价</h3><div class="form-grid">${input('采购成本','请输入采购成本')}${input('配件成本','请输入配件成本')}${input('包装成本','请输入包装成本')}${input('其他成本','请输入其他成本')}${input('单件成本合计','系统计算',false,false,'readonly')}${input('站点售价','请输入站点售价')}${input('利润状态','系统计算',false,false,'readonly')}${textarea('定价备注','请输入定价备注',false,true)}</div></section>
@@ -275,6 +290,16 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 <style>
 /* 刊登信息中的主类目、次类目输入框缩短 */
 #listingInfo .listing-category-input{flex:0 1 260px;width:260px;max-width:260px}
+</style>
+<style>
+/* 外箱条件字段与物流标识下拉多选 */
+.multi-select{position:relative;flex:1;min-width:0}
+.multi-select-trigger{width:100%;height:38px;border:1px solid #d8dee6;border-radius:6px;background:#fff;color:#606b78;padding:0 12px;display:flex;align-items:center;justify-content:space-between;font:inherit;cursor:pointer}
+.multi-select-menu{display:none;position:absolute;left:0;right:0;top:42px;z-index:12;background:#fff;border:1px solid #d8dee6;border-radius:6px;box-shadow:0 8px 18px rgba(39,53,68,.18);padding:8px}
+.multi-select.open .multi-select-menu{display:grid;gap:8px}
+.multi-select-menu label{display:flex;align-items:center;gap:8px;padding:4px 6px;color:#596575;cursor:pointer}
+.multi-select-menu input{accent-color:#2876ed}
+.multi-select-arrow{line-height:1;color:#8a96a5}
 </style>
 </body>
 </html>
