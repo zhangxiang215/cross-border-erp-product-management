@@ -114,6 +114,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const item=(label,control,full=false)=>`<div class="form-item${full?' full':''}"><label>${formatLabel(label)}</label>${control}</div>`;
   const input=(label,ph='',required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<input class="form-input" placeholder="${ph}" ${extra}>`,full);
   const select=(label,opts,required=false,full=false,extra='')=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<select class="form-select" ${extra}>${opts.map((x,i)=>`<option value="${i?'x':''}">${x}</option>`).join('')}</select>`,full);
+  const multiSelect=(label,opts,id,full=false)=>item(label,`<div class="multi-select" id="${id}"><button type="button" class="multi-select-trigger"><span class="multi-select-value">请选择${label}</span><span class="multi-select-arrow">⌄</span></button><div class="multi-select-menu">${opts.map(x=>`<label><input type="checkbox" value="${x}">${x}</label>`).join('')}</div></div>`,full);
   const textarea=(label,ph='',required=false,full=true)=>item(`${required?'<span class="required">':''}${label}${required?'</span>':''}`,`<textarea class="form-textarea" placeholder="${ph}"></textarea>`,full);
   const checks=(arr,name,radio=false)=>`<div class="check-row">${arr.map((x,i)=>`<label class="form-check"><input type="${radio?'radio':'checkbox'}" name="${name}" ${i===arr.length-1&&!radio?'checked':''}>${x}</label>`).join('')}</div>`;
   const upload=(title,multi=false)=>`<div class="upload-group"><div class="upload-box file-trigger" data-title="${title}"><span>＋<br>${multi?'上传图片':'上传文件'}</span></div><div class="upload-name">${multi?'支持单张 / 多张':'点击选择文件'}</div></div>`;
@@ -131,14 +132,13 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       const syncOuterBox=()=>outerFields.forEach(it=>{it.style.display=hasOuterBoxSelect.value==='yes'?'flex':'none';});
       hasOuterBoxSelect.addEventListener('change',syncOuterBox);syncOuterBox();
     }
-    const markSelect=$('logisticsMarkSelect');
-    if(markSelect){
+    document.querySelectorAll('.multi-select').forEach(markSelect=>{
       const trigger=markSelect.querySelector('.multi-select-trigger');
       const value=markSelect.querySelector('.multi-select-value');
-      trigger.addEventListener('click',e=>{e.stopPropagation();markSelect.classList.toggle('open');});
-      markSelect.querySelectorAll('.multi-select-menu input').forEach(input=>input.addEventListener('change',()=>{const values=[...markSelect.querySelectorAll('.multi-select-menu input:checked')].map(x=>x.value);value.textContent=values.length?values.join('、'):'请选择物流标识';}));
-      document.addEventListener('click',()=>markSelect.classList.remove('open'));
-    }
+      trigger.addEventListener('click',e=>{e.stopPropagation();document.querySelectorAll('.multi-select.open').forEach(x=>{if(x!==markSelect)x.classList.remove('open');});markSelect.classList.toggle('open');});
+      markSelect.querySelectorAll('.multi-select-menu input').forEach(input=>input.addEventListener('change',()=>{const values=[...markSelect.querySelectorAll('.multi-select-menu input:checked')].map(x=>x.value);value.textContent=values.length?values.join('、'):`请选择${markSelect.closest('.form-item')?.querySelector('label')?.textContent.trim()||'选项'}`;}));
+    });
+    document.addEventListener('click',()=>document.querySelectorAll('.multi-select.open').forEach(x=>x.classList.remove('open')));
     const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
     if(hasPartSelect&&partRows){
       const syncPartRows=()=>{partRows.closest('.form-item').style.display=hasPartSelect.value==='yes'?'flex':'none';};
@@ -165,8 +165,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       </div></section>
       <section class="form-section section-anchor" id="listingInfo"><h3>产品刊登信息</h3><div class="form-grid">
         ${item('产品精修主图',upload('产品精修主图',true))}${item('产品详情页（A+）',upload('产品详情页（A+）',true))}
-        ${select('平台类目',['Amazon'])}${item('主类目','<input class="form-input listing-category-input" placeholder="请输入主类目">')}${item('次类目','<input class="form-input listing-category-input" placeholder="请输入次类目">')}
-        ${select('售卖市场',['美国站','欧洲站','中东站'])}${select('售卖方式',['FBA','FBM','其他'])}
+        ${multiSelect('平台类目',['Amazon','Temu','eBay','独立站'],'platformCategorySelect')}${item('主类目','<input class="form-input listing-category-input" placeholder="请输入主类目">')}${item('次类目','<input class="form-input listing-category-input" placeholder="请输入次类目">')}
+        ${multiSelect('售卖市场',['美国站','欧洲站','中东站'],'salesMarketSelect')}${multiSelect('售卖方式',['FBA','FBM','其他'],'salesMethodSelect')}
         ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格')}${input('平台限价-大促活动价格','请输入价格')}
         <div class="form-item full"><label>Listing映射</label><div id="listingRows" class="dynamic-list"><div class="inline-control"><input class="form-input" placeholder="平台 / 站点 / 账号 / ASIN / MSKU"><button type="button" class="tool" data-add-row="listingRows">＋增加一条</button></div></div></div>
         ${linkInput('产品说明书超链接','请输入说明书链接')}${linkInput('产品认证证书超链接','请输入认证证书链接')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
