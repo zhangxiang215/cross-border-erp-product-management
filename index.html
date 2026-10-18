@@ -261,5 +261,11 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 #productTableCard #exportProductBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 #productTableCard #exportProductBtn .down{margin-left:0;line-height:1;vertical-align:initial;transform:none}
 </style>
+<style>
+/* 筛选框整体收窄，三组标签分隔线统一前移 */
+#filters .filter{flex:0 1 250px}
+#filters .filter.split .field-label{flex-basis:76px}
+#filters .filter:not(.split) .field-label{flex-basis:96px}
+</style>
 </body>
 </html>
