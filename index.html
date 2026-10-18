@@ -451,7 +451,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .inventory-number{height:40px;display:flex;min-width:0;border:1px solid #d8dee6;border-radius:6px;background:#fff;overflow:hidden}
 .inventory-number:focus-within{border-color:var(--blue);box-shadow:0 0 0 2px rgba(35,133,247,.1)}
 .inventory-number input{width:112px;height:38px;border:0;padding:0 12px;color:#596575;font:inherit;outline:none;min-width:0}
-.inventory-spin{width:28px;display:flex;flex-direction:column;border-left:1px solid #d8dee6;background:#fff}
+.inventory-spin{width:28px;display:none;flex-direction:column;border-left:1px solid #d8dee6;background:#fff}
+.inventory-number:focus-within .inventory-spin{display:flex}
 .inventory-step{height:19px;padding:0;border:0;background:#fff;color:#8f9aa6;line-height:17px;font-size:14px;cursor:pointer}
 .inventory-step:hover{background:#f0f5fb;color:var(--blue)}
 .inventory-realtime .inventory-control{min-width:0}
