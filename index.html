@@ -859,5 +859,13 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   Object.keys(names).forEach(function(key){var box=document.getElementById(key+'SideSubnav');if(!box)return;var title=document.createElement('span');title.className='simple-side-title';title.textContent=names[key];box.insertBefore(title,box.firstChild);});
 })();
 </script>
+<script>
+(function(){
+  var names=['product','inventory','purchase','supply','warehouse'];
+  var boxes=[].slice.call(document.querySelectorAll('.simple-side-subnav'));
+  var style=document.createElement('style');style.textContent='.simple-side-subnav{display:none!important}.left-rail.product-open .simple-side-subnav[data-side-module="product"],.left-rail.inventory-open .simple-side-subnav[data-side-module="inventory"],.left-rail.purchase-open .simple-side-subnav[data-side-module="purchase"],.left-rail.supply-open .simple-side-subnav[data-side-module="supply"],.left-rail.warehouse-open .simple-side-subnav[data-side-module="warehouse"]{display:block!important}';document.head.appendChild(style);
+  boxes.forEach(function(box,i){var key=names[i];if(!key)return;box.dataset.sideModule=key;box.id=key+'SideSubnav';if(!box.querySelector('.simple-side-title')){var title=document.createElement('span');title.className='simple-side-title';title.textContent={product:'产品',inventory:'库存',purchase:'采购',supply:'供应',warehouse:'仓储'}[key];box.insertBefore(title,box.firstChild);}});
+})();
+</script>
 </body>
 </html>
