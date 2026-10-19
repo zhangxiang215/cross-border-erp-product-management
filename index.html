@@ -149,7 +149,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     const comboRadios=[...document.querySelectorAll('input[name="isCombo"]')],comboRows=$('comboRows');
     if(comboRadios.length&&comboRows){
       const syncComboRows=()=>{const yes=comboRadios.find(r=>r.checked&&r.value==='yes');comboRows.closest('.form-item').style.display=yes?'flex':'none';};
-      const bindComboRow=row=>{row.querySelector('.add-combo-row')?.addEventListener('click',()=>{const next=document.createElement('div');next.className='combo-row';next.innerHTML='<input class="form-input" placeholder="请输入组合产品 SKU"><button type="button" class="combo-row-btn add-combo-row" aria-label="增加组合产品 SKU">＋</button><button type="button" class="combo-row-btn remove-combo-row" aria-label="减少组合产品 SKU">−</button>';comboRows.appendChild(next);bindComboRow(next);});row.querySelector('.remove-combo-row')?.addEventListener('click',()=>{if(comboRows.children.length>1)row.remove();});};
+      const bindComboRow=row=>{if(!row.querySelector('.remove-combo-row')){const remove=document.createElement('button');remove.type='button';remove.className='combo-row-btn remove-combo-row';remove.setAttribute('aria-label','减少组合产品 SKU');remove.textContent='−';row.appendChild(remove);}row.querySelector('.add-combo-row')?.addEventListener('click',()=>{const next=document.createElement('div');next.className='combo-row';next.innerHTML='<input class="form-input" placeholder="请输入组合产品 SKU"><button type="button" class="combo-row-btn add-combo-row" aria-label="增加组合产品 SKU">＋</button><button type="button" class="combo-row-btn remove-combo-row" aria-label="减少组合产品 SKU">−</button>';comboRows.appendChild(next);bindComboRow(next);});row.querySelector('.remove-combo-row')?.addEventListener('click',()=>{if(comboRows.children.length>1)row.remove();});};
       comboRadios.forEach(r=>r.addEventListener('change',syncComboRows));bindComboRow(comboRows.querySelector('.combo-row'));syncComboRows();
     }
     document.querySelectorAll('[data-add-row]').forEach(b=>b.onclick=()=>{const box=$(b.dataset.addRow);const row=document.createElement('div');row.className='form-item full dynamic-row';row.innerHTML=`<label>新增关联</label><div class="inline-control"><input class="form-input" placeholder="请输入 ${b.dataset.addRow==='listingRows'?'平台 / 站点 / 账号 / ASIN':'供应商联系方式'}"><button type="button" class="tool remove-row">删除</button></div>`;box.appendChild(row);row.querySelector('.remove-row').onclick=()=>row.remove();});
@@ -737,10 +737,11 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 <style>
 .combo-rows{display:flex;flex:1;flex-direction:column;gap:8px}
 .combo-row{display:flex;align-items:center;gap:8px;min-width:0}
-.combo-row .form-input{min-width:0}
+.combo-row .form-input{width:360px;max-width:360px;flex:0 0 360px;min-width:0}
 .combo-row-btn{width:30px;height:30px;border:1px solid #2876ed;border-radius:5px;background:#fff;color:#2876ed;font-size:20px;line-height:1;cursor:pointer;flex:0 0 30px}
 .combo-row-btn:hover{background:#edf4ff}
 .combo-row-btn.remove{border-color:#cfd7e0;color:#6f7b88}
+@media(max-width:1450px){.combo-row .form-input{width:280px;max-width:280px;flex-basis:280px}}
 </style>
 </body>
 </html>
