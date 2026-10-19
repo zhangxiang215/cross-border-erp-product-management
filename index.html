@@ -804,6 +804,7 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 </script>
 <script>
 (function(){
+  return;
   var rail=document.querySelector('.left-rail');
   var configs={
     product:{open:'product-open',items:[['商品管理','sideListItem'],['配件管理','sidePartsItem'],['物料管理','sideMaterialItem']]},
@@ -833,12 +834,21 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 <style>
 #sideMaterialItem{display:none!important}
 .rail-caret{display:none!important}
+.product-subnav,#purchaseSideSubnav{display:none!important}
+.simple-side-subnav{display:none;width:154px;background:#0d3047;padding:4px 0 10px;border-left:3px solid #2385f7}
+.left-rail.product-open,.left-rail.inventory-open,.left-rail.purchase-open,.left-rail.supply-open,.left-rail.warehouse-open{width:154px;align-items:flex-start}
+.left-rail.product-open .rail-item,.left-rail.inventory-open .rail-item,.left-rail.purchase-open .rail-item,.left-rail.supply-open .rail-item,.left-rail.warehouse-open .rail-item{width:154px;flex-direction:row;justify-content:flex-start;padding-left:18px;gap:12px}
+.left-rail.product-open .simple-side-subnav,.left-rail.inventory-open .simple-side-subnav,.left-rail.purchase-open .simple-side-subnav,.left-rail.supply-open .simple-side-subnav,.left-rail.warehouse-open .simple-side-subnav{display:block}
+.simple-side-item{height:38px;padding-left:50px;display:flex;align-items:center;color:#aebdca;font-size:13px;cursor:pointer}.simple-side-item:hover,.simple-side-item.active{color:#fff;background:#17445f}
 </style>
 <script>
 (function(){
-  var classes=['product-open','inventory-open','purchase-open','supply-open','warehouse-open','mega-open'];
-  function closeSidebars(){var rail=document.querySelector('.left-rail');if(!rail)return;classes.forEach(function(cls){rail.classList.remove(cls);});}
-  window.addEventListener('load',closeSidebars);
+  var rail=document.querySelector('.left-rail'),classes=['product-open','inventory-open','purchase-open','supply-open','warehouse-open'];
+  var data={inventory:[['实时库存','realtime'],['物理仓库','physical'],['每日库存快照','snapshot']],purchase:[['货源管理','source'],['价格管理','price'],['计划管理','plan'],['备货单管理','stock'],['采购单管理','order'],['结算管理','settle'],['合同管理','contract'],['对账管理','reconcile'],['订单交付','delivery'],['订单异常','exception'],['单据管理','docs']],supply:[['供应商管理','info'],['供应商风险','risk']],warehouse:[['入库管理','inbound'],['质检管理','diff'],['质检历史记录','history'],['采购处理','purchase'],['退货管理','returns']]};
+  function closeSidebars(){classes.forEach(function(cls){rail.classList.remove(cls);});}
+  function side(key){var item=document.getElementById(key+'NavToggle');if(!item)return null;var box=item.nextElementSibling;if(!box||!box.classList.contains('simple-side-subnav')){box=document.createElement('div');box.className='simple-side-subnav';item.parentNode.insertBefore(box,item.nextSibling);}box.innerHTML=(key==='product'?[['商品管理','sideListItem'],['配件管理','sidePartsItem']]:data[key]).map(function(x){return '<div class="simple-side-item" data-side-key="'+x[1]+'">'+x[0]+'</div>';}).join('');return box;}
+  function go(key,value){if(key==='product'){document.getElementById(value)?.click();return;}if(key==='purchase'&&window.renderPurchaseFull){window.renderPurchaseFull(value,0);return;}var railItem=document.getElementById(key+'NavToggle');if(!railItem)return;window.__simpleSideNav=true;closeSidebars();railItem.click();window.__simpleSideNav=false;setTimeout(function(){var view=document.getElementById(key+'View');if(!view)return;var map={实时库存:'realtime',物理仓库:'physical',每日库存快照:'snapshot',供应商管理:'info',供应商风险:'risk',入库管理:'inbound',质检管理:'diff',质检历史记录:'history',采购处理:'purchase',退货管理:'returns'};var type=key==='inventory'?'inventory':key==='supply'?'supply':'warehouse';view.querySelector('[data-'+type+'-tab="'+(map[value]||value)+'"]')?.click();},80);}
+  var boxes={};['product','inventory','purchase','supply','warehouse'].forEach(function(key){boxes[key]=side(key);var item=document.getElementById(key+'NavToggle');if(!item)return;item.addEventListener('click',function(e){if(window.__simpleSideNav)return;e.preventDefault();e.stopImmediatePropagation();var open=rail.classList.contains(key+'-open');closeSidebars();if(!open){rail.classList.add(key+'-open');if(key!=='product'){window.__simpleSideNav=true;item.click();window.__simpleSideNav=false;rail.classList.add(key+'-open');}}},true);boxes[key]?.querySelectorAll('.simple-side-item').forEach(function(x){x.onclick=function(){go(key,x.dataset.sideKey);};});});
   document.addEventListener('click',function(e){if(!e.target.closest('.left-rail'))closeSidebars();});
 })();
 </script>
