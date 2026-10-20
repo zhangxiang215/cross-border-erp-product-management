@@ -37,6 +37,9 @@
 /* Prevent stale product content from resurfacing while any procurement page is active. */
 main:has(#purchaseView.active) #productPages{display:none!important}
 main:has(#purchaseView.active) #homePanel{display:none!important}
+/* Tertiary pages must sit above every rail and side navigation layer. */
+.form-mask.show,.drawer-mask.show,.purchase-source-page.active,#genericActionPage.active,#purchaseActionPage.active,#purchaseCreatePage.active,#supplyRiskPage.active,#warehouseDetailPage.active{z-index:2000!important}
+.form-mask.show .product-form{inset:0!important;border-radius:0!important}
 </style>
 </head>
 <body>
