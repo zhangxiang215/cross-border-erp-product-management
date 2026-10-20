@@ -163,6 +163,15 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
   text-overflow:clip;
 }
 .filter-card .filter.split .inline-filter-input::placeholder { color:#777; opacity:1; }
+/* 配件管理列表：字段之间增加统一的浅色竖向分割线 */
+#partsView .module-table th,
+#partsView .module-table td {
+  border-right:1px solid #e5e8ed;
+}
+#partsView .module-table th:last-child,
+#partsView .module-table td:last-child {
+  border-right:0;
+}
 /* 全部列表勾选框统一为商品管理列表的轻边框规格 */
 .data-table .check,
 .module-table .check,
