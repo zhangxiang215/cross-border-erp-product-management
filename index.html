@@ -1821,5 +1821,125 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 })();
 </script>
 <script>window.__tailScriptLoaded=true;</script>
+<style>
+/* 采购模块筛选栏最终统一规范：与商品管理页保持同一控件高度、按钮尺寸和单行布局。 */
+.purchase-filter,
+.purchase-full-filter {
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:12px;
+  padding:18px 22px 20px;
+  overflow-x:auto;
+  box-shadow:var(--shadow);
+}
+.purchase-filter > input,
+.purchase-filter > select,
+.purchase-filter > .purchase-range,
+.purchase-full-filter > input,
+.purchase-full-filter > select,
+.purchase-full-filter > .purchase-range {
+  flex:0 0 220px;
+  width:220px;
+  min-width:220px;
+  max-width:220px;
+}
+.purchase-filter > input:nth-child(2),
+.purchase-full-filter > input:nth-child(2) {
+  flex-basis:300px;
+  width:300px;
+  min-width:300px;
+  max-width:300px;
+}
+.purchase-filter > .purchase-range {
+  flex-basis:300px;
+  width:300px;
+  min-width:300px;
+  max-width:300px;
+}
+.purchase-filter-actions,
+.purchase-full-actions {
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+  gap:12px;
+  margin-left:auto;
+  padding-top:0;
+  white-space:nowrap;
+}
+.purchase-filter .action-btn,
+.purchase-full-filter .action-btn,
+.purchase-filter > .action-btn,
+.purchase-full-filter > .action-btn {
+  flex:0 0 110px;
+  width:110px;
+  min-width:110px;
+  max-width:110px;
+  height:39px;
+  min-height:39px;
+  padding:0 16px;
+  border-radius:7px;
+  line-height:37px;
+  font-size:15px;
+}
+/* 五个筛选字段的采购子页面：压缩字段宽度，但仍保持按钮同排。 */
+.purchase-full-filter:has(> :nth-child(6)) > input,
+.purchase-full-filter:has(> :nth-child(6)) > select,
+.purchase-full-filter:has(> :nth-child(6)) > .purchase-range {
+  flex-basis:170px;
+  width:170px;
+  min-width:170px;
+  max-width:170px;
+}
+.purchase-full-filter:has(> :nth-child(6)) > input:first-child,
+.purchase-full-filter:has(> :nth-child(6)) > select:first-child {
+  flex-basis:190px;
+  width:190px;
+  min-width:190px;
+  max-width:190px;
+}
+.purchase-full-filter:has(> :nth-child(6)) > input:nth-child(2),
+.purchase-full-filter:has(> :nth-child(6)) > select:nth-child(2) {
+  flex-basis:260px;
+  width:260px;
+  min-width:260px;
+  max-width:260px;
+}
+@media (max-width:1500px) {
+  .purchase-filter,
+  .purchase-full-filter {
+    padding-left:22px;
+    padding-right:22px;
+  }
+  .purchase-filter > input,
+  .purchase-filter > select,
+  .purchase-filter > .purchase-range,
+  .purchase-full-filter > input,
+  .purchase-full-filter > select,
+  .purchase-full-filter > .purchase-range {
+    flex-basis:200px;
+    width:200px;
+    min-width:200px;
+    max-width:200px;
+  }
+  .purchase-filter > input:nth-child(2),
+  .purchase-full-filter > input:nth-child(2),
+  .purchase-filter > .purchase-range {
+    flex-basis:260px;
+    width:260px;
+    min-width:260px;
+    max-width:260px;
+  }
+  .purchase-filter .action-btn,
+  .purchase-full-filter .action-btn,
+  .purchase-filter > .action-btn,
+  .purchase-full-filter > .action-btn {
+    flex-basis:110px;
+    width:110px;
+    min-width:110px;
+    max-width:110px;
+  }
+}
+</style>
 </body>
 </html>
