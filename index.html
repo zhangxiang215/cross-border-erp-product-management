@@ -166,8 +166,10 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 /* SPU/SKU 批量查询提示必须完整显示，不使用输入框省略号 */
 #filters .filter.split:nth-child(1),
 #filters .filter.split:nth-child(2) {
-  flex:1 1 300px;
-  min-width:300px;
+  flex:0 1 250px;
+  width:250px;
+  min-width:220px;
+  max-width:250px;
 }
 #filters .filter.split:nth-child(1) .inline-filter-input,
 #filters .filter.split:nth-child(2) .inline-filter-input {
