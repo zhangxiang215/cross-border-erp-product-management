@@ -43,6 +43,137 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 .form-mask.show,.drawer-mask.show,.purchase-source-page.active,#genericActionPage.active,#purchaseActionPage.active,#purchaseCreatePage.active,#supplyRiskPage.active,#warehouseDetailPage.active{z-index:2000!important}
 .form-mask.show .product-form{inset:0!important;border-radius:0!important}
 </style>
+<style>
+/* 全局筛选栏规范：以商品管理页的控件尺寸、边框和按钮为准 */
+.filter-card .filter,
+.module-filter input,
+.module-filter select,
+.purchase-full-filter input,
+.purchase-full-filter select,
+.supply-filter input,
+.supply-filter select,
+.warehouse-filter input,
+.warehouse-filter select,
+.inventory-filter input,
+.inventory-filter select,
+.inventory-filter .inventory-control,
+.inventory-filter .inventory-range input {
+  height:45px;
+  min-height:45px;
+  border:1px solid #d9dee5;
+  border-radius:7px;
+  background:#fff;
+  color:#4d5966;
+  font:inherit;
+  outline:none;
+}
+.module-filter input,
+.module-filter select,
+.purchase-full-filter input,
+.purchase-full-filter select,
+.supply-filter input,
+.supply-filter select,
+.warehouse-filter input,
+.warehouse-filter select,
+.inventory-filter input,
+.inventory-filter select,
+.inventory-filter .inventory-control,
+.inventory-filter .inventory-range input { padding:0 15px; }
+.filter-card .filter.focus,
+.module-filter input:focus,
+.module-filter select:focus,
+.purchase-full-filter input:focus,
+.purchase-full-filter select:focus,
+.supply-filter input:focus,
+.supply-filter select:focus,
+.warehouse-filter input:focus,
+.warehouse-filter select:focus,
+.inventory-filter input:focus,
+.inventory-filter select:focus,
+.inventory-filter .inventory-control:focus,
+.inventory-filter .inventory-range input:focus {
+  border-color:#318df8;
+  box-shadow:0 0 0 2px rgba(35,133,247,.08);
+}
+.filter-card .filter-actions .action-btn,
+.module-filter > .action-btn,
+.purchase-full-filter > .action-btn,
+.purchase-full-filter .purchase-full-actions > .action-btn,
+.supply-filter > .action-btn,
+.supply-filter-actions > .action-btn,
+.warehouse-filter > .action-btn,
+.warehouse-filter-actions > .action-btn,
+.inventory-filter > .action-btn,
+.inventory-filter .inventory-actions > .action-btn {
+  height:39px;
+  min-height:39px;
+  min-width:84px;
+  padding:0 20px;
+  border-radius:7px;
+  font-size:15px;
+  line-height:37px;
+  cursor:pointer;
+}
+.filter-card .filter-actions .action-btn.primary,
+.module-filter > .action-btn.primary,
+.purchase-full-filter > .action-btn.primary,
+.purchase-full-filter .purchase-full-actions > .action-btn.primary,
+.supply-filter > .action-btn.primary,
+.supply-filter-actions > .action-btn.primary,
+.warehouse-filter > .action-btn.primary,
+.warehouse-filter-actions > .action-btn.primary,
+.inventory-filter > .action-btn.primary,
+.inventory-filter .inventory-actions > .action-btn.primary {
+  background:#2385f7;
+  border-color:#2385f7;
+  color:#fff;
+}
+.filter-card .filter-actions .action-btn.reset,
+.module-filter > .action-btn.reset,
+.purchase-full-filter > .action-btn.reset,
+.purchase-full-filter .purchase-full-actions > .action-btn.reset,
+.supply-filter > .action-btn.reset,
+.supply-filter-actions > .action-btn.reset,
+.warehouse-filter > .action-btn.reset,
+.warehouse-filter-actions > .action-btn.reset,
+.inventory-filter > .action-btn.reset,
+.inventory-filter .inventory-actions > .action-btn.reset {
+  background:#fff;
+  border-color:#ff4d4f;
+  color:#ff4d4f;
+}
+.module-filter,
+.purchase-full-filter,
+.supply-filter,
+.warehouse-filter,
+.inventory-filter { align-items:center; }
+/* 全部列表勾选框统一为商品管理列表的轻边框规格 */
+.data-table .check,
+.module-table .check,
+.purchase-full-table .check,
+.supply-table .check,
+.warehouse-table .check,
+.inventory-table .check,
+.table-card .check {
+  width:24px;
+  height:24px;
+  border:2px solid #d2dae4;
+  border-radius:6px;
+  background:#fff;
+  cursor:pointer;
+}
+.data-table .check.checked,
+.module-table .check.checked,
+.purchase-full-table .check.checked,
+.supply-table .check.checked,
+.warehouse-table .check.checked,
+.inventory-table .check.checked,
+.table-card .check.checked {
+  background:#2385f7;
+  border-color:#2385f7;
+  color:#fff;
+}
+</style>
 </head>
 <body>
 <div class="app">
