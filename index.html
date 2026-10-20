@@ -122,11 +122,14 @@ main:has(#purchaseView.active) #homePanel{display:none!important}
   function purchaseActionPage(title,mode){
     var page=document.getElementById('purchaseActionPage');
     if(!page){page=document.createElement('section');page.id='purchaseActionPage';page.className='purchase-source-page';document.querySelector('.main').appendChild(page);}
-    page.innerHTML='<div class="purchase-source-head"><h1>'+esc(title)+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><div class="form-section" style="margin:0;background:#fff;padding:24px"><h3>'+esc(mode==='edit'?'编辑采购记录':'采购记录详情')+'</h3><div class="detail-row"><label>业务编号</label><span>PO202610180028</span></div><div class="detail-row"><label>供应商</label><span>龙泉市庄欣电子商务有限公司</span></div><div class="detail-row"><label>采购负责人</label><span>夏景舟</span></div><div class="detail-row"><label>当前状态</label><span>待处理</span></div><div class="detail-row"><label>备注</label><span>'+esc(mode==='edit'?'可编辑采购数量、价格、交期及备注信息':'已展示采购记录的基础信息、状态与操作日志')+'</span></div></div></div><div class="purchase-source-foot"><button class="action-btn purchase-source-cancel">返回</button><button class="action-btn primary purchase-source-save">'+(mode==='edit'?'保存':'关闭')+'</button></div></section>';
+    var isEdit=mode==='edit', isLog=mode==='log';
+    var detailBody='<div class="form-section purchase-readonly-section" style="margin:0;background:#fff;padding:24px"><h3>备货单基础信息</h3><div class="detail-grid"><div class="detail-row"><label>备货单号</label><span>ERP202610180028</span></div><div class="detail-row"><label>供应商</label><span>龙泉市庄欣电子商务有限公司</span></div><div class="detail-row"><label>采购负责人</label><span>夏景舟</span></div><div class="detail-row"><label>当前状态</label><span class="status-text">待处理</span></div></div><h3>备货商品明细</h3><table class="purchase-detail-table"><thead><tr><th>SKU</th><th>商品名称</th><th>采购数量</th><th>目的仓区</th><th>运输方式</th></tr></thead><tbody><tr><td>JZETLQ-0090000US</td><td>8L速热热水宝（带防电墙）美标</td><td>128</td><td>美国海外仓</td><td>海运</td></tr></tbody></table><h3>'+ (isLog?'操作记录':'备注') +'</h3><div class="detail-note">'+esc(isLog?'2026-10-20 09:30 夏景舟创建备货单；2026-10-20 10:15 进入待处理状态。':'供应商发货至指定国内仓后，再转运至海外仓。')+'</div></div>';
+    var editBody='<div class="form-section purchase-edit-section" style="margin:0;background:#fff;padding:24px"><h3>编辑备货单</h3><div class="purchase-source-grid"><label>备货单号<input class="form-input" value="ERP202610180028" readonly></label><label>供应商名称<select class="form-input"><option>龙泉市庄欣电子商务有限公司</option><option>深圳市恒温电器有限公司</option></select></label><label>商品 SKU<input class="form-input" value="JZETLQ-0090000US"></label><label>商品名称<input class="form-input" value="8L速热热水宝（带防电墙）美标"></label><label>采购数量<input class="form-input" type="number" value="128"></label><label>目的仓区<select class="form-input"><option>美国海外仓</option><option>国内中转仓</option><option>第三方仓库</option></select></label><label>运输方式<select class="form-input"><option>海运</option><option>空运</option><option>快递</option></select></label><label>交付日期<input class="form-input" type="date" value="2026-11-15"></label><label class="full">备注<textarea class="form-input">供应商发货至指定国内仓后，再转运至海外仓。</textarea></label></div></div>';
+    page.innerHTML='<div class="purchase-source-head"><h1>'+esc(title)+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body">'+(isEdit?editBody:detailBody)+'</div><div class="purchase-source-foot"><button class="action-btn purchase-source-cancel">返回列表</button><button class="action-btn primary purchase-source-save">'+(isEdit?'保存修改':'关闭详情')+'</button></div></section>';
     var view=document.getElementById('purchaseView');if(view)view.classList.remove('active');page.classList.add('active');
     page.querySelector('.purchase-source-close').onclick=function(){page.classList.remove('active');if(view)view.classList.add('active');};
     page.querySelector('.purchase-source-cancel').onclick=page.querySelector('.purchase-source-close').onclick;
-    page.querySelector('.purchase-source-save').onclick=page.querySelector('.purchase-source-close').onclick;
+    page.querySelector('.purchase-source-save').onclick=function(){if(isEdit){page.setAttribute('data-feedback','采购信息已保存');}page.querySelector('.purchase-source-close').onclick();};
   }
   function purchaseCreatePage(){
     var page=document.getElementById('purchaseCreatePage');
@@ -149,6 +152,14 @@ main:has(#purchaseView.active) #homePanel{display:none!important}
       link.onclick=function(){var text=link.textContent.trim();purchaseActionPage(text==='编辑'?'编辑采购记录':text==='日志'?'采购操作日志':'采购记录详情',text==='编辑'?'edit':'detail');};
     });
   }
+  document.addEventListener('click',function(e){
+    var link=e.target&&e.target.closest?e.target.closest('#purchaseView .full-link,#purchaseView .full-detail,#purchaseView .full-edit,#purchaseView .full-log'):null;
+    if(!link)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    var text=(link.textContent||'').trim(), action=link.classList.contains('full-edit')||text==='编辑'?'edit':link.classList.contains('full-log')||text==='日志'?'log':'detail';
+    var label=(document.querySelector('#purchaseView .purchase-page-title')||{}).textContent||'备货单详情';
+    purchaseActionPage((action==='edit'?'编辑 - ':action==='log'?'日志 - ':'详情 - ')+label.trim(),action);
+  },true);
   var purchaseToolbarObserver=new MutationObserver(ensurePurchaseCreateAction);
   purchaseToolbarObserver.observe(document.documentElement,{childList:true,subtree:true});
   function genericModulePage(title,kind){
