@@ -1941,5 +1941,178 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   }
 }
 </style>
+<style>
+/* 库存模块筛选栏最终尺寸：字段保持紧凑，操作按钮固定在右侧。 */
+.inventory-view[data-mode="realtime"] .inventory-filter.inventory-realtime {
+  grid-template-columns:190px 280px 190px minmax(24px,1fr) 110px 110px;
+  column-gap:12px;
+  justify-content:stretch;
+  padding-left:22px;
+  padding-right:22px;
+}
+.inventory-view[data-mode="snapshot"] .inventory-filter.inventory-realtime {
+  grid-template-columns:190px 260px 220px minmax(24px,1fr) 110px 110px;
+  column-gap:12px;
+  justify-content:stretch;
+  padding-left:22px;
+  padding-right:22px;
+}
+.inventory-view[data-mode="physical"] .inventory-filter.inventory-realtime {
+  grid-template-columns:170px 190px 170px 240px minmax(24px,1fr) 110px 110px;
+  column-gap:12px;
+  justify-content:stretch;
+  padding-left:22px;
+  padding-right:22px;
+}
+.inventory-view[data-mode="realtime"] .final-inv-search,
+.inventory-view[data-mode="snapshot"] .final-inv-search { grid-column:5; }
+.inventory-view[data-mode="realtime"] .final-inv-reset,
+.inventory-view[data-mode="snapshot"] .final-inv-reset { grid-column:6; }
+.inventory-view[data-mode="physical"] .final-inv-search { grid-column:6; }
+.inventory-view[data-mode="physical"] .final-inv-reset { grid-column:7; }
+.inventory-view[data-mode] .inventory-filter.inventory-realtime .inventory-actions .action-btn,
+.inventory-view[data-mode] .inventory-filter.inventory-realtime > .action-btn {
+  width:110px;
+  min-width:110px;
+  max-width:110px;
+  height:39px;
+  min-height:39px;
+  line-height:37px;
+}
+</style>
+<style>
+/* 全局筛选栏最终规范：商品管理页为唯一尺寸基准。 */
+:root {
+  --erp-filter-height:45px;
+  --erp-filter-radius:7px;
+  --erp-filter-gap:12px;
+  --erp-filter-button-width:110px;
+  --erp-filter-button-height:39px;
+}
+.filter-card .filter,
+.module-filter > input,
+.module-filter > select,
+.purchase-filter > input,
+.purchase-filter > select,
+.purchase-full-filter > input,
+.purchase-full-filter > select,
+.supply-filter > input,
+.supply-filter > select,
+.warehouse-filter > input,
+.warehouse-filter > select,
+.inventory-filter > input,
+.inventory-filter > select,
+.inventory-filter > .inventory-control {
+  height:var(--erp-filter-height);
+  min-height:var(--erp-filter-height);
+  border:1px solid #d9dee5;
+  border-radius:var(--erp-filter-radius);
+  background:#fff;
+  color:#4d5966;
+  font:inherit;
+}
+.filter-card .filter-actions .action-btn,
+.module-filter > .action-btn,
+.purchase-filter .action-btn,
+.purchase-full-filter .action-btn,
+.supply-filter > .action-btn,
+.warehouse-filter > .action-btn,
+.inventory-filter .action-btn {
+  width:var(--erp-filter-button-width);
+  min-width:var(--erp-filter-button-width);
+  max-width:var(--erp-filter-button-width);
+  height:var(--erp-filter-button-height);
+  min-height:var(--erp-filter-button-height);
+  padding:0 16px;
+  border-radius:var(--erp-filter-radius);
+  line-height:37px;
+  font-size:15px;
+}
+.filter-card .filter-actions { gap:var(--erp-filter-gap); }
+.filter-card .filter-actions .action-btn { flex:0 0 var(--erp-filter-button-width); }
+
+/* 配件管理、物料管理等通用列表筛选栏。 */
+.module-filter,
+#partsView .module-filter {
+  display:grid;
+  grid-template-columns:260px 180px 180px minmax(24px,1fr) 110px;
+  align-items:center;
+  gap:var(--erp-filter-gap);
+  padding:18px 22px 20px;
+}
+.module-filter > .action-btn {
+  grid-column:5;
+  justify-self:end;
+}
+
+/* 供应模块：三个条件在左，搜索和重置固定在最右侧。 */
+.supply-filter {
+  display:grid;
+  grid-template-columns:240px 260px 200px minmax(24px,1fr) 110px 110px;
+  align-items:center;
+  gap:var(--erp-filter-gap);
+  padding:18px 22px 20px;
+}
+.supply-filter > .action-btn.primary { grid-column:5; }
+.supply-filter > .action-btn.reset { grid-column:6; }
+
+/* 仓储模块：字段尺寸与商品管理一致，按钮保持同排右对齐。 */
+.warehouse-filter {
+  display:grid;
+  grid-template-columns:200px 260px 200px minmax(24px,1fr) 110px 110px;
+  align-items:center;
+  gap:var(--erp-filter-gap);
+  padding:18px 22px 20px;
+}
+.warehouse-filter > .action-btn.primary { grid-column:5; }
+.warehouse-filter > .action-btn.reset { grid-column:6; }
+
+/* 采购模块继续使用紧凑单行布局，按钮靠右。 */
+.purchase-filter,
+.purchase-full-filter {
+  gap:var(--erp-filter-gap);
+  padding:18px 22px 20px;
+}
+.purchase-filter > input,
+.purchase-filter > select,
+.purchase-filter > .purchase-range,
+.purchase-full-filter > input,
+.purchase-full-filter > select,
+.purchase-full-filter > .purchase-range {
+  flex-basis:200px;
+  width:200px;
+  min-width:200px;
+  max-width:200px;
+}
+.purchase-filter > input:nth-child(2),
+.purchase-full-filter > input:nth-child(2),
+.purchase-filter > .purchase-range {
+  flex-basis:260px;
+  width:260px;
+  min-width:260px;
+  max-width:260px;
+}
+.purchase-filter-actions,
+.purchase-full-actions {
+  margin-left:auto;
+  gap:var(--erp-filter-gap);
+}
+/* 字段较多时缩窄单项，保证搜索和重置不掉到下一行。 */
+.purchase-full-filter:has(> :nth-child(6)) > input,
+.purchase-full-filter:has(> :nth-child(6)) > select,
+.purchase-full-filter:has(> :nth-child(6)) > .purchase-range {
+  flex-basis:170px;
+  width:170px;
+  min-width:170px;
+  max-width:170px;
+}
+.purchase-full-filter:has(> :nth-child(6)) > input:nth-child(2),
+.purchase-full-filter:has(> :nth-child(6)) > select:nth-child(2) {
+  flex-basis:220px;
+  width:220px;
+  min-width:220px;
+  max-width:220px;
+}
+</style>
 </body>
 </html>
