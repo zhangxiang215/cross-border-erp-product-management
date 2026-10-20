@@ -116,18 +116,52 @@ main:has(#purchaseView.active) #homePanel{display:none!important}
     var cells2=heads.slice(0,-1).map(function(h,i){var vals={SKU:'SKU-20261015-001',商品名称:'便携式衣物护理机',供应商名称:'义乌市优品供应链',状态:'进行中',审核状态:'已通过',操作栏:''};return '<td>'+(vals[h]||((i%3===0?'ERP':'')+'202610170041'))+'</td>';}).join('');
     return '<div class="purchase-page-title" style="height:42px;background:#fff;padding:12px 20px;color:#4d5966;font-weight:650">'+esc(label)+'</div><div class="purchase-full-filter"><input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>请选择状态</option><option>全部</option><option>待处理</option><option>已完成</option></select><button class="action-btn primary">搜索</button><button class="action-btn reset">重置</button></div><div class="purchase-full-toolbar"><button class="tool primary">导出</button><button class="tool">日志</button><span class="purchase-full-count">共 128 条数据</span></div><div class="purchase-full-table"><table><thead><tr><th>勾选</th>'+heads.map(function(h){return '<th>'+esc(h)+'</th>';}).join('')+'</tr></thead><tbody><tr><td><span class="check"></span></td>'+cells+'<td><span class="full-link">详情</span><span class="full-link">编辑</span></td></tr><tr><td><span class="check"></span></td>'+cells2+'<td><span class="full-link">详情</span><span class="full-link">编辑</span></td></tr></tbody></table></div>';
   }
+  function purchaseActionPage(title,mode){
+    var page=document.getElementById('purchaseActionPage');
+    if(!page){page=document.createElement('section');page.id='purchaseActionPage';page.className='purchase-source-page';document.querySelector('.main').appendChild(page);}
+    page.innerHTML='<div class="purchase-source-head"><h1>'+esc(title)+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><div class="form-section" style="margin:0;background:#fff;padding:24px"><h3>'+esc(mode==='edit'?'编辑采购记录':'采购记录详情')+'</h3><div class="detail-row"><label>业务编号</label><span>PO202610180028</span></div><div class="detail-row"><label>供应商</label><span>龙泉市庄欣电子商务有限公司</span></div><div class="detail-row"><label>采购负责人</label><span>夏景舟</span></div><div class="detail-row"><label>当前状态</label><span>待处理</span></div><div class="detail-row"><label>备注</label><span>'+esc(mode==='edit'?'可编辑采购数量、价格、交期及备注信息':'已展示采购记录的基础信息、状态与操作日志')+'</span></div></div></div><div class="purchase-source-foot"><button class="action-btn purchase-source-cancel">返回</button><button class="action-btn primary purchase-source-save">'+(mode==='edit'?'保存':'关闭')+'</button></div></section>';
+    var view=document.getElementById('purchaseView');if(view)view.classList.remove('active');page.classList.add('active');
+    page.querySelector('.purchase-source-close').onclick=function(){page.classList.remove('active');if(view)view.classList.add('active');};
+    page.querySelector('.purchase-source-cancel').onclick=page.querySelector('.purchase-source-close').onclick;
+    page.querySelector('.purchase-source-save').onclick=page.querySelector('.purchase-source-close').onclick;
+  }
+  function purchaseCreatePage(){
+    var page=document.getElementById('purchaseCreatePage');
+    if(!page){page=document.createElement('section');page.id='purchaseCreatePage';page.className='purchase-source-page';document.querySelector('.main').appendChild(page);}
+    page.innerHTML='<div class="purchase-source-head"><h1>新增采购记录</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><div class="purchase-source-grid"><label>商品 SKU<input placeholder="请选择商品 SKU"></label><label>供应商名称<select><option>请选择供应商名称</option><option>深圳市恒温电器有限公司</option><option>义乌市优品供应链</option></select></label><label>采购数量<input placeholder="请输入采购数量"></label><label>采购单价<input placeholder="请输入采购单价"></label><label>预计到货日期<input placeholder="请选择预计到货日期"></label><label>采购负责人<input placeholder="请输入采购负责人"></label><label class="full">备注<textarea placeholder="请输入备注"></textarea></label></div></div><div class="purchase-source-foot"><button class="action-btn purchase-source-cancel">取消</button><button class="action-btn primary purchase-source-save">保存</button></div></section>';
+    var view=document.getElementById('purchaseView');if(view)view.classList.remove('active');page.classList.add('active');
+    var back=function(){page.classList.remove('active');if(view)view.classList.add('active');};page.querySelector('.purchase-source-close').onclick=back;page.querySelector('.purchase-source-cancel').onclick=back;page.querySelector('.purchase-source-save').onclick=back;
+  }
   function ensurePurchaseCreateAction(){
     var bars=document.querySelectorAll('#purchaseView .purchase-full-toolbar');
     bars.forEach(function(bar){
       if(!bar.querySelector('.purchase-create-new')){
         var add=document.createElement('button');add.className='tool primary purchase-create-new';add.textContent='新增';
         bar.insertBefore(add,bar.firstChild);
-        add.onclick=function(){openPurchaseSourcePage();};
+        add.onclick=purchaseCreatePage;
       }
+    });
+    document.querySelectorAll('#purchaseView .full-link').forEach(function(link){
+      if(link.dataset.purchaseBound)return;link.dataset.purchaseBound='1';
+      link.onclick=function(){var text=link.textContent.trim();purchaseActionPage(text==='编辑'?'编辑采购记录':text==='日志'?'采购操作日志':'采购记录详情',text==='编辑'?'edit':'detail');};
     });
   }
   var purchaseToolbarObserver=new MutationObserver(ensurePurchaseCreateAction);
   purchaseToolbarObserver.observe(document.documentElement,{childList:true,subtree:true});
+  function genericModulePage(title,kind){
+    var page=document.getElementById('genericActionPage');
+    if(!page){page=document.createElement('section');page.id='genericActionPage';page.className='purchase-source-page';document.querySelector('.main').appendChild(page);}
+    page.innerHTML='<div class="purchase-source-head"><h1>'+esc(title)+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><div class="form-section" style="margin:0;background:#fff;padding:24px"><h3>'+esc(kind==='edit'?'编辑信息':'详情信息')+'</h3><div class="detail-row"><label>业务编号</label><span>ERP202610180028</span></div><div class="detail-row"><label>当前页面</label><span>'+esc(title)+'</span></div><div class="detail-row"><label>操作状态</label><span>可继续填写、保存或返回</span></div></div></div><div class="purchase-source-foot"><button class="action-btn generic-page-back">返回</button><button class="action-btn primary generic-page-save">'+(kind==='edit'?'保存':'关闭')+'</button></div>';
+    var active=document.querySelector('.module-extra.active,.purchase-view.active');if(active)active.classList.remove('active');page.classList.add('active');
+    var back=function(){page.classList.remove('active');if(active)active.classList.add('active');};page.querySelector('.purchase-source-close').onclick=back;page.querySelector('.generic-page-back').onclick=back;page.querySelector('.generic-page-save').onclick=back;
+  }
+  function ensureCommonActions(){
+    document.querySelectorAll('.inventory-add,.actual-inbound-add,#inventoryView .purchase-full-toolbar .tool.primary,#supplyView .purchase-full-toolbar .tool.primary,#warehouseView .purchase-full-toolbar .tool.primary').forEach(function(btn){if(btn.dataset.actionBound)return;btn.dataset.actionBound='1';btn.onclick=function(){genericModulePage(btn.textContent.replace(/^＋\s*/,''),'add');};});
+    document.querySelectorAll('.inventory-edit-action,.actual-inbound-detail,.supply-link,.warehouse-link,#inventoryView .full-link,#supplyView .full-link,#warehouseView .full-link').forEach(function(btn){if(btn.dataset.actionBound)return;btn.dataset.actionBound='1';btn.onclick=function(){genericModulePage(btn.textContent.trim()||'详情','detail');};});
+    document.querySelectorAll('.inventory-export,.inventory-batch-export,.supply-export,.warehouse-export,.inventory-search,.inventory-reset,.supply-search,.supply-reset,.warehouse-search,.warehouse-reset').forEach(function(btn){if(btn.dataset.actionBound)return;btn.dataset.actionBound='1';btn.addEventListener('click',function(){btn.setAttribute('data-feedback','已执行');});});
+  }
+  var commonActionObserver=new MutationObserver(ensureCommonActions);
+  commonActionObserver.observe(document.documentElement,{childList:true,subtree:true});
   renderPurchase=function(key,subIndex){
     var group=purchaseGroups[key]||purchaseGroups.source,idx=Math.max(0,Math.min(Number(subIndex)||0,group.length-2)),label=group.slice(1)[idx]||group[0],v=document.getElementById('purchaseView');
     if(!v){v=document.createElement('section');v.id='purchaseView';v.className='purchase-view';document.querySelector('.main').appendChild(v);}
