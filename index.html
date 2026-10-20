@@ -147,6 +147,22 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 .supply-filter,
 .warehouse-filter,
 .inventory-filter { align-items:center; }
+.filter-card .filter.split .inline-filter-input {
+  flex:1 1 auto;
+  min-width:0;
+  width:100%;
+  height:30px;
+  padding:0 12px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#4f5b68;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:visible;
+  text-overflow:clip;
+}
+.filter-card .filter.split .inline-filter-input::placeholder { color:#777; opacity:1; }
 /* 全部列表勾选框统一为商品管理列表的轻边框规格 */
 .data-table .check,
 .module-table .check,
@@ -413,10 +429,25 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 .inline-filter-input{border:0;outline:0;height:30px;min-width:150px;flex:1;color:#4f5b68;font:inherit;background:transparent;padding:0 10px}.filter.split .field-label{flex:0 0 112px}.filter.input .field-label{flex:0 0 112px;color:#53606c}.upload-group{display:flex;align-items:center;gap:10px;flex:1}.upload-group .upload-box{flex:0 0 92px}.upload-name{color:#8b96a2;font-size:12px}.inline-control{display:flex;align-items:center;gap:8px;flex:1}.inline-control .form-input,.inline-control .form-select{min-width:0}.inline-control .tool{height:34px;padding:0 12px;font-size:12px}.dynamic-list{flex:1}.dynamic-row{margin-top:10px}.supplier-block{border:1px solid #edf0f3;border-radius:7px;padding:12px 14px;margin-bottom:14px}.supplier-block h4{margin:0 0 12px;color:#4d5967;font-size:14px}.supplier-block .form-grid{row-gap:12px}.form-item>label>span.required:before{content:'*';color:#f04d4d;margin-right:4px}.form-item>label>span.required{font-weight:400}.form-item .upload-box small{font-size:11px}.remove-row{border-color:#ffb1b1!important;color:#e55a5a!important;background:#fff!important}
 </style>
 <script>
-const fields=[['SKU（精准）','双击批量查询，模糊搜索','split'],['SPU（精准）','双击批量查询，模糊搜索','split'],['商品类目','','select'],['SKU商品名称','请输入商品名称','split'],['选择类目','','select'],['是否侵权','','select'],['商品状态','','select'],['销售状态','','select'],['是否违禁','','select'],['接手标签','','select'],['是否组合商品','','select'],['是否刷单SKU','','select'],['是否工厂限价','','select'],['是否定制商品','','select'],['是否有适配车型','','select'],['销售国家','','input'],['认证获取渠道','','select'],['认证证书','','select'],['包装形态','','select'],['利润状态','','select'],['开发类型','','select'],['头程运输方式','','select'],['供应商','','input'],['请输入供应商代码','','input'],['报关状态','','select'],['清关状态','','select'],['业务类型','','select'],['商品创建来源','','select'],['采购员','','input'],['开发员','','input'],['销售负责人','','input'],['操作人','请输入','split'],['是否校准','','select'],['是否有新旧SKU关系','','select'],['运营风险','','select'],['时间','开始日期    →  结束日期','date-range'],['海外仓库存最小值','','input'],['海外仓库存最大值','','input']];
+const fields=[['SPU','输入 SPU，支持批量查询','split'],['SKU','输入 SKU，支持批量查询','split'],['商品类目','','select'],['SKU商品名称','请输入商品名称','split'],['选择类目','','select'],['是否侵权','','select'],['商品状态','','select'],['销售状态','','select'],['是否违禁','','select'],['接手标签','','select'],['是否组合商品','','select'],['是否刷单SKU','','select'],['是否工厂限价','','select'],['是否定制商品','','select'],['是否有适配车型','','select'],['销售国家','','input'],['认证获取渠道','','select'],['认证证书','','select'],['包装形态','','select'],['利润状态','','select'],['开发类型','','select'],['头程运输方式','','select'],['供应商','','input'],['请输入供应商代码','','input'],['报关状态','','select'],['清关状态','','select'],['业务类型','','select'],['商品创建来源','','select'],['采购员','','input'],['开发员','','input'],['销售负责人','','input'],['操作人','请输入','split'],['是否校准','','select'],['是否有新旧SKU关系','','select'],['运营风险','','select'],['时间','开始日期    →  结束日期','date-range'],['海外仓库存最小值','','input'],['海外仓库存最大值','','input']];
 const options={商品状态:['在售','停售','禁售'],开发类型:['试卖','精品','普通','精铺'],业务类型:['海外仓','FBA','直发'],是否侵权:['是','否'],是否组合商品:['是','否'],商品类目:['家居用品','数码配件','服饰','汽配']};
 const filters=document.getElementById('filters');
 fields.forEach((f,i)=>{const [label,placeholder,type]=f;let cls='filter '+type;if(type==='date-range')cls+=' date-range';if(type==='input')cls+=' input';if(type==='split')cls+=' split';const el=document.createElement('div');el.className=cls;el.dataset.label=label;if(type==='date-range'){el.innerHTML=`<span class="field-label">${label}<span class="field-arrow">⌄</span></span><span class="range">${placeholder}</span><span class="cal">▣</span>`;}else if(type==='split'){el.innerHTML=`<span class="field-label">${label}<span class="field-arrow">⌄</span></span><span class="hint">${placeholder}</span>`;}else{el.innerHTML=`<span class="field-label">${placeholder||label}</span>${type==='select'?'<span class="field-arrow">⌄</span>':''}`;}if(type==='select'){const list=options[label]||['全部','是','否'];const dd=document.createElement('div');dd.className='filter-dropdown';list.forEach((o,j)=>{const op=document.createElement('div');op.className='option'+(j===0?' selected':'');op.textContent=o;op.onclick=e=>{e.stopPropagation();el.querySelector('.field-label').textContent=o;el.classList.remove('open');};dd.appendChild(op)});el.appendChild(dd);el.onclick=e=>{e.stopPropagation();document.querySelectorAll('.filter.open').forEach(x=>x!==el&&x.classList.remove('open'));el.classList.toggle('open');};}filters.appendChild(el);});
+// 批量查询字段使用真实输入框：支持换行、逗号、分号和空格分隔多个值。
+document.querySelectorAll('#filters .filter.split .hint').forEach(hint=>{
+  const input=document.createElement('input');
+  input.className='inline-filter-input';
+  input.dataset.queryField=hint.parentElement.dataset.label;
+  input.placeholder=hint.textContent;
+  input.title=hint.textContent;
+  hint.replaceWith(input);
+});
+const splitBatchValues=value=>String(value||'').split(/[\\s,，;；、]+/).map(x=>x.trim()).filter(Boolean);
+document.getElementById('resetBtn').addEventListener('click',()=>document.querySelectorAll('#filters .inline-filter-input').forEach(input=>{input.value='';}));
+document.getElementById('searchBtn').addEventListener('click',()=>{
+  const batch=[...document.querySelectorAll('#filters .inline-filter-input')].flatMap(input=>splitBatchValues(input.value));
+  if(batch.length) toast2(`已按 ${batch.length} 个 SPU/SKU 条件查询`);
+});
 document.addEventListener('click',()=>document.querySelectorAll('.filter.open').forEach(x=>x.classList.remove('open')));
 const data=[{sku:'JZETLQ-0090000US',name:'8L速热热水宝（带防电墙）美标',model:'JZETLQ-8L',type:'海外仓',tags:['待校准','普品'],sales:['英国仓：平销','墨西哥仓：平销','美国仓：平销','韩国仓：平销','欧盟仓：平销','日本仓：平销'],combo:'否'},{sku:'SKU-20261015-001',name:'便携式衣物护理机',model:'YJ-2201',type:'普通',tags:['新品','待上架'],sales:['美国仓：新品','英国仓：平销'],combo:'否'},{sku:'SKU-20261015-002',name:'防水旅行收纳袋',model:'BX-019',type:'海外仓',tags:['在售','精品'],sales:['美国仓：平销','欧盟仓：平销'],combo:'是'}];
 const spuData=[{spu:'JY2605840',name:'不锈钢鸣笛烧水壶 3L大容量 适用于大部分炉灶',variants:'3 个 SKU',category:'家居园艺 / 厨房和餐饮 / 炊具 / 热水壶',status:'试卖',image:'kettle',purchase:'供应商代码：V26100068|供应商名称：阳江市阳东区塘坪镇万联五金塑料厂|采购链接：1688|参考链接：amazon',pack:'基准包装尺寸(CM)：- * - * -|基准包装毛重(KG)：-',sales:'7天：-|30天：-|60天：-|90天：-',price:'-',margin:'-',record:'创建时间：2026-10-09 17:18:14|更新时间：2026-10-16 11:40:05'},{spu:'QM2602984',name:'黑色，尾门防盗锁，尾门铰链防盗锁，适用于 Chevy Silverado 1500 2019-2026',variants:'2 个 SKU',category:'汽摩配件 / 汽车内外饰 / 汽车外饰 / 靴盖、尾门及零件',status:'试卖',image:'parts',purchase:'供应商代码：V26050747|供应商名称：深圳市壹迦染科技有限公司|采购链接：1688|参考链接：amazon',pack:'基准包装尺寸(CM)：- * - * -|基准包装毛重(KG)：-',sales:'7天：-|30天：-|60天：-|90天：-',price:'-',margin:'-',record:'创建时间：2026-09-30 17:33:14|更新时间：2026-10-16 17:35:49'},{spu:'SPU-20261015-002',name:'防水旅行收纳袋',variants:'4 个 SKU',category:'家居园艺 / 收纳用品',status:'在售',image:'bag',purchase:'最新采购价（￥）：-|供应商代码：V26030218|供应商名称：义乌市优品供应链',pack:'基准包装尺寸(CM)：32 * 24 * 5|基准包装毛重(KG)：0.18',sales:'7天：12|30天：46|60天：90|90天：128',price:'$18.99',margin:'32%',record:'创建时间：2026-09-18 10:12:08|更新时间：2026-10-15 09:28:12'}];
