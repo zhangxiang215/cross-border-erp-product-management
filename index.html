@@ -1011,6 +1011,17 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .inventory-view[data-mode="physical"] .inventory-filter.inventory-realtime {
   grid-template-columns:340px minmax(360px,1fr) 260px 360px 140px 140px;
 }
+.inventory-view[data-mode="realtime"] .inventory-filter.inventory-realtime,
+.inventory-view[data-mode="snapshot"] .inventory-filter.inventory-realtime {
+  grid-template-columns:380px 640px 380px 140px 140px;
+  justify-content:space-between;
+  column-gap:0;
+}
+.inventory-view[data-mode="physical"] .inventory-filter.inventory-realtime {
+  grid-template-columns:300px 420px 300px 420px 140px 140px;
+  justify-content:space-between;
+  column-gap:0;
+}
 .inventory-view[data-mode] .inventory-filter.inventory-realtime .inventory-control,
 .inventory-view[data-mode] .inventory-filter.inventory-realtime .inventory-actions .action-btn {
   height:45px;
