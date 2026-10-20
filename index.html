@@ -207,6 +207,8 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
   white-space:nowrap;
 }
 #productTableCard .data-table td:last-child .status-list br { display:none; }
+/* 库存子模块已由左侧边栏切换，移除页面顶部重复的横向切换 */
+.inventory-head .inventory-tabs { display:none; }
 /* 全局列表列间距：统一密度，避免字段过宽或过窄 */
 .data-table th,
 .data-table td,
