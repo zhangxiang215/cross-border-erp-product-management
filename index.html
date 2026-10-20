@@ -209,6 +209,18 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 #productTableCard .data-table td:last-child .status-list br { display:none; }
 /* 库存子模块已由左侧边栏切换，移除页面顶部重复的横向切换 */
 .inventory-head .inventory-tabs { display:none; }
+.inventory-filter .inventory-actions {
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+}
+.inventory-filter .inventory-actions .action-btn,
+.inventory-filter > .action-btn {
+  flex:0 0 112px;
+  width:112px;
+  min-width:112px;
+  max-width:112px;
+}
 /* 全局列表列间距：统一密度，避免字段过宽或过窄 */
 .data-table th,
 .data-table td,
@@ -912,8 +924,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   function toolbar(mode){return `<div class="inventory-toolbar"><button class="tool primary inventory-add">＋ 新增库存</button><button class="tool inventory-export">导出</button>${mode!=='snapshot'?'<button class="tool inventory-batch-export">多SKU一键导出</button>':''}</div>`;}
   function mount(mode='realtime'){
     let view=document.getElementById('inventoryView');if(!view){view=document.createElement('section');view.id='inventoryView';view.className='inventory-view';document.querySelector('.main').appendChild(view);}
-    view.dataset.mode=mode;view.innerHTML=`<div class="inventory-head"><h2>库存</h2><div class="inventory-tabs"><div class="inventory-tab ${mode==='realtime'?'active':''}" data-inventory-tab="realtime">实时库存</div><div class="inventory-tab ${mode==='physical'?'active':''}" data-inventory-tab="physical">物理仓库</div><div class="inventory-tab ${mode==='snapshot'?'active':''}" data-inventory-tab="snapshot">每日库存快照</div></div></div>${filters(mode)}${summary(mode)}${toolbar(mode)}${table(mode)}`;
-    view.classList.add('active');document.getElementById('moduleProductView')?.style.setProperty('display','none');document.getElementById('partsView')?.classList.remove('active');document.getElementById('spuTableCard')?.style.setProperty('display','none');document.getElementById('productPages').hidden=true;document.getElementById('homePanel').hidden=true;document.getElementById('homeTopTab').classList.remove('active');const topTab=document.getElementById('productTopTab');topTab.style.display='flex';topTab.querySelector('.x').previousSibling.textContent='库存 ';topTab.classList.add('active');document.querySelector('.left-rail').classList.add('product-open');document.querySelectorAll('.rail-item').forEach(x=>x.classList.remove('active'));document.getElementById('inventoryNavToggle').classList.add('active');
+    view.dataset.mode=mode;const inventoryTitle=mode==='realtime'?'实时库存':mode==='physical'?'物理仓库':'每日库存快照';view.innerHTML=`<div class="inventory-head"><h2>${inventoryTitle}</h2><div class="inventory-tabs"><div class="inventory-tab ${mode==='realtime'?'active':''}" data-inventory-tab="realtime">实时库存</div><div class="inventory-tab ${mode==='physical'?'active':''}" data-inventory-tab="physical">物理仓库</div><div class="inventory-tab ${mode==='snapshot'?'active':''}" data-inventory-tab="snapshot">每日库存快照</div></div></div>${filters(mode)}${summary(mode)}${toolbar(mode)}${table(mode)}`;
+    view.classList.add('active');document.getElementById('moduleProductView')?.style.setProperty('display','none');document.getElementById('partsView')?.classList.remove('active');document.getElementById('spuTableCard')?.style.setProperty('display','none');document.getElementById('productPages').hidden=true;document.getElementById('homePanel').hidden=true;document.getElementById('homeTopTab').classList.remove('active');const topTab=document.getElementById('productTopTab');topTab.style.display='flex';topTab.querySelector('.x').previousSibling.textContent=inventoryTitle+' ';topTab.classList.add('active');document.querySelector('.left-rail').classList.add('product-open');document.querySelectorAll('.rail-item').forEach(x=>x.classList.remove('active'));document.getElementById('inventoryNavToggle').classList.add('active');
     bindView(mode);
   }
   function drawer(title,content){let d=document.getElementById('inventoryDrawer');if(!d){d=document.createElement('div');d.id='inventoryDrawer';d.className='inventory-drawer';document.body.appendChild(d);}d.innerHTML=`<div class="inventory-drawer-panel"><div class="inventory-drawer-head"><span>${title}</span><button class="close inventory-drawer-close">×</button></div>${content}</div>`;d.classList.add('show');d.querySelector('.inventory-drawer-close').onclick=()=>d.classList.remove('show');d.onclick=e=>{if(e.target===d)d.classList.remove('show');};}
@@ -1657,6 +1669,30 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     showCommon(v);document.getElementById('warehouseNavToggle').classList.add('active');var fields=function(r){return d.cols.map(function(c,i){return [c,r[i]];});};v.querySelector('.audit-add').onclick=function(){auditOverlay('新增'+d.title,fields(d.rows[0]),true);};v.querySelector('.audit-search').onclick=function(){toast(d.title+'筛选结果已刷新');};v.querySelector('.audit-reset').onclick=function(){v.querySelectorAll('input').forEach(function(x){x.value='';});toast('仓储筛选条件已重置');};v.querySelector('.audit-export').onclick=function(){toast(d.title+'导出任务已创建');};v.querySelectorAll('.audit-detail,.audit-edit').forEach(function(x){x.onclick=function(){auditOverlay((x.classList.contains('audit-edit')?'编辑':'详情')+d.title,fields(d.rows[Number(x.dataset.i)]),x.classList.contains('audit-edit'));};});v.querySelectorAll('.audit-log').forEach(function(x){x.onclick=function(){auditOverlay(d.title+'日志',[['操作时间','2026-10-20 10:15'],['操作人','夏景舟'],['操作记录','页面数据已更新']],false);};});
   }
   window.addEventListener('click',function(e){var item=e.target.closest&&e.target.closest('#supplySideSubnav .simple-side-item,#warehouseSideSubnav .simple-side-item');if(!item)return;var box=item.closest('.simple-side-subnav'),mod=box&&box.id.replace('SideSubnav',''),key=item.dataset.sideKey;if(mod==='supply')supplyAudit(key==='risk'?'risk':'info');if(mod==='warehouse')warehouseAudit(key||'inbound');},true);
+})();
+</script>
+<script>
+/* 兜底同步库存子页面标题：无论由主路由还是备用挂载器进入，都显示当前子模块名称。 */
+(function(){
+  var inventoryNames={realtime:'实时库存',physical:'物理仓库',snapshot:'每日库存快照'};
+  function syncInventoryTitle(){
+    var view=document.getElementById('inventoryView');
+    if(!view||!view.classList.contains('active'))return;
+    var mode=view.dataset.mode;
+    var active=view.querySelector('[data-final-inv-tab].active,[data-inventory-tab].active');
+    var title=(mode&&inventoryNames[mode])||(active&&active.textContent.trim())||'实时库存';
+    var heading=view.querySelector('.inventory-head h2');
+    if(heading)heading.textContent=title;
+    var top=document.getElementById('productTopTab');
+    var x=top&&top.querySelector('.x');
+    if(x&&x.previousSibling)x.previousSibling.textContent=title+' ';
+  }
+  document.addEventListener('click',function(e){
+    var item=e.target.closest&&e.target.closest('#inventorySideSubnav .simple-side-item,#inventorySideSubnav .module-side-item');
+    if(item)setTimeout(syncInventoryTitle,0);
+  },true);
+  window.addEventListener('erp:inventory-mounted',syncInventoryTitle);
+  setTimeout(syncInventoryTitle,0);
 })();
 </script>
 <script>window.__tailScriptLoaded=true;</script>
