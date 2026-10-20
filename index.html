@@ -1027,6 +1027,12 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .inventory-view[data-mode] .inventory-filter.inventory-realtime .inventory-actions {
   display:contents;
 }
+.inventory-view[data-mode="realtime"] .final-inv-search,
+.inventory-view[data-mode="snapshot"] .final-inv-search { grid-column:4; }
+.inventory-view[data-mode="realtime"] .final-inv-reset,
+.inventory-view[data-mode="snapshot"] .final-inv-reset { grid-column:5; }
+.inventory-view[data-mode="physical"] .final-inv-search { grid-column:5; }
+.inventory-view[data-mode="physical"] .final-inv-reset { grid-column:6; }
 @media(max-width:1500px){
   .inventory-view[data-mode="realtime"] .inventory-filter.inventory-realtime,
   .inventory-view[data-mode="snapshot"] .inventory-filter.inventory-realtime { grid-template-columns:260px minmax(360px,1fr) 260px 128px 128px; }
