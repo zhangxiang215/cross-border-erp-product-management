@@ -13,6 +13,31 @@
 .home-tab.active{background:#fff;color:#2c3138;border-radius:13px 13px 0 0;margin-top:6px}
 .module-extra{display:none}.module-extra.active{display:block}.module-page-head{height:58px;background:#fff;border-radius:8px 8px 0 0;box-shadow:var(--shadow);display:flex;align-items:center;padding:0 22px;border-bottom:1px solid #e7ebef}.module-page-head h2{margin:0;color:#293641;font-size:18px}.module-page-head .module-actions{margin-left:auto;display:flex;gap:10px}.module-filter{background:#fff;padding:18px 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;box-shadow:var(--shadow)}.module-filter input,.module-filter select{height:38px;border:1px solid #d9dee5;border-radius:6px;padding:0 11px;color:#4d5966;background:#fff}.module-toolbar{height:60px;background:#f1f3f6;display:flex;align-items:center;padding:0 18px;gap:12px;margin-top:14px;border-radius:8px 8px 0 0}.module-table{background:#fff;box-shadow:var(--shadow);overflow:hidden}.module-table table{width:100%;border-collapse:collapse}.module-table th{height:48px;background:#fbfcfd;border-bottom:1px solid #e7ebef;color:#4d5966;text-align:left;padding:0 16px}.module-table td{height:66px;border-bottom:1px solid #edf0f3;padding:0 16px;color:#596575}.module-table td:last-child,.module-table th:last-child{text-align:right}.module-table .link{margin-left:14px}.module-badge{display:inline-block;padding:4px 8px;border-radius:5px;background:#edf7ef;color:#23904d;font-size:12px}.module-badge.gray{background:#f2f4f6;color:#74808c}.module-empty{padding:40px;text-align:center;color:#929da8;background:#fff}.form-head .form-context{font-size:14px;font-weight:400;opacity:.82;margin-right:4px}.form-head:before{display:none}
 </style>
+<style>
+/* Unified tertiary-page shell: every module uses the same full-page size and close behavior. */
+.form-mask{display:none;position:fixed;inset:0;z-index:70;background:#f5f7fa}
+.form-mask.show{display:block}
+.product-form{position:absolute;inset:0;background:#f5f7fa;border-radius:0;box-shadow:none;overflow:hidden}
+.purchase-source-page{display:none;position:fixed;inset:0;z-index:70;min-height:100vh;margin:0;border-radius:0;background:#f5f7fa;box-shadow:none;overflow:hidden}
+.purchase-source-page.active{display:flex;flex-direction:column}
+.purchase-source-head{height:82px;flex:none;background:#2876ed;color:#fff;border-bottom:0;padding:0 36px}
+.purchase-source-head h1{color:#fff;font-size:27px}
+.purchase-source-head .purchase-source-close{color:#fff;font-size:30px}
+.purchase-source-body{flex:1;min-height:0;overflow:auto;padding:32px 48px 70px;background:#f5f7fa}
+.purchase-source-foot{height:82px;flex:none;background:#fff}
+.drawer-mask{display:none;position:fixed;inset:0;z-index:70;background:#f5f7fa}
+.drawer-mask.show{display:block}
+.drawer{position:absolute;inset:0;width:auto;background:#f5f7fa;box-shadow:none;padding:0;overflow:auto}
+.drawer-title{height:82px;background:#2876ed;color:#fff;padding:0 36px;border-bottom:0;font-size:27px}
+.drawer-title .close{color:#fff;font-size:30px}
+.drawer .detail-section{margin:18px 48px 0;padding:0 20px 22px;background:#fff;border-radius:8px;box-shadow:var(--shadow);border-bottom:0}
+.drawer .detail-section h3{padding:18px 0;border-bottom:1px solid var(--line)}
+</style>
+<style>
+/* Prevent stale product content from resurfacing while any procurement page is active. */
+main:has(#purchaseView.active) #productPages{display:none!important}
+main:has(#purchaseView.active) #homePanel{display:none!important}
+</style>
 </head>
 <body>
 <div class="app">
@@ -117,13 +142,21 @@
     return false;
   }
   window.addEventListener('click',function(e){var item=e.target.closest&&e.target.closest('.simple-side-item,.module-side-item,.purchase-side-item,.product-subitem');if(!item)return;if(item.classList.contains('product-subitem')){setTimeout(hideSidebars,0);return;}if(dispatch(item)){e.preventDefault();e.stopImmediatePropagation();}},true);
+  window.addEventListener('click',function(e){
+    var purchaseItem=e.target.closest&&e.target.closest('#purchaseNavToggle');if(!purchaseItem)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    var rail=document.querySelector('.left-rail'),box=document.getElementById('purchaseSideSubnav'),wasOpen=rail&&rail.classList.contains('purchase-open');
+    renderPurchase('source',0);
+    if(rail&&!wasOpen){rail.classList.add('purchase-open');purchaseItem.classList.add('active');}
+    if(box&&!wasOpen)box.style.setProperty('display','block','important');
+  },true);
 })();
 </script>
   <aside class="left-rail">
     <div class="logo"><div class="logo-mark"></div></div>
     <div class="rail-item active" id="productNavToggle"><svg viewBox="0 0 24 24"><path d="M4 4h16v5H4zM4 12h16v8H4zM8 6.5h8M8 15.5h8"/></svg><span>产品</span></div><div class="product-subnav" id="productSubnav"><div class="product-subitem" id="sideListItem">商品管理</div><div class="product-subitem" id="sidePartsItem">配件管理</div><div class="product-subitem" id="sideMaterialItem">物料管理</div></div>
     <div class="rail-item" id="inventoryNavToggle"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM8 9h8M8 13h5"/></svg><span>库存</span></div>
-    <div class="rail-item" id="purchaseNavToggle"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10h3l3 3v4h-6zM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg><span>采购</span></div><div class="purchase-side-subnav" id="purchaseSideSubnav"></div>
+    <div class="rail-item" id="purchaseNavToggle"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10h3l3 3v4h-6zM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg><span>采购</span></div><div class="purchase-side-subnav simple-side-subnav" id="purchaseSideSubnav"></div>
     <div class="rail-item" id="supplyNavToggle"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0M4 12h3M17 12h3"/></svg><span>供应</span></div>
     <div class="rail-item" id="warehouseNavToggle"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9H4zM9 20v-6h6v6"/></svg><span>仓储</span></div>
     <div class="rail-item" style="margin-top:auto"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg><span>系统</span></div>
@@ -919,6 +952,8 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   var css=document.createElement('style');css.textContent='.rail-item{position:relative}.rail-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:13px;color:#9fb2c0}.left-rail:not(.product-open):not(.inventory-open):not(.purchase-open):not(.supply-open):not(.warehouse-open) .rail-caret{display:none}.module-side-subnav{display:none;width:154px;background:#0d3047;padding:4px 0 10px;border-left:3px solid #2385f7}.left-rail.inventory-open,.left-rail.supply-open,.left-rail.warehouse-open{width:154px;align-items:flex-start}.left-rail.inventory-open .rail-item,.left-rail.supply-open .rail-item,.left-rail.warehouse-open .rail-item{width:154px;flex-direction:row;justify-content:flex-start;padding-left:18px;gap:12px}.left-rail.inventory-open .module-side-subnav,.left-rail.supply-open .module-side-subnav,.left-rail.warehouse-open .module-side-subnav{display:block}.module-side-item{height:38px;padding-left:50px;display:flex;align-items:center;color:#aebdca;font-size:13px;cursor:pointer;position:relative}.module-side-item:hover,.module-side-item.active{color:#fff;background:#17445f}.module-side-item.active:before{content:"";position:absolute;left:32px;width:4px;height:4px;border-radius:50%;background:#2385f7}';document.head.appendChild(css);
   function ensureSide(key){var cfg=configs[key],item=document.getElementById(key+'NavToggle');if(!item)return;var caret=item.querySelector('.rail-caret');if(!caret){caret=document.createElement('span');caret.className='rail-caret';caret.textContent='▾';item.appendChild(caret);}var side=item.nextElementSibling;if(side&&key==='purchase'&&side.id==='purchaseSideSubnav'){side.classList.add('module-side-subnav');}else if(!side||!side.classList.contains('module-side-subnav')){side=document.createElement('div');side.className='module-side-subnav';item.parentNode.insertBefore(side,item.nextSibling);}side.id=key+'SideSubnav';side.innerHTML=cfg.items.map(function(x){return '<div class="module-side-item" data-module-side="'+x[1]+'">'+x[0]+'</div>';}).join('');return {item:item,side:side,caret:caret,cfg:cfg};}
   var groups={};Object.keys(configs).forEach(function(k){groups[k]=ensureSide(k);});
+  /* Keep one authoritative side panel per module; duplicate IDs caused clicks to hit stale panels. */
+  document.querySelectorAll('#purchaseSideSubnav').forEach(function(node,index){if(index>0)node.remove();});
   function closeOthers(except){Object.keys(configs).forEach(function(k){if(k!==except){rail.classList.remove(configs[k].open);if(groups[k])groups[k].caret.textContent='▾';}});}
   function openGroup(key){closeOthers(key);rail.classList.add(configs[key].open);groups[key].caret.textContent='▴';}
   function invokeSide(key,value){
@@ -932,6 +967,30 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
     g.side.querySelectorAll('[data-module-side]').forEach(function(sub){sub.onclick=function(){openGroup(key);g.side.querySelectorAll('.module-side-item').forEach(function(x){x.classList.remove('active');});sub.classList.add('active');invokeSide(key,sub.dataset.moduleSide);};});
   });
   window.addEventListener('load',function(){openGroup('product');});
+  /* Procurement entry is handled here before legacy rail handlers. */
+  window.addEventListener('click',function(e){
+    var item=e.target.closest&&e.target.closest('#purchaseNavToggle');
+    if(!item)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    var view=document.getElementById('purchaseView');
+    if(!view){view=document.createElement('section');view.id='purchaseView';view.className='purchase-view';document.querySelector('.main').appendChild(view);}
+    var rail=document.querySelector('.left-rail'),open=rail.classList.contains('purchase-open');
+    if(open){rail.classList.remove('purchase-open');var oldBox=document.getElementById('purchaseSideSubnav');if(oldBox)oldBox.style.setProperty('display','none','important');return;}
+    drawPurchase('source');
+    document.getElementById('productPages').hidden=true;
+    document.getElementById('homePanel').hidden=true;
+    rail.classList.add('purchase-open');
+    var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','block','important');
+    setTimeout(function(){
+      drawPurchase('source');
+      document.getElementById('productPages').hidden=true;
+      document.getElementById('homePanel').hidden=true;
+      document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});
+      item.classList.add('active');
+      rail.classList.add('purchase-open');
+      var finalBox=document.getElementById('purchaseSideSubnav');if(finalBox)finalBox.style.setProperty('display','block','important');
+    },0);
+  },true);
 })();
 </script>
 <style>
@@ -1053,5 +1112,63 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   },true);
 })();
 </script>
+<script>
+/* Final navigation guard: keep module entry pages authoritative after all legacy bindings. */
+(function(){
+  window.__finalModuleNavigationGuard=true;
+  function resetMain(){
+    ['homePanel','productPages','inventoryView','supplyView','warehouseView','materialsView','partsView'].forEach(function(id){
+      var el=document.getElementById(id);if(!el)return;
+      if(id==='homePanel')el.hidden=true;
+      else if('hidden' in el)el.hidden=true;
+      el.classList&&el.classList.remove('active');
+    });
+    var form=document.getElementById('formMask');if(form)form.classList.remove('show');
+    var drawer=document.getElementById('drawerMask');if(drawer)drawer.classList.remove('show');
+    var source=document.getElementById('purchaseSourcePage');if(source)source.classList.remove('active');
+    document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});
+    var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.classList.add('active');}
+    var homeTab=document.getElementById('homeTopTab');if(homeTab)homeTab.classList.remove('active');
+  }
+  function ensurePurchaseView(){
+    var view=document.getElementById('purchaseView');
+    if(!view){view=document.createElement('section');view.id='purchaseView';view.className='purchase-view';var main=document.querySelector('.main');if(main)main.appendChild(view);}
+    return view;
+  }
+  function enterPurchase(key,sub){
+    var view=ensurePurchaseView();
+    resetMain();
+    if(typeof window.renderPurchaseFull==='function')window.renderPurchaseFull(key||'source',Number(sub)||0);
+    else if(typeof window.renderPurchase==='function')window.renderPurchase(key||'source',Number(sub)||0);
+    view.hidden=false;view.classList.add('active');
+    var pages=document.getElementById('productPages');if(pages)pages.setAttribute('hidden','');
+    var tab=document.getElementById('productTopTab'),x=tab&&tab.querySelector('.x');if(x&&x.previousSibling)x.previousSibling.textContent='采购 ';
+    var purchaseItem=document.getElementById('purchaseNavToggle');if(purchaseItem)purchaseItem.classList.add('active');
+  }
+  function openPurchaseSide(){
+    var rail=document.querySelector('.left-rail'),box=document.getElementById('purchaseSideSubnav');
+    if(rail)rail.classList.add('purchase-open');
+    if(box){box.style.setProperty('display','block','important');box.classList.add('simple-side-subnav');}
+  }
+  window.addEventListener('click',function(e){
+    var target=e.target.closest&&e.target.closest('#purchaseNavToggle');
+    if(target){
+      e.preventDefault();e.stopImmediatePropagation();
+      var rail=document.querySelector('.left-rail'),wasOpen=rail?.classList.contains('purchase-open');
+      if(!wasOpen){enterPurchase('source',0);openPurchaseSide();}
+      else{if(rail)rail.classList.remove('purchase-open');var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','none','important');}
+      return;
+    }
+    var child=e.target.closest&&e.target.closest('#purchaseSideSubnav .simple-side-item,#purchaseSideSubnav .module-side-item');
+    if(child){
+      e.preventDefault();e.stopImmediatePropagation();
+      enterPurchase(child.dataset.sideKey||child.dataset.moduleSide||'source',0);
+      var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','none','important');
+      var sideRail=document.querySelector('.left-rail');if(sideRail)sideRail.classList.remove('purchase-open');
+    }
+  },true);
+})();
+</script>
+<script>window.__tailScriptLoaded=true;</script>
 </body>
 </html>
