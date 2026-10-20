@@ -35,6 +35,9 @@
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function closeViews(){
     ['homePanel','productPages','inventoryView','purchaseView','supplyView','warehouseView','materialsView','partsView'].forEach(function(id){var x=document.getElementById(id);if(x){x.hidden=id==='homePanel';x.classList&&x.classList.remove('active');}});
+    var rail=document.querySelector('.left-rail');
+    if(rail){['product-open','inventory-open','purchase-open','supply-open','warehouse-open'].forEach(function(c){rail.classList.remove(c);});}
+    document.querySelectorAll('.simple-side-subnav,.module-side-subnav,.purchase-side-subnav,.product-subnav').forEach(function(x){x.style.setProperty('display','none','important');});
     var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.classList.add('active');}
     var home=document.getElementById('homeTopTab');if(home)home.classList.remove('active');
   }
