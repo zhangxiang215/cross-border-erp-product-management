@@ -198,6 +198,15 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
 #productTableCard .data-table td:last-child .status-list {
   text-align:center !important;
 }
+#productTableCard .data-table td:last-child .status-list {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  line-height:1.5;
+  white-space:nowrap;
+}
+#productTableCard .data-table td:last-child .status-list br { display:none; }
 /* 全局列表列间距：统一密度，避免字段过宽或过窄 */
 .data-table th,
 .data-table td,
