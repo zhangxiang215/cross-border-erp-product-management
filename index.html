@@ -62,7 +62,8 @@ main:has(#purchaseView.active) #homePanel{display:none!important}
   };
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function closeViews(){
-    ['homePanel','productPages','inventoryView','purchaseView','supplyView','warehouseView','materialsView','partsView'].forEach(function(id){var x=document.getElementById(id);if(x){x.hidden=id==='homePanel';x.classList&&x.classList.remove('active');}});
+    ['homePanel','productPages','inventoryView','purchaseView','supplyView','warehouseView','materialsView','partsView','purchaseActionPage','purchaseCreatePage','genericActionPage','purchaseSourcePage','purchaseAuditPage','purchaseLogPage','supplyRiskPage','warehouseDetailPage'].forEach(function(id){var x=document.getElementById(id);if(x){x.hidden=id==='homePanel';x.classList&&x.classList.remove('active');}});
+    ['formMask','drawerMask','inventoryDrawer'].forEach(function(id){var x=document.getElementById(id);if(x)x.classList.remove('show');});
     hideSidebars();
     var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.classList.add('active');}
     var home=document.getElementById('homeTopTab');if(home)home.classList.remove('active');
@@ -194,7 +195,7 @@ main:has(#purchaseView.active) #homePanel{display:none!important}
     if(module==='product'){
       var productKey=item.dataset.sideKey||'';
       var productPages=document.getElementById('productPages'),home=document.getElementById('homePanel'),productView=document.getElementById('moduleProductView'),partsView=document.getElementById('partsView'),materialsView=document.getElementById('materialsView');
-      if(productPages){productPages.hidden=false;if(home)home.hidden=true;if(productView)productView.style.display=productKey==='sideListItem'?'block':'none';if(partsView)partsView.classList.toggle('active',productKey==='sidePartsItem');if(materialsView)materialsView.classList.toggle('active',productKey==='sideMaterialItem');document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});document.getElementById('productNavToggle')?.classList.add('active');setTitle(productKey==='sidePartsItem'?'配件管理':productKey==='sideMaterialItem'?'物料管理':'商品管理');hideSidebars();if(productKey==='sidePartsItem'&&typeof bindPartsActions==='function')bindPartsActions();if(productKey==='sideMaterialItem'&&typeof bindMaterialActions==='function')bindMaterialActions();return true;}
+      if(productPages){closeViews();productPages.hidden=false;if(home)home.hidden=true;if(productView)productView.style.display=productKey==='sideListItem'?'block':'none';if(partsView)partsView.classList.toggle('active',productKey==='sidePartsItem');if(materialsView)materialsView.classList.toggle('active',productKey==='sideMaterialItem');document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});document.getElementById('productNavToggle')?.classList.add('active');setTitle(productKey==='sidePartsItem'?'配件管理':productKey==='sideMaterialItem'?'物料管理':'商品管理');hideSidebars();if(productKey==='sidePartsItem'&&typeof bindPartsActions==='function')bindPartsActions();if(productKey==='sideMaterialItem'&&typeof bindMaterialActions==='function')bindMaterialActions();return true;}
       return false;
     }
     if(module==='purchase'){var key=Object.keys(purchaseGroups).filter(function(k){return purchaseGroups[k][0]===label;})[0]||'source';renderPurchase(key);return true;}
