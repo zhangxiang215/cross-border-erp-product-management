@@ -51,6 +51,51 @@
     if(!v){v=document.createElement('section');v.id='purchaseView';v.className='purchase-view';document.querySelector('.main').appendChild(v);}
     var current=group[0];v.innerHTML='<div class="purchase-head"><h2>采购</h2><div class="purchase-tabs"><div class="purchase-tab active">'+esc(current)+'</div></div></div><div class="purchase-module-nav">'+Object.keys(purchaseGroups).map(function(k){return '<button class="'+(k===key?'active':'')+'" data-unified-purchase="'+k+'">'+esc(purchaseGroups[k][0])+'</button>';}).join('')+'</div><div class="purchase-subnav">'+group.slice(1).map(function(x,i){return '<button class="'+(i===0?'active':'')+'">'+esc(x)+'</button>';}).join('')+'</div>'+table(current);v.classList.add('active');closeViews();v.hidden=false;v.classList.add('active');setTitle('采购');document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});document.getElementById('purchaseNavToggle')?.classList.add('active');v.querySelectorAll('[data-unified-purchase]').forEach(function(b){b.onclick=function(){renderPurchase(b.dataset.unifiedPurchase);};});
   }
+  var purchasePageHeaders={
+    '货源变更审核':['SKU','商品名称','审核类型','当前审核节点','货源供应商','变更人','发起时间','操作栏'],
+    '货源变更记录':['SKU','商品名称','审核类型','审核状态','货源供应商','变更人','时间','操作栏'],
+    '商品列表':['SKU','商品名称','SPU','商品状态','采购负责人','货源供应商','操作栏'],
+    '采购价管理':['SKU','商品名称','供应商名称','原采购价','新采购价','生效时间','状态','操作栏'],
+    '价格审核':['SKU','商品名称','供应商名称','申请人','审核状态','申请时间','操作栏'],
+    '价格审核记录':['SKU','商品名称','供应商名称','审核结果','审核人','审核时间','操作栏'],
+    '核价列表':['SKU','商品名称','供应商名称','核价状态','采购价','核价人','操作栏'],
+    '计划列表':['计划单号','计划名称','计划类型','计划数量','计划日期','负责人','状态','操作栏'],
+    '计划明细':['计划单号','SKU','商品名称','计划数量','已采购数量','待采购数量','状态','操作栏'],
+    '备货单列表':['备货单号','SKU数量','备货仓库','目的仓区','预计到货日期','创建人','状态','操作栏'],
+    '异常备货单':['备货单号','异常类型','SKU','异常数量','异常原因','处理状态','操作栏'],
+    '待转备货明细':['备货单号','SKU','商品名称','可转数量','目的仓区','转采购状态','操作栏'],
+    '待执行采购单':['采购单号','供应商名称','SKU数量','采购金额','交货日期','采购负责人','状态','操作栏'],
+    '待审核采购单':['采购单号','供应商名称','申请人','采购金额','提交时间','审核状态','操作栏'],
+    '待下单采购单':['采购单号','供应商名称','SKU数量','采购金额','下单渠道','采购负责人','状态','操作栏'],
+    '履约采购单':['采购单号','供应商名称','发货状态','到货状态','预计到货日期','采购负责人','状态','操作栏'],
+    '采购订单':['采购单号','供应商名称','采购金额','下单时间','付款状态','履约状态','操作栏'],
+    '抵扣单':['抵扣单号','供应商名称','抵扣金额','抵扣类型','申请人','审核状态','操作栏'],
+    '预付款':['付款单号','供应商名称','付款金额','付款方式','申请时间','付款状态','操作栏'],
+    '请款单':['请款单号','供应商名称','请款金额','请款类型','申请人','申请时间','状态','操作栏'],
+    '请款单审批':['请款单号','供应商名称','请款金额','申请人','当前审批人','审批状态','操作栏'],
+    '索赔单':['索赔单号','供应商名称','索赔类型','索赔金额','申请人','处理状态','操作栏'],
+    '合同列表':['合同编号','合同名称','供应商名称','合同类型','签署状态','生效日期','操作栏'],
+    '待对账池子':['供应商名称','采购单号','对账金额','差异金额','账期','入池时间','操作栏'],
+    '对账单列表':['对账单号','供应商名称','对账周期','对账金额','差异金额','对账状态','操作栏'],
+    '中仓到货预约':['预约单号','采购单号','供应商名称','预约仓库','预约日期','到货数量','状态','操作栏'],
+    '供应商集货列表':['集货单号','供应商名称','集货数量','物流方式','发货时间','物流状态','操作栏'],
+    '订单异常列表':['异常单号','采购单号','异常类型','异常描述','发现时间','处理状态','操作栏'],
+    '订单异常审核':['异常单号','采购单号','异常类型','申请人','审核状态','审核时间','操作栏'],
+    '入库异常列表':['异常单号','SKU','异常类型','异常数量','仓库','处理状态','操作栏'],
+    '商检单管理':['商检单号','采购单号','供应商名称','SKU数量','提交时间','商检状态','操作栏'],
+    '开票通知列表':['通知单号','供应商名称','采购单号','开票金额','发票类型','通知时间','状态','操作栏']
+  };
+  function purchaseTable(label){
+    var heads=purchasePageHeaders[label]||['编号','名称','负责人','状态','操作栏'];
+    var cells=heads.slice(0,-1).map(function(h,i){var vals={SKU:'JZETLQ-0090000US',商品名称:'8L速热热水宝（带防电墙）美标',供应商名称:'深圳市恒温电器有限公司',状态:'待处理',审核状态:'待审核',操作栏:''};return '<td>'+(vals[h]||((i%3===0?'ERP':'')+'202610180028'))+'</td>';}).join('');
+    var cells2=heads.slice(0,-1).map(function(h,i){var vals={SKU:'SKU-20261015-001',商品名称:'便携式衣物护理机',供应商名称:'义乌市优品供应链',状态:'进行中',审核状态:'已通过',操作栏:''};return '<td>'+(vals[h]||((i%3===0?'ERP':'')+'202610170041'))+'</td>';}).join('');
+    return '<div class="purchase-page-title" style="height:42px;background:#fff;padding:12px 20px;color:#4d5966;font-weight:650">'+esc(label)+'</div><div class="purchase-full-filter"><input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>请选择状态</option><option>全部</option><option>待处理</option><option>已完成</option></select><button class="action-btn primary">搜索</button><button class="action-btn reset">重置</button></div><div class="purchase-full-toolbar"><button class="tool primary">导出</button><button class="tool">日志</button><span class="purchase-full-count">共 128 条数据</span></div><div class="purchase-full-table"><table><thead><tr><th>勾选</th>'+heads.map(function(h){return '<th>'+esc(h)+'</th>';}).join('')+'</tr></thead><tbody><tr><td><span class="check"></span></td>'+cells+'<td><span class="full-link">详情</span><span class="full-link">编辑</span></td></tr><tr><td><span class="check"></span></td>'+cells2+'<td><span class="full-link">详情</span><span class="full-link">编辑</span></td></tr></tbody></table></div>';
+  }
+  renderPurchase=function(key,subIndex){
+    var group=purchaseGroups[key]||purchaseGroups.source,idx=Math.max(0,Math.min(Number(subIndex)||0,group.length-2)),label=group.slice(1)[idx]||group[0],v=document.getElementById('purchaseView');
+    if(!v){v=document.createElement('section');v.id='purchaseView';v.className='purchase-view';document.querySelector('.main').appendChild(v);}
+    v.innerHTML='<div class="purchase-head"><h2>采购</h2><div class="purchase-tabs"><div class="purchase-tab active">'+esc(group[0])+'</div></div></div><div class="purchase-module-nav">'+Object.keys(purchaseGroups).map(function(k){return '<button class="'+(k===key?'active':'')+'" data-unified-purchase="'+k+'">'+esc(purchaseGroups[k][0])+'</button>';}).join('')+'</div><div class="purchase-subnav">'+group.slice(1).map(function(x,i){return '<button class="'+(i===idx?'active':'')+'" data-unified-sub="'+i+'">'+esc(x)+'</button>';}).join('')+'</div>'+purchaseTable(label);v.classList.add('active');closeViews();v.hidden=false;v.classList.add('active');setTitle('采购');document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});document.getElementById('purchaseNavToggle')?.classList.add('active');v.querySelectorAll('[data-unified-purchase]').forEach(function(b){b.onclick=function(){renderPurchase(b.dataset.unifiedPurchase,0);};});v.querySelectorAll('[data-unified-sub]').forEach(function(b){b.onclick=function(){renderPurchase(key,b.dataset.unifiedSub);};});v.querySelectorAll('.purchase-full-toolbar .tool,.purchase-full-actions button').forEach(function(b){b.onclick=function(){toast(label+'页面操作已提交');};});
+  };
   function renderGeneric(module,key,label){
     var view=document.getElementById(module+'View');if(!view){view=document.createElement('section');view.id=module+'View';view.className=module+'-view';document.querySelector('.main').appendChild(view);}
     var title={inventory:'库存',supply:'供应',warehouse:'仓储'}[module]||module;
