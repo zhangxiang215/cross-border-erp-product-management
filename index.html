@@ -967,6 +967,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const closeCurrentPage=()=>{document.getElementById('inventoryView')?.classList.remove('active');document.getElementById('purchaseView')?.classList.remove('active');document.getElementById('purchaseSourcePage')?.classList.remove('active');document.getElementById('purchaseDrawer')?.classList.remove('show');document.getElementById('formMask')?.classList.remove('show');document.getElementById('drawerMask')?.classList.remove('show');document.getElementById('productPages').hidden=true;document.getElementById('homePanel').hidden=false;document.getElementById('homeTopTab').classList.add('active');document.getElementById('productTopTab').classList.remove('active');document.getElementById('productTopTab').style.display='none';document.querySelectorAll('.rail-item').forEach(x=>x.classList.remove('active'));document.querySelector('.left-rail').classList.remove('product-open');};
   document.getElementById('productTopTab')?.addEventListener('click',e=>{if(e.target.closest('.x')){closeCurrentPage();return;}if(document.getElementById('inventoryView')?.classList.contains('active'))mount('realtime');else if(document.getElementById('purchaseView')?.classList.contains('active'))purchaseMount('source');else document.getElementById('sideListItem')?.click();});
   document.getElementById('homeTopTab')?.addEventListener('click',closeCurrentPage);
+  window.__primaryInventoryMount=mount;
   window.__erpInventoryMount=mount;
 })();
 */
@@ -1704,6 +1705,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 <script>
 /* 兜底同步库存子页面标题：无论由主路由还是备用挂载器进入，都显示当前子模块名称。 */
 (function(){
+  if(window.__primaryInventoryMount)window.__erpInventoryMount=window.__primaryInventoryMount;
   var inventoryNames={realtime:'实时库存',physical:'物理仓库',snapshot:'每日库存快照'};
   function syncInventoryTitle(){
     var view=document.getElementById('inventoryView');
