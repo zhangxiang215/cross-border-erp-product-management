@@ -728,7 +728,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     const body=document.querySelector('.product-form .form-body');
     body.innerHTML=sectionNav('配件SKU管理',[['partBase','关联商品'],['partSku','配件信息'],['partSupplier','配件供应商'],['partPackage','包装资料'],['partQuality','品控检测']])+`<div class="form-content">
       <section class="form-section" id="partBase"><h3>关联商品</h3><div class="form-grid">${input('关联商品SKU','请选择商品 SKU',true)}${input('关联数量','请输入单个商品配件数量')}</div></section>
-      <section class="form-section" id="partSku"><h3>配件信息</h3><div class="form-grid">${input('配件SKU','系统生成或输入配件 SKU',true)}${input('配件名称','请输入配件名称',true)}${select('配件类型',['插头配件','结构配件','包装配件','其他'],true)}${select('状态',['启用','停用'])}</div></section>
+      <section class="form-section" id="partSku"><h3>配件信息</h3><div class="form-grid">${input('配件SKU','系统生成或输入配件 SKU',true)}${input('配件名称','请输入配件名称',true)}${select('配件类型',['插头配件','结构配件','包装配件','其他'],true)}${select('状态',['启用','停用'])}${input('配件重量','请输入配件重量')}</div></section>
       <section class="form-section" id="partSupplier"><h3>配件供应商</h3><div class="form-grid">${select('供应商',['请选择供应商'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入备注',false,true)}</div></section>
       <section class="form-section" id="partPackage"><h3>包装资料</h3><div class="form-grid">${select('包装形态',['标准包装','裸装'])}${input('包装尺寸','长 × 宽 × 高 cm')}${input('包装毛重','请输入包装毛重 g')}${select('基本单位',['个','件'])}</div></section>
       <section class="form-section" id="partQuality"><h3>品控检测</h3><div class="form-grid">${select('检测等级',['B','A'])}${select('检验方式',['抽检','全检'])}${textarea('检验标准','请输入配件检查标准',false,true)}</div></section>
