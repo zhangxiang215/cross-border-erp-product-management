@@ -670,9 +670,8 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
         const skuInput=row.querySelector('.part-sku'),weightInput=row.querySelector('.part-weight');
         const syncWeight=()=>{const part=partsData.find(p=>p.code===skuInput.value.trim());weightInput.value=part?part.weight:'';weightInput.title=part?`取自配件管理：${part.name}`:'未匹配到配件重量';};
         skuInput.addEventListener('input',syncWeight);skuInput.addEventListener('change',syncWeight);syncWeight();
-        row.querySelector('.add-part-row')?.addEventListener('click',()=>{const next=document.createElement('div');next.className='part-row';next.innerHTML=rowMarkup(null,true);partRows.appendChild(next);bindPartRow(next);});
-        row.querySelector('.remove-part-row')?.addEventListener('click',()=>{if(partRows.children.length>1)row.remove();});
       };
+      partRows.addEventListener('click',event=>{const add=event.target.closest('.add-part-row'),remove=event.target.closest('.remove-part-row');if(add){const next=document.createElement('div');next.className='part-row';next.innerHTML=rowMarkup(null,true);partRows.appendChild(next);bindPartRow(next);}if(remove&&partRows.children.length>1)remove.closest('.part-row').remove();});
       bindPartRow(partRows.querySelector('.part-row'));hasPartSelect.addEventListener('change',syncPartRows);syncPartRows();
       window.__populateAccessoryWeightRows=productSku=>{const linked=partsData.filter(p=>p.sku===productSku);if(!linked.length)return;hasPartSelect.value='yes';partRows.innerHTML='';linked.forEach((part,index)=>{const row=document.createElement('div');row.className='part-row';row.innerHTML=rowMarkup(part,index>0);partRows.appendChild(row);bindPartRow(row);});syncPartRows();};
     }
