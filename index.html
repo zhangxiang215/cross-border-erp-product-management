@@ -700,6 +700,11 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       addBackupSupplier.onclick=()=>{backupSupplierList.insertAdjacentHTML('beforeend',backupSupplierBlock(backupSupplierList.children.length+1));renumberBackupSuppliers();};
       backupSupplierList.addEventListener('click',event=>{const remove=event.target.closest('.remove-backup-supplier');if(remove){remove.closest('.backup-supplier-block').remove();renumberBackupSuppliers();}});
     }
+    const declarationCurrency=$('declarationCurrency'),declarationAmount=$('declarationAmount');
+    if(declarationCurrency&&declarationAmount){
+      const currencyRates={USD:1,CNY:7.2,EUR:.92};let previousCurrency=declarationCurrency.value;
+      declarationCurrency.addEventListener('change',()=>{const nextCurrency=declarationCurrency.value,amount=Number(declarationAmount.value);if(previousCurrency&&nextCurrency&&Number.isFinite(amount)&&declarationAmount.value!==''){const amountInUsd=amount/currencyRates[previousCurrency];declarationAmount.value=(amountInUsd*currencyRates[nextCurrency]).toFixed(2);toast2(`申报金额已由 ${previousCurrency} 自动换算为 ${nextCurrency}`);}previousCurrency=nextCurrency;});
+    }
   }
   function sectionNav(title,items){return `<nav class="form-nav"><div class="form-nav-title">${title}</div>${items.map((x,i)=>`<div class="form-nav-item${i?'':' active'}" data-target="${x[0]}">${x[1]}</div>`).join('')}</nav>`;}
 
@@ -731,7 +736,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       </div></section>
       <section class="form-section section-anchor" id="supplierInfo"><h3>供应商管理</h3><div class="supplier-block"><h4>主供应商</h4><div class="form-grid">${select('供应商',['请选择主供应商','深圳市恒温电器有限公司','义乌市优品供应链'],true)}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div><div id="backupSupplierList"></div><div class="supplier-actions"><button type="button" class="tool" id="addBackupSupplier">＋ 增加备用供应商</button></div></section>
       <section class="form-section section-anchor" id="costInfo"><h3>成本与定价</h3><div class="form-grid">${input('采购成本','请输入采购成本')}${input('配件成本','请输入配件成本')}${input('包装成本','请输入包装成本')}${input('其他成本','请输入其他成本')}${input('单件成本合计','请输入')}${input('站点售价','请输入站点售价')}${input('利润状态','请输入')}${textarea('定价备注','请输入定价备注',false,true)}</div></section>
-      <section class="form-section section-anchor" id="customsInfo"><h3>海关申报</h3><div class="form-grid">${input('中文申报品名','请输入中文申报品名',true)}${input('英文申报品名','请输入英文申报品名',true)}${input('HS编码（中国海关编码）','请输入 HS 编码',true)}${item('申报价值',`<div class="inline-control"><select class="form-select"><option value="">请选择币种</option><option>USD</option><option>CNY</option><option>EUR</option></select><input class="form-input" placeholder="请输入金额"></div>`)}</div></section>
+      <section class="form-section section-anchor" id="customsInfo"><h3>海关申报</h3><div class="form-grid">${input('中文申报品名','请输入HS编码的中文申报名称',true)}${input('英文申报品名','请输入英文申报品名',true)}${input('HS编码（中国海关编码）','请输入 HS 编码',true)}${item('申报价值',`<div class="declaration-value-control"><div class="inline-control"><select class="form-select" id="declarationCurrency"><option value="">请选择币种</option><option value="USD">USD 美元</option><option value="CNY">CNY 人民币</option><option value="EUR">EUR 欧元</option></select><input class="form-input" id="declarationAmount" type="number" min="0" step="0.01" placeholder="请输入金额"></div><small>切换币种后自动换算金额</small></div>`)}${input('海关申报用途','请输入海关申报用途')}${input('申报产品材质','请输入申报产品材质')}</div></section>
     </div>`;
     bindEnhancedForm();
   };
@@ -899,6 +904,12 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .supplier-actions{display:flex;justify-content:flex-start;padding-top:2px}
 .supplier-actions .tool{height:36px;font-size:13px;padding:0 15px}
 .remove-backup-supplier{height:30px;padding:0 12px;border:1px solid #ffb1b1;border-radius:5px;background:#fff;color:#e34f4f;cursor:pointer}
+</style>
+<style>
+/* 海关申报价值：币种切换自动换算 */
+.declaration-value-control{flex:1;min-width:0}
+.declaration-value-control .form-select{flex:0 0 180px}
+.declaration-value-control small{display:block;margin-top:5px;color:#8a96a5;font-size:12px}
 </style>
 <style>
 /* 外箱条件字段与物流标识下拉多选 */
