@@ -642,6 +642,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const checks=(arr,name,radio=false)=>`<div class="check-row">${arr.map((x,i)=>`<label class="form-check"><input type="${radio?'radio':'checkbox'}" name="${name}" ${i===arr.length-1&&!radio?'checked':''}>${x}</label>`).join('')}</div>`;
   const upload=(title,multi=false)=>`<div class="upload-group"><div class="upload-box file-trigger" data-title="${title}"><span>＋<br>${multi?'上传图片':'上传文件'}</span></div><div class="upload-name">${multi?'支持单张 / 多张':'点击选择文件'}</div></div>`;
   const linkInput=(label,ph)=>item(label,`<div class="inline-control"><input class="form-input" placeholder="${ph}"><button class="tool link-test" type="button">打开链接</button></div>`,true);
+  const listingPlatformRow=(index=1)=>`<div class="listing-platform-row" data-platform-index="${index}"><label>上架平台${index}</label><div class="listing-platform-content"><div class="listing-platform-line"><select class="form-select listing-platform-select"><option value="">请选择上架平台</option><option value="Amazon">Amazon</option><option value="Temu">Temu</option><option value="eBay">eBay</option><option value="独立站">独立站</option></select><button type="button" class="listing-platform-btn add-listing-platform" aria-label="新增上架平台">＋</button>${index>1?'<button type="button" class="listing-platform-btn remove-listing-platform" aria-label="删除上架平台">−</button>':''}</div><div class="listing-platform-categories" hidden><div class="listing-category-field"><span>主类目</span><input class="form-input" placeholder="请输入主类目"></div><div class="listing-category-field"><span>次类目</span><input class="form-input" placeholder="请输入次类目"></div></div></div></div>`;
 
   function bindEnhancedForm(){
     document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
@@ -662,6 +663,14 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       markSelect.querySelectorAll('.multi-select-menu input').forEach(input=>input.addEventListener('change',()=>{const values=[...markSelect.querySelectorAll('.multi-select-menu input:checked')].map(x=>x.value);value.textContent=values.length?values.join('、'):`请选择${markSelect.closest('.form-item')?.querySelector('label')?.textContent.trim()||'选项'}`;}));
     });
     document.addEventListener('click',()=>document.querySelectorAll('.multi-select.open').forEach(x=>x.classList.remove('open')));
+    const listingPlatformRows=$('listingPlatformRows');
+    if(listingPlatformRows){
+      const syncListingPlatformRow=row=>{const selected=row.querySelector('.listing-platform-select')?.value;const categories=row.querySelector('.listing-platform-categories');if(categories)categories.hidden=!selected;};
+      const renumberListingPlatforms=()=>{[...listingPlatformRows.children].forEach((row,index)=>{const number=index+1;row.dataset.platformIndex=number;row.querySelector(':scope > label').textContent=`上架平台${number}`;const line=row.querySelector('.listing-platform-line');const oldRemove=line.querySelector('.remove-listing-platform');if(index===0){oldRemove?.remove();}else if(!oldRemove){line.insertAdjacentHTML('beforeend','<button type="button" class="listing-platform-btn remove-listing-platform" aria-label="删除上架平台">−</button>');}});};
+      listingPlatformRows.addEventListener('change',event=>{if(event.target.matches('.listing-platform-select'))syncListingPlatformRow(event.target.closest('.listing-platform-row'));});
+      listingPlatformRows.addEventListener('click',event=>{const add=event.target.closest('.add-listing-platform'),remove=event.target.closest('.remove-listing-platform');if(add){listingPlatformRows.insertAdjacentHTML('beforeend',listingPlatformRow(listingPlatformRows.children.length+1));renumberListingPlatforms();}if(remove&&listingPlatformRows.children.length>1){remove.closest('.listing-platform-row').remove();renumberListingPlatforms();}});
+      [...listingPlatformRows.children].forEach(syncListingPlatformRow);renumberListingPlatforms();
+    }
     const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
     if(hasPartSelect&&partRows){
       const syncPartRows=()=>{partRows.closest('.form-item').style.display=hasPartSelect.value==='yes'?'flex':'none';};
@@ -702,7 +711,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       </div></section>
       <section class="form-section section-anchor" id="listingInfo"><h3>产品刊登信息</h3><div class="form-grid">
         ${item('产品精修主图',upload('产品精修主图',true))}${item('产品详情页（A+）',upload('产品详情页（A+）',true))}
-        ${multiSelect('平台类目',['Amazon','Temu','eBay','独立站'],'platformCategorySelect')}${item('主类目','<input class="form-input listing-category-input" placeholder="请输入主类目">')}${item('次类目','<input class="form-input listing-category-input" placeholder="请输入次类目">')}
+        <div class="listing-platform-rows" id="listingPlatformRows">${listingPlatformRow(1)}</div>
         ${multiSelect('售卖市场',['美国站','欧洲站','中东站'],'salesMarketSelect')}${multiSelect('售卖方式',['FBA','FBM','其他'],'salesMethodSelect')}
         ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格')}${input('平台限价-大促活动价格','请输入价格')}
         <div class="form-item full"><label>Listing映射</label><div id="listingRows" class="dynamic-list"><div class="inline-control"><input class="form-input" placeholder="平台 / 站点 / 账号 / ASIN / MSKU"><button type="button" class="tool" data-add-row="listingRows">＋增加一条</button></div></div></div>
@@ -838,8 +847,20 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .part-row .form-input:first-child{flex:0 1 260px;width:260px;max-width:260px}
 </style>
 <style>
-/* 刊登信息中的主类目、次类目输入框缩短 */
-#listingInfo .listing-category-input{flex:0 1 260px;width:260px;max-width:260px}
+/* 商品新增/编辑：动态上架平台与按平台显示的类目 */
+.listing-platform-rows{grid-column:1/-1;display:flex;flex-direction:column;gap:14px}
+.listing-platform-row{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:start;gap:0}
+.listing-platform-row>label{padding:9px 14px 0 0;text-align:right;color:#475467;font-weight:500;white-space:nowrap}
+.listing-platform-content{min-width:0}
+.listing-platform-line{display:flex;align-items:center;gap:8px}
+.listing-platform-select{flex:0 1 520px;width:520px;max-width:calc(100% - 76px)}
+.listing-platform-btn{flex:0 0 32px;width:32px;height:32px;border:1px solid #2876ed;border-radius:6px;background:#fff;color:#2876ed;font-size:22px;line-height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.listing-platform-btn:hover{background:#eef5ff}
+.listing-platform-categories{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:12px;max-width:1056px}
+.listing-platform-categories[hidden]{display:none}
+.listing-category-field{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:10px}
+.listing-category-field>span{text-align:right;color:#475467;white-space:nowrap}
+@media(max-width:900px){.listing-platform-row{grid-template-columns:1fr}.listing-platform-row>label{text-align:left;padding:0 0 8px}.listing-platform-categories{grid-template-columns:1fr}.listing-platform-select{width:auto;max-width:calc(100% - 76px)}}
 </style>
 <style>
 /* 外箱条件字段与物流标识下拉多选 */
