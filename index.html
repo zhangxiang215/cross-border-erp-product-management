@@ -645,6 +645,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const linkInput=(label,ph)=>item(label,`<div class="inline-control"><input class="form-input" placeholder="${ph}"><button class="tool link-test" type="button">打开链接</button></div>`,true);
   const documentUpload=(label,id)=>item(label,`<div class="document-upload" id="${id}"><input class="document-file-input" type="file" accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" hidden><div class="document-upload-row"><input class="form-input document-file-display" placeholder="支持 .doc、.docx、.pdf上传" readonly><button type="button" class="tool document-upload-btn">上传</button><div class="document-file-actions" hidden><button type="button" class="tool document-view-btn">查看</button><button type="button" class="tool document-delete-btn">删除</button><button type="button" class="tool document-reupload-btn">重新上传</button></div></div></div>`,true);
   const listingPlatformRow=(index=1)=>`<div class="listing-platform-row" data-platform-index="${index}"><label>上架平台${index}</label><div class="listing-platform-content"><div class="listing-platform-line"><select class="form-select listing-platform-select"><option value="">请选择上架平台</option><option value="Amazon">Amazon</option><option value="Temu">Temu</option><option value="eBay">eBay</option><option value="独立站">独立站</option></select><button type="button" class="listing-platform-btn add-listing-platform" aria-label="新增上架平台">＋</button>${index>1?'<button type="button" class="listing-platform-btn remove-listing-platform" aria-label="删除上架平台">−</button>':''}</div><div class="listing-platform-categories" hidden><div class="listing-category-field"><span>主类目</span><input class="form-input" placeholder="请输入主类目"></div><div class="listing-category-field"><span>次类目</span><input class="form-input" placeholder="请输入次类目"></div><div class="listing-category-field listing-mapping-field"><span>Listing映射</span><input class="form-input"></div></div></div></div>`;
+  const backupSupplierBlock=(index=1)=>`<div class="supplier-block backup-supplier-block"><div class="supplier-block-head"><h4>备用供应商${index}</h4><button type="button" class="remove-backup-supplier">删除</button></div><div class="form-grid">${select('供应商',['请选择备用供应商','深圳市恒温电器有限公司','义乌市优品供应链'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div>`;
 
   function bindEnhancedForm(){
     document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
@@ -693,6 +694,12 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       comboRadios.forEach(r=>r.addEventListener('change',syncComboRows));bindComboRow(comboRows.querySelector('.combo-row'));syncComboRows();
     }
     document.querySelectorAll('[data-add-row]').forEach(b=>b.onclick=()=>{const box=$(b.dataset.addRow);const row=document.createElement('div');row.className='form-item full dynamic-row';row.innerHTML=`<label>新增关联</label><div class="inline-control"><input class="form-input" placeholder="请输入 ${b.dataset.addRow==='listingRows'?'平台 / 站点 / 账号 / ASIN':'供应商联系方式'}"><button type="button" class="tool remove-row">删除</button></div>`;box.appendChild(row);row.querySelector('.remove-row').onclick=()=>row.remove();});
+    const backupSupplierList=$('backupSupplierList'),addBackupSupplier=$('addBackupSupplier');
+    if(backupSupplierList&&addBackupSupplier){
+      const renumberBackupSuppliers=()=>[...backupSupplierList.children].forEach((block,index)=>{block.querySelector('h4').textContent=`备用供应商${index+1}`;});
+      addBackupSupplier.onclick=()=>{backupSupplierList.insertAdjacentHTML('beforeend',backupSupplierBlock(backupSupplierList.children.length+1));renumberBackupSuppliers();};
+      backupSupplierList.addEventListener('click',event=>{const remove=event.target.closest('.remove-backup-supplier');if(remove){remove.closest('.backup-supplier-block').remove();renumberBackupSuppliers();}});
+    }
   }
   function sectionNav(title,items){return `<nav class="form-nav"><div class="form-nav-title">${title}</div>${items.map((x,i)=>`<div class="form-nav-item${i?'':' active'}" data-target="${x[0]}">${x[1]}</div>`).join('')}</nav>`;}
 
@@ -722,7 +729,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
         ${item('包装图片',upload('包装图片',true))}${item('箱子尺寸标识图',upload('箱子尺寸标识图',true))}${item('内衬图片',upload('内衬图片',true))}
         ${input('单个SKU包装尺寸','长 × 宽 × 高 cm')}${input('单个包装重量','请输入包装重量 kg')}${input('包装箱材质','请输入包装箱材质')}${input('内衬','请输入内衬材质')}${input('加固方式','请输入加固方式')}${input('体积重','系统计算',false,false,'readonly id="singleVolumeWeight"')}${input('计费重','取外箱体积重与外箱整体重量最大值',false,false,'readonly id="chargeableWeight"')}${input('外箱材质','请输入外箱材质')}${input('装箱规格（PCS）','请输入装箱数量')}${input('外箱尺寸','长 × 宽 × 高 cm')}${input('外箱体积重','系统计算',false,false,'readonly id="outerVolumeWeight"')}${input('外箱整体重量','请输入外箱整体重量 kg',false,false,'id="outerTotalWeight"')}${textarea('物流备注','请输入物流备注',false,true)}
       </div></section>
-      <section class="form-section section-anchor" id="supplierInfo"><h3>供应商管理</h3><div class="supplier-block"><h4>主供应商</h4><div class="form-grid">${select('供应商',['请选择主供应商','深圳市恒温电器有限公司','义乌市优品供应链'],true)}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div><div class="supplier-block"><h4>预备供应商</h4><div class="form-grid">${select('供应商',['请选择预备供应商','深圳市恒温电器有限公司','义乌市优品供应链'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div></section>
+      <section class="form-section section-anchor" id="supplierInfo"><h3>供应商管理</h3><div class="supplier-block"><h4>主供应商</h4><div class="form-grid">${select('供应商',['请选择主供应商','深圳市恒温电器有限公司','义乌市优品供应链'],true)}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div><div id="backupSupplierList"></div><div class="supplier-actions"><button type="button" class="tool" id="addBackupSupplier">＋ 增加备用供应商</button></div></section>
       <section class="form-section section-anchor" id="costInfo"><h3>成本与定价</h3><div class="form-grid">${input('采购成本','请输入采购成本')}${input('配件成本','请输入配件成本')}${input('包装成本','请输入包装成本')}${input('其他成本','请输入其他成本')}${input('单件成本合计','请输入')}${input('站点售价','请输入站点售价')}${input('利润状态','请输入')}${textarea('定价备注','请输入定价备注',false,true)}</div></section>
       <section class="form-section section-anchor" id="customsInfo"><h3>海关申报</h3><div class="form-grid">${input('中文申报品名','请输入中文申报品名',true)}${input('英文申报品名','请输入英文申报品名',true)}${input('HS编码（中国海关编码）','请输入 HS 编码',true)}${item('申报价值',`<div class="inline-control"><select class="form-select"><option value="">请选择币种</option><option>USD</option><option>CNY</option><option>EUR</option></select><input class="form-input" placeholder="请输入金额"></div>`)}</div></section>
     </div>`;
@@ -884,6 +891,14 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .document-confirm-actions button{height:36px;min-width:92px;border-radius:6px;font:inherit;cursor:pointer}
 .document-confirm-cancel{border:1px solid #d8dee6;background:#fff;color:#596575}
 .document-confirm-delete{border:1px solid #ef4444;background:#ef4444;color:#fff}
+</style>
+<style>
+/* 备用供应商默认隐藏，按需动态新增 */
+.supplier-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.supplier-block-head h4{margin:0}
+.supplier-actions{display:flex;justify-content:flex-start;padding-top:2px}
+.supplier-actions .tool{height:36px;font-size:13px;padding:0 15px}
+.remove-backup-supplier{height:30px;padding:0 12px;border:1px solid #ffb1b1;border-radius:5px;background:#fff;color:#e34f4f;cursor:pointer}
 </style>
 <style>
 /* 外箱条件字段与物流标识下拉多选 */
