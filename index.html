@@ -642,12 +642,20 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const checks=(arr,name,radio=false)=>`<div class="check-row">${arr.map((x,i)=>`<label class="form-check"><input type="${radio?'radio':'checkbox'}" name="${name}" ${i===arr.length-1&&!radio?'checked':''}>${x}</label>`).join('')}</div>`;
   const upload=(title,multi=false)=>`<div class="upload-group"><div class="upload-box file-trigger" data-title="${title}"><span>＋<br>${multi?'上传图片':'上传文件'}</span></div><div class="upload-name">${multi?'支持单张 / 多张':'点击选择文件'}</div></div>`;
   const linkInput=(label,ph)=>item(label,`<div class="inline-control"><input class="form-input" placeholder="${ph}"><button class="tool link-test" type="button">打开链接</button></div>`,true);
+  const documentUpload=(label,id)=>item(label,`<div class="document-upload" id="${id}"><input class="document-file-input" type="file" accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" hidden><div class="document-upload-empty"><button type="button" class="tool document-upload-btn">上传Word或PDF文件</button><span>支持 .doc、.docx、.pdf</span></div><div class="document-upload-result" hidden><span class="document-file-name"></span><div class="document-file-actions"><button type="button" class="tool document-view-btn">查看</button><button type="button" class="tool document-delete-btn">删除</button><button type="button" class="tool document-reupload-btn">重新上传</button></div></div></div>`,true);
   const listingPlatformRow=(index=1)=>`<div class="listing-platform-row" data-platform-index="${index}"><label>上架平台${index}</label><div class="listing-platform-content"><div class="listing-platform-line"><select class="form-select listing-platform-select"><option value="">请选择上架平台</option><option value="Amazon">Amazon</option><option value="Temu">Temu</option><option value="eBay">eBay</option><option value="独立站">独立站</option></select><button type="button" class="listing-platform-btn add-listing-platform" aria-label="新增上架平台">＋</button>${index>1?'<button type="button" class="listing-platform-btn remove-listing-platform" aria-label="删除上架平台">−</button>':''}</div><div class="listing-platform-categories" hidden><div class="listing-category-field"><span>主类目</span><input class="form-input" placeholder="请输入主类目"></div><div class="listing-category-field"><span>次类目</span><input class="form-input" placeholder="请输入次类目"></div><div class="listing-category-field listing-mapping-field"><span>Listing映射</span><input class="form-input"></div></div></div></div>`;
 
   function bindEnhancedForm(){
     document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
     document.querySelectorAll('#logisticsInfo input[readonly]').forEach(input=>{input.readOnly=false;input.value='';input.placeholder='请输入重量';});
     document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
+    document.querySelectorAll('.document-upload').forEach(box=>{
+      const input=box.querySelector('.document-file-input'),empty=box.querySelector('.document-upload-empty'),result=box.querySelector('.document-upload-result'),name=box.querySelector('.document-file-name');let currentFile=null,currentUrl='';
+      const choose=()=>input.click();
+      const clearFile=()=>{if(currentUrl)URL.revokeObjectURL(currentUrl);currentUrl='';currentFile=null;input.value='';name.textContent='';result.hidden=true;empty.hidden=false;};
+      input.addEventListener('change',()=>{const file=input.files?.[0];if(!file)return;const valid=/\.(doc|docx|pdf)$/i.test(file.name);if(!valid){clearFile();toast2('仅支持上传Word或PDF文件');return;}if(currentUrl)URL.revokeObjectURL(currentUrl);currentUrl='';currentFile=file;name.textContent=file.name;name.title=file.name;empty.hidden=true;result.hidden=false;toast2(`已上传：${file.name}`);});
+      box.querySelector('.document-upload-btn').onclick=choose;box.querySelector('.document-reupload-btn').onclick=choose;box.querySelector('.document-delete-btn').onclick=()=>{clearFile();toast2('已删除上传文件');};box.querySelector('.document-view-btn').onclick=()=>{if(!currentFile)return;currentUrl=currentUrl||URL.createObjectURL(currentFile);window.open(currentUrl,'_blank');};
+    });
     document.querySelectorAll('.link-test').forEach(b=>b.onclick=()=>{const v=b.parentElement.querySelector('input').value.trim();toast2(v?`已打开链接：${v}`:'请先填写链接地址');});
     const hasOuterBoxSelect=$('hasOuterBoxSelect');
     if(hasOuterBoxSelect){
@@ -715,7 +723,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
         <div class="listing-platform-rows" id="listingPlatformRows">${listingPlatformRow(1)}</div>
         ${multiSelect('售卖市场',['美国站','欧洲站','中东站'],'salesMarketSelect')}${multiSelect('售卖方式',['FBA','FBM','其他'],'salesMethodSelect')}${item('其他售卖方式','<input class="form-input" id="otherSalesMethodInput" placeholder="请手动填写其他售卖方式">',false).replace('class="form-item"','class="form-item" id="otherSalesMethodField" style="display:none"')}
         ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格，一般日常活动折扣需要大于10%')}${input('平台限价-大促活动价格','请输入价格，大促活动需要折扣大于20%')}
-        ${linkInput('产品说明书超链接','请输入说明书链接')}${linkInput('产品认证证书超链接','请输入认证证书链接')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
+        ${documentUpload('产品说明书','productManualUpload')}${documentUpload('产品认证证书','productCertificateUpload')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
       </div></section>
       <section class="form-section section-anchor" id="logisticsInfo"><h3>物流包装信息</h3><div class="form-grid">
         ${item('包装图片',upload('包装图片',true))}${item('箱子尺寸标识图',upload('箱子尺寸标识图',true))}${item('内衬图片',upload('内衬图片',true))}
@@ -862,6 +870,18 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 .listing-category-field>span{text-align:right;color:#475467;white-space:nowrap}
 .listing-mapping-field{grid-column:1/-1}
 @media(max-width:900px){.listing-platform-row{grid-template-columns:1fr}.listing-platform-row>label{text-align:left;padding:0 0 8px}.listing-platform-categories{grid-template-columns:1fr}.listing-platform-select{width:auto;max-width:calc(100% - 76px)}}
+</style>
+<style>
+/* 产品说明书、认证证书：Word/PDF 上传与文件操作 */
+.document-upload{flex:1;min-width:0}
+.document-upload-empty,.document-upload-result{min-height:38px;border:1px solid #d8dee6;border-radius:6px;background:#fff;padding:6px 10px;display:flex;align-items:center;gap:12px}
+.document-upload-empty[hidden],.document-upload-result[hidden]{display:none}
+.document-upload-empty>span{color:#8a96a5;font-size:12px}
+.document-upload-result{justify-content:space-between}
+.document-file-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#465365}
+.document-file-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.document-upload .tool{height:30px;padding:0 12px;background:#fff;border:1px solid #2876ed;border-radius:5px;color:#2876ed;cursor:pointer}
+.document-upload .document-delete-btn{border-color:#ffb1b1;color:#e34f4f}
 </style>
 <style>
 /* 外箱条件字段与物流标识下拉多选 */
