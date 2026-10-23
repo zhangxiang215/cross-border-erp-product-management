@@ -714,7 +714,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
         ${item('产品精修主图',upload('产品精修主图',true))}${item('产品详情页（A+）',upload('产品详情页（A+）',true))}
         <div class="listing-platform-rows" id="listingPlatformRows">${listingPlatformRow(1)}</div>
         ${multiSelect('售卖市场',['美国站','欧洲站','中东站'],'salesMarketSelect')}${multiSelect('售卖方式',['FBA','FBM','其他'],'salesMethodSelect')}${item('其他售卖方式','<input class="form-input" id="otherSalesMethodInput" placeholder="请手动填写其他售卖方式">',false).replace('class="form-item"','class="form-item" id="otherSalesMethodField" style="display:none"')}
-        ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格')}${input('平台限价-大促活动价格','请输入价格')}
+        ${input('平台限价-平时售卖价格','请输入价格')}${input('平台限价-日常活动价格','请输入价格，一般日常活动折扣需要大于10%')}${input('平台限价-大促活动价格','请输入价格，大促活动需要折扣大于20%')}
         <div class="form-item full"><label>Listing映射</label><div id="listingRows" class="dynamic-list"><div class="inline-control"><input class="form-input" placeholder="平台 / 站点 / 账号 / ASIN / MSKU"><button type="button" class="tool" data-add-row="listingRows">＋增加一条</button></div></div></div>
         ${linkInput('产品说明书超链接','请输入说明书链接')}${linkInput('产品认证证书超链接','请输入认证证书链接')}${textarea('产品卖点描述','请输入产品卖点描述',false,true)}${textarea('运营备注','请输入运营备注',false,true)}
       </div></section>
