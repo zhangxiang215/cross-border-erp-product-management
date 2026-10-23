@@ -873,12 +873,13 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 </style>
 <style>
 /* 产品说明书、认证证书：Word/PDF 上传与文件操作 */
-.document-upload{flex:1;min-width:0}
-.document-upload-row{display:flex;align-items:center;gap:8px}
+.document-upload{flex:0 1 760px;width:760px;max-width:100%;min-width:0}
+.document-upload-row{display:flex;align-items:center;gap:10px;width:100%}
 .document-file-display{min-width:0;flex:1}
 .document-file-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .document-file-actions[hidden],.document-upload-btn[hidden]{display:none}
-.document-upload .tool{height:30px;padding:0 12px;background:#fff;border:1px solid #2876ed;border-radius:5px;color:#2876ed;cursor:pointer}
+.document-upload .tool{height:38px;min-width:64px;padding:0 12px;background:#fff;border:1px solid #2876ed;border-radius:6px;color:#2876ed;cursor:pointer}
+.document-upload .document-upload-btn{min-width:72px}
 .document-upload .document-delete-btn{border-color:#ffb1b1;color:#e34f4f}
 </style>
 <style>
