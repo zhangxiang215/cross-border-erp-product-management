@@ -648,7 +648,23 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   const backupSupplierBlock=(index=1)=>`<div class="supplier-block backup-supplier-block"><div class="supplier-block-head"><h4>备用供应商${index}</h4><button type="button" class="remove-backup-supplier">删除</button></div><div class="form-grid">${select('供应商',['请选择备用供应商','深圳市恒温电器有限公司','义乌市优品供应链'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入供应商备注',false,true)}</div></div>`;
 
   function bindEnhancedForm(){
-    document.querySelectorAll('.form-nav-item').forEach(n=>n.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
+    const formBody=document.querySelector('.product-form .form-body');
+    const formContent=formBody?.querySelector('.form-content');
+    const formNavItems=[...(formBody?.querySelectorAll('.form-nav-item')||[])];
+    const syncActiveFormNav=()=>{
+      if(!formContent||!formNavItems.length)return;
+      const sections=formNavItems.map(item=>$(item.dataset.target)).filter(Boolean);
+      const contentTop=formContent.getBoundingClientRect().top;
+      const focusLine=contentTop+72;
+      let activeSection=sections[0];
+      sections.forEach(section=>{if(section.getBoundingClientRect().top<=focusLine)activeSection=section;});
+      if(formContent.scrollTop+formContent.clientHeight>=formContent.scrollHeight-8)activeSection=sections[sections.length-1];
+      formNavItems.forEach(item=>item.classList.toggle('active',item.dataset.target===activeSection?.id));
+    };
+    formNavItems.forEach(n=>n.onclick=()=>{$(n.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});});
+    let formNavFrame=0;
+    formContent?.addEventListener('scroll',()=>{cancelAnimationFrame(formNavFrame);formNavFrame=requestAnimationFrame(syncActiveFormNav);},{passive:true});
+    requestAnimationFrame(syncActiveFormNav);
     document.querySelectorAll('.file-trigger').forEach(box=>box.onclick=()=>{const f=document.createElement('input');f.type='file';f.multiple=box.closest('.upload-group')?.querySelector('.upload-name')?.textContent.includes('多张');f.onchange=()=>{const name=[...f.files].map(x=>x.name).join('、');box.querySelector('span').innerHTML=`${name?esc(name):'已选择文件'}<br><small>点击更换</small>`;toast2(name?`已选择 ${f.files.length} 个文件`:'未选择文件');};f.click();});
     document.querySelectorAll('.document-upload').forEach(box=>{
       const input=box.querySelector('.document-file-input'),display=box.querySelector('.document-file-display'),uploadButton=box.querySelector('.document-upload-btn'),actions=box.querySelector('.document-file-actions');let currentFile=null,currentUrl='';
