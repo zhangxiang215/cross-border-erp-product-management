@@ -1533,13 +1533,13 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
     if(!view){view=document.createElement('section');view.id='purchaseView';view.className='purchase-view';document.querySelector('.main').appendChild(view);}
     var rail=document.querySelector('.left-rail'),open=rail.classList.contains('purchase-open');
     if(open){rail.classList.remove('purchase-open');var oldBox=document.getElementById('purchaseSideSubnav');if(oldBox)oldBox.style.setProperty('display','none','important');return;}
-    drawPurchase('source');
+    drawPurchase('order');
     document.getElementById('productPages').hidden=true;
     document.getElementById('homePanel').hidden=true;
     rail.classList.add('purchase-open');
     var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','block','important');
     setTimeout(function(){
-      drawPurchase('source');
+      drawPurchase('order');
       document.getElementById('productPages').hidden=true;
       document.getElementById('homePanel').hidden=true;
       document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});
@@ -1564,13 +1564,13 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 <script>
 (function(){
   window.__simpleScriptLoaded=true;var rail=document.querySelector('.left-rail'),classes=['product-open','inventory-open','purchase-open','supply-open','warehouse-open'];
-  var data={inventory:[['实时库存','realtime'],['物理仓库','physical'],['每日库存快照','snapshot']],purchase:[['货源管理','source'],['价格管理','price'],['计划管理','plan'],['备货单管理','stock'],['采购单管理','order'],['结算管理','settle'],['合同管理','contract'],['对账管理','reconcile'],['订单交付','delivery'],['订单异常','exception'],['单据管理','docs']],supply:[['供应商管理','info'],['供应商风险','risk']],warehouse:[['入库管理','inbound'],['质检管理','diff'],['质检历史记录','history'],['采购处理','purchase'],['退货管理','returns']]};
+  var data={inventory:[['实时库存','realtime'],['物理仓库','physical'],['每日库存快照','snapshot']],purchase:[['采购单管理','order']],supply:[['供应商管理','info'],['供应商风险','risk']],warehouse:[['入库管理','inbound'],['质检管理','diff'],['质检历史记录','history'],['采购处理','purchase'],['退货管理','returns']]};
   function closeSidebars(){classes.forEach(function(cls){rail.classList.remove(cls);});document.querySelectorAll('.simple-side-subnav').forEach(function(box){box.style.display='none';});}
   function side(key){var item=document.getElementById(key+'NavToggle');if(!item)return null;var box=item.nextElementSibling;if(!box||!box.classList.contains('simple-side-subnav')){box=document.createElement('div');box.className='simple-side-subnav';item.parentNode.insertBefore(box,item.nextSibling);}box.innerHTML=(key==='product'?[['商品管理','sideListItem'],['配件管理','sidePartsItem']]:data[key]).map(function(x){return '<div class="simple-side-item" data-side-key="'+x[1]+'">'+x[0]+'</div>';}).join('');return box;}
   if(typeof window.renderPurchaseFull!=='function'){window.renderPurchaseFull=function(key){var names={source:'货源管理',price:'价格管理',plan:'计划管理',stock:'备货单管理',order:'采购单管理',settle:'结算管理',contract:'合同管理',reconcile:'对账管理',delivery:'订单交付',exception:'订单异常',docs:'单据管理'},subs={source:['货源管理','货源变更审核','货源变更记录'],price:['商品列表','采购价管理','价格审核','价格审核记录','核价列表'],plan:['计划列表','计划明细'],stock:['备货单列表','异常备货单','待转备货明细'],order:['待执行采购单','待审核采购单','待下单采购单','履约采购单','采购订单'],settle:['抵扣单','预付款','请款单','请款单审批','索赔单'],contract:['合同列表'],reconcile:['待对账池子','对账单列表'],delivery:['中仓到货预约','供应商集货列表'],exception:['订单异常列表','订单异常审核','入库异常列表'],docs:['商检单管理','开票通知列表']};key=names[key]?key:'source';var v=document.getElementById('purchaseView');if(!v)return;v.innerHTML='<div class="purchase-head"><h2>采购</h2><div class="purchase-tabs"><div class="purchase-tab active">'+names[key]+'</div></div></div><div class="purchase-module-nav">'+Object.keys(names).map(function(k){return '<button class="'+(k===key?'active':'')+'">'+names[k]+'</button>';}).join('')+'</div><div class="purchase-subnav">'+subs[key].map(function(x){return '<button>'+x+'</button>';}).join('')+'</div><div class="purchase-page-title" style="height:42px;background:#fff;padding:12px 20px;color:#4d5966;font-weight:650">'+subs[key][0]+'</div><div class="purchase-full-filter"><input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>采购负责人</option><option>全部</option></select><select><option>状态</option><option>待处理</option></select><div class="purchase-full-actions"><button class="action-btn primary">搜索</button><button class="action-btn reset">重置</button></div></div><div class="purchase-full-toolbar"><button class="tool primary">新增</button><button class="tool">导出</button><span class="purchase-full-count">共 128 条数据</span></div><div class="purchase-full-table"><table><thead><tr><th>勾选</th><th>编号</th><th>供应商</th><th>负责人</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td><span class="check"></span></td><td class="full-code">PO202610180028</td><td>龙泉市庄欣电子商务有限公司</td><td>夏景舟</td><td><span class="full-status pending">待处理</span></td><td><span class="full-link">详情</span><span class="full-link">编辑</span><span class="full-link">日志</span></td></tr><tr><td><span class="check"></span></td><td class="full-code">PO202610170041</td><td>曹县睿翔工艺品有限公司</td><td>毛鸿雁</td><td><span class="full-status blue">进行中</span></td><td><span class="full-link">详情</span><span class="full-link">编辑</span><span class="full-link">日志</span></td></tr></tbody></table></div>';v.classList.add('active');document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('inventoryView')?.classList.remove('active');document.getElementById('homeTopTab').classList.remove('active');document.getElementById('productTopTab').style.display='flex';document.getElementById('productTopTab').querySelector('.x').previousSibling.textContent='采购 ';};}
   function drawPurchase(key){var names={source:'货源管理',price:'价格管理',plan:'计划管理',stock:'备货单管理',order:'采购单管理',settle:'结算管理',contract:'合同管理',reconcile:'对账管理',delivery:'订单交付',exception:'订单异常',docs:'单据管理'},subs={source:['货源管理','货源变更审核','货源变更记录'],price:['商品列表','采购价管理','价格审核','价格审核记录','核价列表'],plan:['计划列表','计划明细'],stock:['备货单列表','异常备货单','待转备货明细'],order:['待执行采购单','待审核采购单','待下单采购单','履约采购单','采购订单'],settle:['抵扣单','预付款','请款单','请款单审批','索赔单'],contract:['合同列表'],reconcile:['待对账池子','对账单列表'],delivery:['中仓到货预约','供应商集货列表'],exception:['订单异常列表','订单异常审核','入库异常列表'],docs:['商检单管理','开票通知列表']};var v=document.getElementById('purchaseView');if(!v)return;key=names[key]?key:'source';v.innerHTML='<div class="purchase-head"><h2>采购</h2><div class="purchase-tabs"><div class="purchase-tab active">'+names[key]+'</div></div></div><div class="purchase-module-nav">'+Object.keys(names).map(function(k){return '<button class="'+(k===key?'active':'')+'">'+names[k]+'</button>';}).join('')+'</div><div class="purchase-subnav">'+subs[key].map(function(x){return '<button>'+x+'</button>';}).join('')+'</div><div class="purchase-page-title" style="height:42px;background:#fff;padding:12px 20px;color:#4d5966;font-weight:650">'+subs[key][0]+'</div><div class="purchase-full-filter"><input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>采购负责人</option><option>全部</option></select><select><option>状态</option><option>待处理</option></select><button class="action-btn primary">搜索</button><button class="action-btn reset">重置</button></div><div class="purchase-full-toolbar"><button class="tool primary">新增</button><button class="tool">导出</button></div><div class="purchase-full-table"><table><thead><tr><th>勾选</th><th>编号</th><th>供应商</th><th>负责人</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td><span class="check"></span></td><td class="full-code">PO202610180028</td><td>龙泉市庄欣电子商务有限公司</td><td>夏景舟</td><td><span class="full-status pending">待处理</span></td><td><span class="full-link">详情</span><span class="full-link">编辑</span><span class="full-link">日志</span></td></tr><tr><td><span class="check"></span></td><td class="full-code">PO202610170041</td><td>曹县睿翔工艺品有限公司</td><td>毛鸿雁</td><td><span class="full-status blue">进行中</span></td><td><span class="full-link">详情</span><span class="full-link">编辑</span><span class="full-link">日志</span></td></tr></tbody></table></div>';v.classList.add('active');document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('inventoryView')?.classList.remove('active');document.getElementById('homeTopTab').classList.remove('active');document.getElementById('productTopTab').style.display='flex';document.getElementById('productTopTab').querySelector('.x').previousSibling.textContent='采购 ';document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});document.getElementById('purchaseNavToggle').classList.add('active');}
   function go(key,value){if(key==='product'){document.getElementById(value)?.click();return;}if(key==='purchase'){drawPurchase(value);return;}var railItem=document.getElementById(key+'NavToggle');if(!railItem)return;window.__simpleSideNav=true;closeSidebars();railItem.click();window.__simpleSideNav=false;setTimeout(function(){var view=document.getElementById(key+'View');if(!view)return;var map={实时库存:'realtime',物理仓库:'physical',每日库存快照:'snapshot',供应商管理:'info',供应商风险:'risk',入库管理:'inbound',质检管理:'diff',质检历史记录:'history',采购处理:'purchase',退货管理:'returns'};var type=key==='inventory'?'inventory':key==='supply'?'supply':'warehouse';view.querySelector('[data-'+type+'-tab="'+(map[value]||value)+'"]')?.click();},80);}
-  var boxes={};['product','inventory','purchase','supply','warehouse'].forEach(function(key){boxes[key]=side(key);var item=document.getElementById(key+'NavToggle');if(!item)return;item.addEventListener('click',function(e){if(window.__simpleSideNav)return;e.preventDefault();e.stopImmediatePropagation();var open=rail.classList.contains(key+'-open');closeSidebars();document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});if(!open){rail.classList.add(key+'-open');item.classList.add('active');boxes[key]&&boxes[key].style.setProperty('display','block','important');if(key==='purchase'){drawPurchase('source');rail.classList.add('purchase-open');boxes[key]&&boxes[key].style.setProperty('display','block','important');}else if(key!=='product'){window.__simpleSideNav=true;item.click();window.__simpleSideNav=false;rail.classList.add(key+'-open');boxes[key]&&boxes[key].style.setProperty('display','block','important');}}},true);boxes[key]?.querySelectorAll('.simple-side-item').forEach(function(x){x.onclick=function(){go(key,x.dataset.sideKey);};});});
+  var boxes={};['product','inventory','purchase','supply','warehouse'].forEach(function(key){boxes[key]=side(key);var item=document.getElementById(key+'NavToggle');if(!item)return;item.addEventListener('click',function(e){if(window.__simpleSideNav)return;e.preventDefault();e.stopImmediatePropagation();var open=rail.classList.contains(key+'-open');closeSidebars();document.querySelectorAll('.rail-item').forEach(function(x){x.classList.remove('active');});if(!open){rail.classList.add(key+'-open');item.classList.add('active');boxes[key]&&boxes[key].style.setProperty('display','block','important');if(key==='purchase'){drawPurchase('order');rail.classList.add('purchase-open');boxes[key]&&boxes[key].style.setProperty('display','block','important');}else if(key!=='product'){window.__simpleSideNav=true;item.click();window.__simpleSideNav=false;rail.classList.add(key+'-open');boxes[key]&&boxes[key].style.setProperty('display','block','important');}}},true);boxes[key]?.querySelectorAll('.simple-side-item').forEach(function(x){x.onclick=function(){go(key,x.dataset.sideKey);};});});
   document.addEventListener('click',function(e){if(!e.target.closest('.left-rail'))closeSidebars();});
 })();
 </script>
@@ -1712,7 +1712,7 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
     if(target){
       e.preventDefault();e.stopImmediatePropagation();
       var rail=document.querySelector('.left-rail'),wasOpen=rail?.classList.contains('purchase-open');
-      if(!wasOpen){enterPurchase('source',0);openPurchaseSide();}
+      if(!wasOpen){enterPurchase('order',0);openPurchaseSide();}
       else{if(rail)rail.classList.remove('purchase-open');var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','none','important');}
       return;
     }
@@ -2283,5 +2283,28 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   font-size:15px;
 }
 </style>
+<style>
+/* 采购模块仅保留采购单管理，不再展示其他一级采购模块。 */
+#purchaseView .purchase-module-nav{display:none!important}
+</style>
+<script>
+(function(){
+  function resetPurchaseSide(){
+    var box=document.getElementById('purchaseSideSubnav');
+    if(!box)return;
+    box.innerHTML='<span class="simple-side-title">采购</span><div class="simple-side-item active" data-side-key="order">采购单管理</div>';
+  }
+  var originalRender=window.renderPurchaseFull;
+  if(typeof originalRender==='function'){
+    window.renderPurchaseFull=function(key,sub){
+      originalRender('order',Number(sub)||0);
+      document.querySelectorAll('#purchaseView [data-purchase-module]').forEach(function(button){if(button.dataset.purchaseModule!=='order')button.remove();});
+    };
+    window.__purchaseAuditRender=window.renderPurchaseFull;
+  }
+  resetPurchaseSide();
+  window.addEventListener('load',resetPurchaseSide);
+})();
+</script>
 </body>
 </html>
