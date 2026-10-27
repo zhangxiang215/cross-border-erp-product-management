@@ -794,7 +794,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     const setField=(label,value)=>{const control=findItem(label)?.querySelector('input,select,textarea');if(control&&value!=null){control.value=value;control.dispatchEvent(new Event('change',{bubbles:true}));}};
     if(p&&isSpu){setField('商品编码',p.spu);setField('商品名称（中文）',p.name);setField('商品目录',p.category);setField('关联SKU',p.variants);setField('近期售价',p.price);setField('近期毛利',p.margin);}
     else if(p){setField('产品名称（中文）',p.name);setField('SKU',p.sku);setField('自定义型号',p.model);setField('出厂型号',p.model);setField('产品状态',p.productStatus);}
-    if(mode==='spu-view'){$('spuHistory')?.remove();document.querySelector('.form-nav-item[data-target="spuHistory"]')?.remove();}
+    if(mode==='spu-view'||(mode==='spu'&&p)){$('spuHistory')?.remove();document.querySelector('.form-nav-item[data-target="spuHistory"]')?.remove();}
     if((mode==='edit'||mode==='view')&&p?.sku)window.__populateAccessoryWeightRows?.(p.sku);
     if(isView){
       if(!isSpu){const platform=document.querySelector('.listing-platform-select');if(platform){platform.value='Amazon';platform.dispatchEvent(new Event('change',{bubbles:true}));}const outer=$('hasOuterBoxSelect');if(outer){outer.value='yes';outer.dispatchEvent(new Event('change',{bubbles:true}));}}
