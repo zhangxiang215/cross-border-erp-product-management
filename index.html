@@ -785,22 +785,25 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 
   window.showForm=function(mode,p){
     enterProductPage();
-    if(mode==='part')buildPartForm();else if(mode==='spu')buildSpuForm();else buildMvpForm();
-    const isView=mode==='view';
-    $('formTitle').textContent=mode==='part'?'新增 / 编辑配件SKU':mode==='spu'?(p?'编辑SPU':'新增SPU'):isView?'商品详情':mode==='edit'?'编辑商品':'新增商品';
+    const isSpu=mode==='spu'||mode==='spu-view';
+    if(mode==='part')buildPartForm();else if(isSpu)buildSpuForm();else buildMvpForm();
+    const isView=mode==='view'||mode==='spu-view';
+    $('formTitle').textContent=mode==='part'?'新增 / 编辑配件SKU':mode==='spu-view'?'SPU详情':mode==='spu'?(p?'编辑SPU':'新增SPU'):isView?'商品详情':mode==='edit'?'编辑商品':'新增商品';
     $('formMask').classList.add('show');document.querySelector('.left-rail').classList.add('product-open');$('sideListItem').classList.toggle('active',mode!=='part');$('sidePartsItem').classList.toggle('active',mode==='part');$('sideMaterialItem')?.classList.remove('active');
     const findItem=label=>[...document.querySelectorAll('#formMask .form-item')].find(item=>(item.querySelector(':scope > label')?.textContent||'').replace('*','').replace(/\s/g,'')===label.replace(/\s/g,''));
     const setField=(label,value)=>{const control=findItem(label)?.querySelector('input,select,textarea');if(control&&value!=null){control.value=value;control.dispatchEvent(new Event('change',{bubbles:true}));}};
-    if(p){setField('产品名称（中文）',p.name);setField('SKU',p.sku);setField('自定义型号',p.model);setField('出厂型号',p.model);setField('产品状态',p.productStatus);const code=document.querySelector('#spuBase input');if(code)code.value=p.spu;}
-    if((mode==='edit'||isView)&&p?.sku)window.__populateAccessoryWeightRows?.(p.sku);
+    if(p&&isSpu){setField('商品编码',p.spu);setField('商品名称（中文）',p.name);setField('商品目录',p.category);setField('关联SKU',p.variants);setField('近期售价',p.price);setField('近期毛利',p.margin);}
+    else if(p){setField('产品名称（中文）',p.name);setField('SKU',p.sku);setField('自定义型号',p.model);setField('出厂型号',p.model);setField('产品状态',p.productStatus);}
+    if((mode==='edit'||mode==='view')&&p?.sku)window.__populateAccessoryWeightRows?.(p.sku);
     if(isView){
-      const platform=document.querySelector('.listing-platform-select');if(platform){platform.value='Amazon';platform.dispatchEvent(new Event('change',{bubbles:true}));}
-      const outer=$('hasOuterBoxSelect');if(outer){outer.value='yes';outer.dispatchEvent(new Event('change',{bubbles:true}));}
+      if(!isSpu){const platform=document.querySelector('.listing-platform-select');if(platform){platform.value='Amazon';platform.dispatchEvent(new Event('change',{bubbles:true}));}const outer=$('hasOuterBoxSelect');if(outer){outer.value='yes';outer.dispatchEvent(new Event('change',{bubbles:true}));}}
       document.querySelectorAll('#formMask .form-content input,#formMask .form-content select,#formMask .form-content textarea,#formMask .form-content button').forEach(control=>control.disabled=true);
       $('submitForm').hidden=true;$('cancelForm').textContent='返回';
     }else{$('submitForm').hidden=false;$('cancelForm').textContent='取消';}
   };
   document.querySelectorAll('.view').forEach((element,index)=>element.onclick=()=>window.showForm('view',data[index]));
+  document.querySelectorAll('.spu-link,.spu-view').forEach(element=>element.onclick=()=>window.showForm('spu-view',spuData[Number(element.dataset.index)]));
+  document.addEventListener('click',event=>{const target=event.target.closest('.spu-link,.spu-view');if(!target)return;event.preventDefault();event.stopImmediatePropagation();window.showForm('spu-view',spuData[Number(target.dataset.index)]);},true);
 
   // 按附件要求收敛商品列表筛选项，仅保留 SPU、SKU、商品名称，并互换 SPU/SKU顺序。
   const filters=$('filters');if(filters){filters.innerHTML=`<div class="filter split input" data-label="SPU"><span class="field-label">SPU</span><input class="inline-filter-input" placeholder="输入 SPU，支持批量查询"></div><div class="filter split input" data-label="SKU"><span class="field-label">SKU</span><input class="inline-filter-input" placeholder="输入 SKU，支持批量查询"></div><div class="filter input" data-label="商品名称"><span class="field-label">商品名称</span><span class="field-divider">｜</span><input class="inline-filter-input" placeholder="请输入商品名称"></div>`;}
