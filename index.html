@@ -2289,6 +2289,15 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 </style>
 <script>
 (function(){
+  function normalizePurchaseOrderView(){
+    var view=document.getElementById('purchaseView');
+    if(!view)return;
+    var isOrder=view.querySelector('.purchase-tab')?.textContent.trim()==='采购单管理';
+    if(!isOrder)return;
+    view.querySelector('.purchase-subnav')?.remove();
+    var pageTitle=view.querySelector('.purchase-page-title');
+    if(pageTitle&&pageTitle.textContent.trim()!=='采购单管理')pageTitle.textContent='采购单管理';
+  }
   function resetPurchaseSide(){
     var box=document.getElementById('purchaseSideSubnav');
     if(!box)return;
@@ -2301,11 +2310,13 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       originalRender(allowedKey,Number(sub)||0);
       document.querySelectorAll('#purchaseView [data-purchase-module]').forEach(function(button){if(!['plan','order'].includes(button.dataset.purchaseModule))button.remove();});
       document.querySelectorAll('#purchaseSideSubnav .simple-side-item').forEach(function(item){item.classList.toggle('active',item.dataset.sideKey===allowedKey);});
+      normalizePurchaseOrderView();
     };
     window.__purchaseAuditRender=window.renderPurchaseFull;
   }
   resetPurchaseSide();
-  window.addEventListener('load',resetPurchaseSide);
+  new MutationObserver(normalizePurchaseOrderView).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('load',function(){resetPurchaseSide();normalizePurchaseOrderView();});
 })();
 </script>
 </body>
