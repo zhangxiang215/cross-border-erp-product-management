@@ -2309,6 +2309,18 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #purchaseView .purchase-order-actions .full-link{margin-right:16px}
 #purchaseView .purchase-order-actions .full-link:last-child{margin-right:0}
 </style>
+<style>
+/* 商品列表短内容列收窄，减少无效留白。 */
+#productTableCard .data-table{min-width:1280px}
+#productTableCard .data-table col:nth-child(1){width:48px!important}
+#productTableCard .data-table col:nth-child(2){width:230px!important}
+#productTableCard .data-table col:nth-child(3){width:260px!important}
+#productTableCard .data-table col:nth-child(4){width:130px!important}
+#productTableCard .data-table col:nth-child(5){width:130px!important}
+#productTableCard .data-table col:nth-child(6){width:140px!important}
+#productTableCard .data-table col:nth-child(7){width:140px!important}
+#productTableCard .data-table col:nth-child(8){width:202px!important}
+</style>
 <script>
 (function(){
   var purchaseOrderRows=[
