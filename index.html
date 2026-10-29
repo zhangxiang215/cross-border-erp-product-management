@@ -2435,6 +2435,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     view.querySelector('.purchase-subnav')?.remove();
     var pageTitle=view.querySelector('.purchase-page-title');
     if(pageTitle&&pageTitle.textContent.trim()!=='采购单管理')pageTitle.textContent='采购单管理';
+    view.querySelector('.purchase-log-list')?.remove();
     var filter=view.querySelector('.purchase-full-filter');
     if(filter&&!filter.dataset.orderFilterReady){
       filter.innerHTML='<input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>请选择状态</option><option>草稿</option><option>待下单</option><option>待付款</option><option>生产中</option><option>已收货</option><option>已验收</option><option>退换货</option><option>已完成</option></select><input placeholder="采购负责人｜请输入"><div class="purchase-full-actions"><button class="action-btn primary purchase-order-search">搜索</button><button class="action-btn reset purchase-order-reset">重置</button></div>';
