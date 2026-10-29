@@ -417,7 +417,8 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
     var back=function(){page.classList.remove('active');if(view)view.classList.add('active');};page.querySelector('.purchase-source-close').onclick=back;page.querySelector('.purchase-source-cancel').onclick=back;page.querySelector('.purchase-source-save').onclick=back;
   }
   function ensurePurchaseCreateAction(){
-    if(document.querySelector('#purchaseView .purchase-tab')?.textContent.trim()==='计划管理')return;
+    var currentPurchaseTab=document.querySelector('#purchaseView .purchase-tab')?.textContent.trim();
+    if(currentPurchaseTab==='计划管理'||currentPurchaseTab==='采购单管理')return;
     var bars=document.querySelectorAll('#purchaseView .purchase-full-toolbar');
     bars.forEach(function(bar){
       if(!bar.querySelector('.purchase-create-new')){
@@ -434,6 +435,7 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
   document.addEventListener('click',function(e){
     var link=e.target&&e.target.closest?e.target.closest('#purchaseView .full-link,#purchaseView .full-detail,#purchaseView .full-edit,#purchaseView .full-log'):null;
     if(!link)return;
+    if(link.matches('[data-order-action]'))return;
     e.preventDefault();e.stopImmediatePropagation();
     var text=(link.textContent||'').trim(), action=link.classList.contains('full-edit')||text==='编辑'?'edit':link.classList.contains('full-log')||text==='日志'?'log':'detail';
     var label=(document.querySelector('#purchaseView .purchase-page-title')||{}).textContent||'备货单详情';
@@ -2358,6 +2360,13 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #purchaseView .purchase-time-status.ontime{color:#15803d;background:#f0fdf4}
 #purchaseView .purchase-time-status.late{color:#dc2626;background:#fef2f2}
 #purchaseView .purchase-order-source{color:#475569;white-space:nowrap}
+.purchase-order-item-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.purchase-order-item-heading h3{margin:0}
+.purchase-order-edit-items{display:flex;flex-direction:column;gap:12px}
+.purchase-order-edit-item{display:grid;grid-template-columns:minmax(240px,1.5fr) minmax(180px,1fr) minmax(180px,1fr) 88px;gap:14px;align-items:end;padding:16px;border:1px solid #e3e8ef;border-radius:8px;background:#fafbfd}
+.purchase-order-edit-item .form-item{margin:0}
+.purchase-order-edit-item .purchase-order-remove-item{height:40px;margin-bottom:0}
+@media(max-width:1100px){.purchase-order-edit-item{grid-template-columns:1fr 1fr}.purchase-order-edit-item .purchase-order-remove-item{width:88px}}
 </style>
 <style>
 /* 商品列表短内容列收窄，减少无效留白。 */
@@ -2384,17 +2393,34 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   ];
   function orderItemLines(items,key){return items.map(function(item){return '<div class="purchase-order-item-line">'+item[key]+'</div>';}).join('');}
   function orderDate(date,label,className){return '<div class="purchase-order-date"><span>'+date+'</span><span class="purchase-time-status '+className+'">'+label+'</span></div>';}
+  function purchaseOrderItemEditor(item,index){
+    item=item||{sku:'',quantity:'',unitPrice:''};
+    return '<div class="purchase-order-edit-item" data-order-item="'+index+'"><div class="form-item"><label>SKU</label><input class="form-input" value="'+item.sku+'" placeholder="请输入SKU"></div><div class="form-item"><label>采购数量</label><input class="form-input" value="'+item.quantity+'" placeholder="请输入采购数量"></div><div class="form-item"><label>SKU单价</label><input class="form-input" value="'+item.unitPrice.replace('¥','')+'" placeholder="请输入SKU单价"></div><button type="button" class="action-btn reset purchase-order-remove-item">删除</button></div>';
+  }
+  function openPurchaseOrderForm(row){
+    var editing=!!row,p=document.getElementById('purchaseActionPage');
+    document.getElementById('purchaseCreatePage')?.classList.remove('active','show');
+    if(!p){p=document.createElement('section');p.id='purchaseActionPage';p.className='purchase-source-page';document.querySelector('.main').appendChild(p);}
+    var current=row||{no:'',supplier:'',items:[{sku:'',quantity:'',unitPrice:''}],amount:'',created:'',createdTiming:'准时',delivery:'',deliveryTiming:'准时',owner:'',source:'采购计划',status:'草稿'};
+    p.innerHTML='<div class="purchase-source-head"><h1>'+(editing?'编辑采购单':'新增采购单')+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><section class="form-section"><h3>采购单基础信息</h3><div class="form-grid"><div class="form-item"><label>采购单号</label><input class="form-input" value="'+current.no+'" placeholder="系统自动生成"></div><div class="form-item"><label>供应商名称</label><input class="form-input" value="'+current.supplier+'" placeholder="请选择供应商"></div><div class="form-item"><label>创建日期</label><input class="form-input" type="date" value="'+current.created+'"></div><div class="form-item"><label>创建时间状态</label><select class="form-select"><option '+(current.createdTiming==='提前'?'selected':'')+'>提前</option><option '+(current.createdTiming==='准时'?'selected':'')+'>准时</option><option '+(current.createdTiming==='延迟'?'selected':'')+'>延迟</option></select></div><div class="form-item"><label>约定交货日期</label><input class="form-input" type="date" value="'+current.delivery+'"></div><div class="form-item"><label>交货时间状态</label><select class="form-select"><option '+(current.deliveryTiming==='提前'?'selected':'')+'>提前</option><option '+(current.deliveryTiming==='准时'?'selected':'')+'>准时</option><option '+(current.deliveryTiming==='延迟'?'selected':'')+'>延迟</option></select></div><div class="form-item"><label>采购负责人</label><input class="form-input" value="'+current.owner+'" placeholder="请输入采购负责人"></div><div class="form-item"><label>订单来源</label><select class="form-select"><option '+(current.source==='采购计划'?'selected':'')+'>采购计划</option><option '+(current.source==='手工新建'?'selected':'')+'>手工新建</option><option '+(current.source==='安全库存'?'selected':'')+'>安全库存</option><option '+(current.source==='销售预测'?'selected':'')+'>销售预测</option></select></div><div class="form-item"><label>状态</label><select class="form-select">'+['草稿','待下单','待付款','生产中','已收货','已验收','退换货','已完成'].map(function(status){return '<option '+(current.status===status?'selected':'')+'>'+status+'</option>';}).join('')+'</select></div><div class="form-item"><label>采购金额</label><input class="form-input" value="'+current.amount.replace('¥','')+'" placeholder="根据SKU明细自动计算"></div></div></section><section class="form-section"><div class="purchase-order-item-heading"><h3>SKU明细</h3><button type="button" class="action-btn primary purchase-order-add-item">＋ 增加SKU</button></div><div class="purchase-order-edit-items">'+current.items.map(purchaseOrderItemEditor).join('')+'</div></section></div><div class="purchase-source-foot"><button class="action-btn purchase-order-form-cancel">取消</button><button class="action-btn primary purchase-order-form-save">保存</button></div>';
+    p.classList.add('active');document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('purchaseView')?.classList.remove('active');document.getElementById('productTopTab').style.display='flex';document.getElementById('productTopTab').querySelector('.x').previousSibling.textContent=(editing?'编辑采购单':'新增采购单')+' ';
+    function close(){p.classList.remove('active');window.renderPurchaseFull('order',0);}
+    function bindRemove(){p.querySelectorAll('.purchase-order-remove-item').forEach(function(button){button.onclick=function(){var items=p.querySelectorAll('.purchase-order-edit-item');if(items.length===1){toast('采购单至少保留一条SKU明细');return;}button.closest('.purchase-order-edit-item').remove();};});}
+    p.querySelector('.purchase-source-close').onclick=close;p.querySelector('.purchase-order-form-cancel').onclick=close;p.querySelector('.purchase-order-form-save').onclick=function(){close();toast((editing?'采购单已更新':'采购单已新增'));};
+    p.querySelector('.purchase-order-add-item').onclick=function(){var box=p.querySelector('.purchase-order-edit-items');box.insertAdjacentHTML('beforeend',purchaseOrderItemEditor(null,box.children.length));bindRemove();};
+    bindRemove();
+  }
   function bindPurchaseOrderActions(table){
     table.querySelectorAll('[data-order-action]').forEach(function(action){
       action.onclick=function(){
         var row=purchaseOrderRows[Number(action.dataset.row)];
         var type=action.dataset.orderAction;
-        if(type==='edit'){toast('已进入采购单编辑：'+row.no);return;}
-        openInfoDrawer(type==='log'?'采购单日志':'采购单详情',[
-          ['采购单号',row.no],['供应商名称',row.supplier],['SKU',row.items.map(function(item){return item.sku;}).join('、')],['采购数量',row.items.map(function(item){return item.quantity;}).join('、')],['SKU单价',row.items.map(function(item){return item.unitPrice;}).join('、')],['采购金额',row.amount],
-          ['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status],
-          ...(type==='log'?[['操作记录',row.created+' 创建采购单']]:[])
-        ]);
+        if(type==='edit'){openPurchaseOrderForm(row);return;}
+        var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
+        row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
+        detailRows.push(['采购金额',row.amount],['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
+        if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
+        openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
       };
     });
   }
@@ -2420,6 +2446,10 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     table.innerHTML='<thead><tr><th>勾选</th><th>采购单号</th><th>供应商名称</th><th>SKU</th><th>采购数量</th><th>SKU单价</th><th>采购金额</th><th>创建日期</th><th>约定交货日期</th><th>采购负责人</th><th>订单来源</th><th>状态</th><th>操作</th></tr></thead><tbody>'+purchaseOrderRows.map(function(row,index){return '<tr><td><span class="check full-row-check"></span></td><td class="full-code">'+row.no+'</td><td>'+row.supplier+'</td><td>'+orderItemLines(row.items,'sku')+'</td><td>'+orderItemLines(row.items,'quantity')+'</td><td>'+orderItemLines(row.items,'unitPrice')+'</td><td>'+row.amount+'</td><td>'+orderDate(row.created,row.createdTiming,row.createdTimingClass)+'</td><td>'+orderDate(row.delivery,row.deliveryTiming,row.deliveryTimingClass)+'</td><td>'+row.owner+'</td><td class="purchase-order-source">'+row.source+'</td><td><span class="purchase-order-status '+row.statusClass+'">'+row.status+'</span></td><td class="purchase-order-actions"><span class="full-link" data-order-action="detail" data-row="'+index+'">详情</span><span class="full-link" data-order-action="edit" data-row="'+index+'">编辑</span><span class="full-link" data-order-action="log" data-row="'+index+'">日志</span></td></tr>';}).join('')+'</tbody>';
     table.querySelectorAll('.full-row-check').forEach(function(check){check.onclick=function(){check.classList.toggle('checked');};});
     bindPurchaseOrderActions(table);
+    var toolbar=view.querySelector('.purchase-full-toolbar');
+    var createButton=view.querySelector('.purchase-create,.purchase-order-create');
+    if(toolbar&&!createButton){createButton=document.createElement('button');createButton.className='tool primary purchase-order-create';createButton.textContent='新增';toolbar.insertBefore(createButton,toolbar.firstChild);}
+    if(createButton)createButton.onclick=function(){openPurchaseOrderForm(null);};
   }
   function resetPurchaseSide(){
     var box=document.getElementById('purchaseSideSubnav');
@@ -2438,6 +2468,21 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     window.__purchaseAuditRender=window.renderPurchaseFull;
   }
   resetPurchaseSide();
+  document.addEventListener('click',function(event){
+    var create=event.target.closest&&event.target.closest('#purchaseView .purchase-create,#purchaseView .purchase-order-create');
+    var action=event.target.closest&&event.target.closest('#purchaseView [data-order-action]');
+    if(create){event.preventDefault();event.stopImmediatePropagation();openPurchaseOrderForm(null);return;}
+    if(action){
+      event.preventDefault();event.stopImmediatePropagation();
+      var row=purchaseOrderRows[Number(action.dataset.row)],type=action.dataset.orderAction;
+      if(type==='edit'){openPurchaseOrderForm(row);return;}
+      var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
+      row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
+      detailRows.push(['采购金额',row.amount],['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
+      if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
+      openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
+    }
+  },true);
   new MutationObserver(normalizePurchaseOrderView).observe(document.body,{childList:true,subtree:true});
   window.addEventListener('load',function(){resetPurchaseSide();normalizePurchaseOrderView();});
 })();
