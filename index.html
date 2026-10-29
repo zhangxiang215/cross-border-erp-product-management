@@ -2339,9 +2339,25 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #purchaseView .purchase-order-status.waiting{color:#d97706;background:#fff7ed}
 #purchaseView .purchase-order-status.fulfillment{color:#2563eb;background:#eff6ff}
 #purchaseView .purchase-order-status.received{color:#16a34a;background:#f0fdf4}
+#purchaseView .purchase-order-status.payment{color:#b45309;background:#fffbeb}
+#purchaseView .purchase-order-status.production{color:#1d4ed8;background:#eff6ff}
+#purchaseView .purchase-order-status.accepted{color:#047857;background:#ecfdf5}
+#purchaseView .purchase-order-status.returned{color:#dc2626;background:#fef2f2}
+#purchaseView .purchase-order-status.completed{color:#15803d;background:#f0fdf4}
 #purchaseView .purchase-order-actions{white-space:nowrap}
 #purchaseView .purchase-order-actions .full-link{margin-right:16px}
 #purchaseView .purchase-order-actions .full-link:last-child{margin-right:0}
+#purchaseView .purchase-order-table{min-width:1780px;table-layout:fixed}
+#purchaseView .purchase-order-table th,#purchaseView .purchase-order-table td{padding-left:8px;padding-right:8px}
+#purchaseView .purchase-order-table td{height:auto;min-height:104px}
+#purchaseView .purchase-order-item-line{display:flex;align-items:center;justify-content:center;min-height:34px;padding:4px 0;border-bottom:1px dashed #e8edf3;line-height:1.35}
+#purchaseView .purchase-order-item-line:last-child{border-bottom:0}
+#purchaseView .purchase-order-date{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+#purchaseView .purchase-time-status{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;border-radius:10px;font-size:12px;font-weight:600}
+#purchaseView .purchase-time-status.early{color:#2563eb;background:#eff6ff}
+#purchaseView .purchase-time-status.ontime{color:#15803d;background:#f0fdf4}
+#purchaseView .purchase-time-status.late{color:#dc2626;background:#fef2f2}
+#purchaseView .purchase-order-source{color:#475569;white-space:nowrap}
 </style>
 <style>
 /* 商品列表短内容列收窄，减少无效留白。 */
@@ -2358,11 +2374,16 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 <script>
 (function(){
   var purchaseOrderRows=[
-    {no:'PO202610180028',supplier:'深圳市恒温电器有限公司',sku:'JZETLQ-0090000US',quantity:'128',amount:'¥24,800.00',created:'2026-10-18',delivery:'2026-10-28',owner:'夏景舟',status:'新建',statusClass:'new'},
-    {no:'PO202610170041',supplier:'义乌市优品供应链',sku:'SKU-20261015-001',quantity:'200',amount:'¥18,600.00',created:'2026-10-17',delivery:'2026-10-25',owner:'毛鸿雁',status:'待下单',statusClass:'waiting'},
-    {no:'PO202610160036',supplier:'曹县睿翔工艺品有限公司',sku:'SKU-20261015-002',quantity:'96',amount:'¥12,980.00',created:'2026-10-16',delivery:'2026-10-24',owner:'王娜',status:'履约中',statusClass:'fulfillment'},
-    {no:'PO202610150019',supplier:'阳江市万联五金塑料厂',sku:'JY2605840-001',quantity:'80',amount:'¥9,560.00',created:'2026-10-15',delivery:'2026-10-22',owner:'刘露',status:'已收货',statusClass:'received'}
+    {no:'PO202610180028',supplier:'深圳市恒温电器有限公司',items:[{sku:'JZETLQ-0090000US',quantity:'128',unitPrice:'¥192.19'},{sku:'JZETLQ-0090001US',quantity:'64',unitPrice:'¥86.50'}],amount:'¥30,336.00',created:'2026-10-18',createdTiming:'准时',createdTimingClass:'ontime',delivery:'2026-10-28',deliveryTiming:'提前',deliveryTimingClass:'early',owner:'夏景舟',source:'采购计划',status:'草稿',statusClass:'new'},
+    {no:'PO202610170041',supplier:'义乌市优品供应链',items:[{sku:'SKU-20261015-001',quantity:'200',unitPrice:'¥93.00'},{sku:'SKU-20261015-006',quantity:'50',unitPrice:'¥42.00'}],amount:'¥20,700.00',created:'2026-10-17',createdTiming:'准时',createdTimingClass:'ontime',delivery:'2026-10-25',deliveryTiming:'准时',deliveryTimingClass:'ontime',owner:'毛鸿雁',source:'手工新建',status:'待下单',statusClass:'waiting'},
+    {no:'PO202610160036',supplier:'曹县睿翔工艺品有限公司',items:[{sku:'SKU-20261015-002',quantity:'96',unitPrice:'¥135.21'}],amount:'¥12,980.00',created:'2026-10-16',createdTiming:'延迟',createdTimingClass:'late',delivery:'2026-10-24',deliveryTiming:'延迟',deliveryTimingClass:'late',owner:'王娜',source:'安全库存',status:'生产中',statusClass:'production'},
+    {no:'PO202610150019',supplier:'阳江市万联五金塑料厂',items:[{sku:'JY2605840-001',quantity:'80',unitPrice:'¥119.50'}],amount:'¥9,560.00',created:'2026-10-15',createdTiming:'准时',createdTimingClass:'ontime',delivery:'2026-10-22',deliveryTiming:'准时',deliveryTimingClass:'ontime',owner:'刘露',source:'手工新建',status:'已收货',statusClass:'received'},
+    {no:'PO202610140012',supplier:'东莞市联创家居有限公司',items:[{sku:'HOME-20261012-008',quantity:'120',unitPrice:'¥68.00'}],amount:'¥8,160.00',created:'2026-10-14',createdTiming:'提前',createdTimingClass:'early',delivery:'2026-10-21',deliveryTiming:'提前',deliveryTimingClass:'early',owner:'陈敏',source:'销售预测',status:'已验收',statusClass:'accepted'},
+    {no:'PO202610130008',supplier:'宁波越洋日用品有限公司',items:[{sku:'NY-20261010-003',quantity:'60',unitPrice:'¥145.00'}],amount:'¥8,700.00',created:'2026-10-13',createdTiming:'准时',createdTimingClass:'ontime',delivery:'2026-10-20',deliveryTiming:'延迟',deliveryTimingClass:'late',owner:'张晨',source:'采购计划',status:'退换货',statusClass:'returned'},
+    {no:'PO202610120006',supplier:'佛山市恒亮电器有限公司',items:[{sku:'FS-20261008-011',quantity:'100',unitPrice:'¥210.00'}],amount:'¥21,000.00',created:'2026-10-12',createdTiming:'准时',createdTimingClass:'ontime',delivery:'2026-10-19',deliveryTiming:'准时',deliveryTimingClass:'ontime',owner:'李欣',source:'销售预测',status:'已完成',statusClass:'completed'}
   ];
+  function orderItemLines(items,key){return items.map(function(item){return '<div class="purchase-order-item-line">'+item[key]+'</div>';}).join('');}
+  function orderDate(date,label,className){return '<div class="purchase-order-date"><span>'+date+'</span><span class="purchase-time-status '+className+'">'+label+'</span></div>';}
   function bindPurchaseOrderActions(table){
     table.querySelectorAll('[data-order-action]').forEach(function(action){
       action.onclick=function(){
@@ -2370,8 +2391,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
         var type=action.dataset.orderAction;
         if(type==='edit'){toast('已进入采购单编辑：'+row.no);return;}
         openInfoDrawer(type==='log'?'采购单日志':'采购单详情',[
-          ['采购单号',row.no],['供应商名称',row.supplier],['SKU',row.sku],['采购数量',row.quantity],['采购金额',row.amount],
-          ['创建日期',row.created],['交货日期',row.delivery],['采购负责人',row.owner],['状态',row.status],
+          ['采购单号',row.no],['供应商名称',row.supplier],['SKU',row.items.map(function(item){return item.sku;}).join('、')],['采购数量',row.items.map(function(item){return item.quantity;}).join('、')],['SKU单价',row.items.map(function(item){return item.unitPrice;}).join('、')],['采购金额',row.amount],
+          ['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status],
           ...(type==='log'?[['操作记录',row.created+' 创建采购单']]:[])
         ]);
       };
@@ -2385,15 +2406,18 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     view.querySelector('.purchase-subnav')?.remove();
     var pageTitle=view.querySelector('.purchase-page-title');
     if(pageTitle&&pageTitle.textContent.trim()!=='采购单管理')pageTitle.textContent='采购单管理';
-    var statusSelect=view.querySelector('.purchase-full-filter select:last-of-type');
-    if(statusSelect&&!statusSelect.dataset.orderStatusReady){
-      statusSelect.innerHTML='<option>请选择状态</option><option>新建</option><option>待下单</option><option>履约中</option><option>已收货</option>';
-      statusSelect.dataset.orderStatusReady='1';
+    var filter=view.querySelector('.purchase-full-filter');
+    if(filter&&!filter.dataset.orderFilterReady){
+      filter.innerHTML='<input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>请选择状态</option><option>草稿</option><option>待下单</option><option>待付款</option><option>生产中</option><option>已收货</option><option>已验收</option><option>退换货</option><option>已完成</option></select><input placeholder="采购负责人｜请输入"><div class="purchase-full-actions"><button class="action-btn primary purchase-order-search">搜索</button><button class="action-btn reset purchase-order-reset">重置</button></div>';
+      filter.dataset.orderFilterReady='1';
+      filter.querySelector('.purchase-order-search').onclick=function(){toast('采购单筛选结果已刷新');};
+      filter.querySelector('.purchase-order-reset').onclick=function(){filter.querySelectorAll('input').forEach(function(input){input.value='';});filter.querySelector('select').selectedIndex=0;toast('筛选条件已重置');};
     }
     var table=view.querySelector('.purchase-full-table table');
     if(!table||table.dataset.purchaseOrderNormalized)return;
     table.dataset.purchaseOrderNormalized='1';
-    table.innerHTML='<thead><tr><th>勾选</th><th>采购单号</th><th>供应商名称</th><th>SKU</th><th>采购数量</th><th>采购金额</th><th>创建日期</th><th>交货日期</th><th>采购负责人</th><th>状态</th><th>操作</th></tr></thead><tbody>'+purchaseOrderRows.map(function(row,index){return '<tr><td><span class="check full-row-check"></span></td><td class="full-code">'+row.no+'</td><td>'+row.supplier+'</td><td>'+row.sku+'</td><td>'+row.quantity+'</td><td>'+row.amount+'</td><td>'+row.created+'</td><td>'+row.delivery+'</td><td>'+row.owner+'</td><td><span class="purchase-order-status '+row.statusClass+'">'+row.status+'</span></td><td class="purchase-order-actions"><span class="full-link" data-order-action="detail" data-row="'+index+'">详情</span><span class="full-link" data-order-action="edit" data-row="'+index+'">编辑</span><span class="full-link" data-order-action="log" data-row="'+index+'">日志</span></td></tr>';}).join('')+'</tbody>';
+    table.classList.add('purchase-order-table');
+    table.innerHTML='<thead><tr><th>勾选</th><th>采购单号</th><th>供应商名称</th><th>SKU</th><th>采购数量</th><th>SKU单价</th><th>采购金额</th><th>创建日期</th><th>约定交货日期</th><th>采购负责人</th><th>订单来源</th><th>状态</th><th>操作</th></tr></thead><tbody>'+purchaseOrderRows.map(function(row,index){return '<tr><td><span class="check full-row-check"></span></td><td class="full-code">'+row.no+'</td><td>'+row.supplier+'</td><td>'+orderItemLines(row.items,'sku')+'</td><td>'+orderItemLines(row.items,'quantity')+'</td><td>'+orderItemLines(row.items,'unitPrice')+'</td><td>'+row.amount+'</td><td>'+orderDate(row.created,row.createdTiming,row.createdTimingClass)+'</td><td>'+orderDate(row.delivery,row.deliveryTiming,row.deliveryTimingClass)+'</td><td>'+row.owner+'</td><td class="purchase-order-source">'+row.source+'</td><td><span class="purchase-order-status '+row.statusClass+'">'+row.status+'</span></td><td class="purchase-order-actions"><span class="full-link" data-order-action="detail" data-row="'+index+'">详情</span><span class="full-link" data-order-action="edit" data-row="'+index+'">编辑</span><span class="full-link" data-order-action="log" data-row="'+index+'">日志</span></td></tr>';}).join('')+'</tbody>';
     table.querySelectorAll('.full-row-check').forEach(function(check){check.onclick=function(){check.classList.toggle('checked');};});
     bindPurchaseOrderActions(table);
   }
