@@ -2355,6 +2355,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #purchaseView .purchase-order-item-line{display:flex;align-items:center;justify-content:center;min-height:34px;padding:4px 0;border-bottom:1px dashed #e8edf3;line-height:1.35}
 #purchaseView .purchase-order-item-line:last-child{border-bottom:0}
 #purchaseView .purchase-order-date{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+#purchaseView .purchase-order-table td:nth-child(8) .purchase-time-status{display:none}
+#purchaseActionPage.purchase-order-form .form-grid>.form-item:nth-child(4){display:none}
 #purchaseView .purchase-time-status{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;border-radius:10px;font-size:12px;font-weight:600}
 #purchaseView .purchase-time-status.early{color:#2563eb;background:#eff6ff}
 #purchaseView .purchase-time-status.ontime{color:#15803d;background:#f0fdf4}
@@ -2401,6 +2403,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     var editing=!!row,p=document.getElementById('purchaseActionPage');
     document.getElementById('purchaseCreatePage')?.classList.remove('active','show');
     if(!p){p=document.createElement('section');p.id='purchaseActionPage';p.className='purchase-source-page';document.querySelector('.main').appendChild(p);}
+    p.classList.add('purchase-order-form');
     var current=row||{no:'',supplier:'',items:[{sku:'',quantity:'',unitPrice:''}],amount:'',created:'',createdTiming:'准时',delivery:'',deliveryTiming:'准时',owner:'',source:'采购计划',status:'草稿'};
     p.innerHTML='<div class="purchase-source-head"><h1>'+(editing?'编辑采购单':'新增采购单')+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><section class="form-section"><h3>采购单基础信息</h3><div class="form-grid"><div class="form-item"><label>采购单号</label><input class="form-input" value="'+current.no+'" placeholder="系统自动生成"></div><div class="form-item"><label>供应商名称</label><input class="form-input" value="'+current.supplier+'" placeholder="请选择供应商"></div><div class="form-item"><label>创建日期</label><input class="form-input" type="date" value="'+current.created+'"></div><div class="form-item"><label>创建时间状态</label><select class="form-select"><option '+(current.createdTiming==='提前'?'selected':'')+'>提前</option><option '+(current.createdTiming==='准时'?'selected':'')+'>准时</option><option '+(current.createdTiming==='延迟'?'selected':'')+'>延迟</option></select></div><div class="form-item"><label>约定交货日期</label><input class="form-input" type="date" value="'+current.delivery+'"></div><div class="form-item"><label>交货时间状态</label><select class="form-select"><option '+(current.deliveryTiming==='提前'?'selected':'')+'>提前</option><option '+(current.deliveryTiming==='准时'?'selected':'')+'>准时</option><option '+(current.deliveryTiming==='延迟'?'selected':'')+'>延迟</option></select></div><div class="form-item"><label>采购负责人</label><input class="form-input" value="'+current.owner+'" placeholder="请输入采购负责人"></div><div class="form-item"><label>订单来源</label><select class="form-select"><option '+(current.source==='采购计划'?'selected':'')+'>采购计划</option><option '+(current.source==='手工新建'?'selected':'')+'>手工新建</option><option '+(current.source==='安全库存'?'selected':'')+'>安全库存</option><option '+(current.source==='销售预测'?'selected':'')+'>销售预测</option></select></div><div class="form-item"><label>状态</label><select class="form-select">'+['草稿','待下单','待付款','生产中','已收货','已验收','退换货','已完成'].map(function(status){return '<option '+(current.status===status?'selected':'')+'>'+status+'</option>';}).join('')+'</select></div><div class="form-item"><label>采购金额</label><input class="form-input" value="'+current.amount.replace('¥','')+'" placeholder="根据SKU明细自动计算"></div></div></section><section class="form-section"><div class="purchase-order-item-heading"><h3>SKU明细</h3><button type="button" class="action-btn primary purchase-order-add-item">＋ 增加SKU</button></div><div class="purchase-order-edit-items">'+current.items.map(purchaseOrderItemEditor).join('')+'</div></section></div><div class="purchase-source-foot"><button class="action-btn purchase-order-form-cancel">取消</button><button class="action-btn primary purchase-order-form-save">保存</button></div>';
     p.classList.add('active');document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('purchaseView')?.classList.remove('active');document.getElementById('productTopTab').style.display='flex';document.getElementById('productTopTab').querySelector('.x').previousSibling.textContent=(editing?'编辑采购单':'新增采购单')+' ';
@@ -2418,7 +2421,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
         if(type==='edit'){openPurchaseOrderForm(row);return;}
         var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
         row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
-        detailRows.push(['采购金额',row.amount],['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
+        detailRows.push(['采购金额',row.amount],['创建日期',row.created],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
         if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
         openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
       };
@@ -2478,7 +2481,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       if(type==='edit'){openPurchaseOrderForm(row);return;}
       var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
       row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
-      detailRows.push(['采购金额',row.amount],['创建日期',row.created+'（'+row.createdTiming+'）'],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
+      detailRows.push(['采购金额',row.amount],['创建日期',row.created],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
       if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
       openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
     }
