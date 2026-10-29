@@ -499,6 +499,11 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
       var mode=moduleItems[module][label];
       closeViews();
       if(module==='inventory'&&typeof window.__erpInventoryMount==='function'){window.__erpInventoryMount(mode);hideSidebars();return true;}
+      if(module==='supply'&&typeof window.__erpSupplyMount==='function'){
+        var supplyMode=item.dataset.sideKey;
+        if(!['supplier','carrier','tracking'].includes(supplyMode))supplyMode=mode==='info'?'supplier':mode;
+        window.__erpSupplyMount(supplyMode);hideSidebars();return true;
+      }
       if(module==='supply'&&typeof supplyMount==='function'){supplyMount(mode);hideSidebars();return true;}
       if(module==='warehouse'&&typeof warehouseMount==='function'){warehouseMount(mode);hideSidebars();return true;}
       if(module==='supply'||module==='warehouse'){renderAuditModule(module,mode,label);return true;}
@@ -1674,6 +1679,13 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
       if(key==='plan'&&typeof window.__renderPurchasePlanFinal==='function'){window.__renderPurchasePlanFinal();}else if(window.renderPurchaseFull){window.renderPurchaseFull(key,0);}else{fallbackPurchase(key);}
       if(rail)rail.classList.add('purchase-open');
       var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','block','important');
+      return;
+    }
+    if(item.closest('#supplySideSubnav')&&['supplier','carrier','tracking'].includes(key)&&typeof window.__erpSupplyMount==='function'){
+      e.preventDefault();e.stopImmediatePropagation();
+      window.__erpSupplyMount(key);
+      var supplyBox=document.getElementById('supplySideSubnav');if(supplyBox)supplyBox.style.setProperty('display','none','important');
+      document.querySelector('.left-rail')?.classList.remove('supply-open');
       return;
     }
     if(item.classList.contains('simple-side-item')){
