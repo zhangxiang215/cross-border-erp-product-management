@@ -612,7 +612,7 @@ function buildMaterialForm(){const body=document.querySelector('.product-form .f
 function bindFormNav(){document.querySelectorAll('.form-nav-item').forEach(item=>item.onclick=()=>{document.querySelectorAll('.form-nav-item').forEach(x=>x.classList.remove('active'));item.classList.add('active');document.getElementById(item.dataset.target).scrollIntoView({behavior:'smooth',block:'start'});});}
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>el.classList.remove('show'),1800);}
 function copyValue(value){const text=String(value||'');const done=()=>toast('复制成功');if(navigator.clipboard?.writeText){navigator.clipboard.writeText(text).then(done).catch(done);}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.appendChild(input);input.select();try{document.execCommand('copy');}catch(e){}input.remove();done();}}
-function openInfoDrawer(title,rows){const drawer=document.querySelector('.drawer');drawer.innerHTML=`<div class="drawer-title"><span>${title}</span><button class="close" id="closeDrawer">×</button></div><div class="detail-section"><h3>信息</h3>${rows.map(r=>`<div class="detail-row"><label>${r[0]}</label><span>${r[1]}</span></div>`).join('')}</div>`;document.getElementById('drawerMask').classList.add('show');document.getElementById('closeDrawer').onclick=()=>document.getElementById('drawerMask').classList.remove('show');}
+function openInfoDrawer(title,rows){const drawer=document.querySelector('.drawer'),esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const groups=[{title:'基础信息',rows:[]},{title:'业务关联',rows:[]},{title:'状态与时间',rows:[]}];rows.forEach(r=>{const label=String(r[0]||'');if(/状态|时间|日期|操作人|更新人/.test(label))groups[2].rows.push(r);else if(/SKU|商品|供应商|仓库|物流|合同|关联|链接|平台/.test(label))groups[1].rows.push(r);else groups[0].rows.push(r);});const sections=groups.filter(g=>g.rows.length).map(g=>`<section class="purchase-detail-section unified-detail-section"><h3>${g.title}</h3><div class="purchase-detail-grid">${g.rows.map(r=>`<div class="purchase-detail-field"><label>${esc(r[0])}</label><span>${r[1]}</span></div>`).join('')}</div></section>`).join('');drawer.innerHTML=`<div class="drawer-title"><span>${esc(title)}</span><button class="close" id="closeDrawer">×</button></div><div class="purchase-detail-layout unified-detail-layout">${sections}</div>`;document.getElementById('drawerMask').classList.add('show');document.getElementById('closeDrawer').onclick=()=>document.getElementById('drawerMask').classList.remove('show');}
 function bindPartsActions(){document.getElementById('addPartBtn').onclick=()=>showForm('part');document.getElementById('partExportBtn').onclick=()=>toast('配件数据导出任务已创建');document.getElementById('partSearchBtn').onclick=()=>toast('配件列表已刷新');document.getElementById('partLogBtn').onclick=()=>openInfoDrawer('配件操作日志',[['操作类型','编辑配件SKU'],['操作人','2051'],['操作时间','2026-10-15 15:22'],['变更内容','配件名称、关联商品SKU']]);document.querySelectorAll('.part-edit').forEach((el,i)=>el.onclick=()=>showForm('part',partsData[i]));document.querySelectorAll('.part-relation').forEach((el,i)=>el.onclick=()=>openInfoDrawer('关联SKU',[['配件SKU',partsData[i].code],['配件名称',partsData[i].name],['关联商品SKU',partsData[i].sku],['单件用量','1 个']]));document.querySelectorAll('.part-log').forEach((el,i)=>el.onclick=()=>openInfoDrawer('配件操作日志',[['配件SKU',partsData[i].code],['操作人','2051'],['操作时间','2026-10-15 15:22'],['操作结果','保存成功']]));}
 function bindMaterialActions(){document.getElementById('addMaterialBtn').onclick=()=>showForm('material');document.getElementById('materialExportBtn').onclick=()=>toast('物料数据导出任务已创建');document.getElementById('materialSearchBtn').onclick=()=>toast('物料列表已刷新');document.getElementById('materialLogBtn').onclick=()=>openInfoDrawer('物料操作日志',[['操作类型','编辑物料'],['操作人','2051'],['操作时间','2026-10-15 15:36'],['变更内容','物料规格、关联商品SKU']]);document.querySelectorAll('.material-edit').forEach((el,i)=>el.onclick=()=>showForm('material',materialData[i]));document.querySelectorAll('.material-log').forEach((el,i)=>el.onclick=()=>openInfoDrawer('物料操作日志',[['物料编码',materialData[i].code],['操作人','2051'],['操作时间','2026-10-15 15:36'],['操作结果','保存成功']]));}
 function bindSpuActions(){document.getElementById('spuBackSkuBtn').onclick=()=>switchSkuSpu('sku');document.getElementById('spuActiveBtn').onclick=()=>switchSkuSpu('spu');document.getElementById('spuRefreshBtn').onclick=()=>toast('SPU列表已刷新');document.getElementById('addSpuBtn').onclick=()=>showForm('spu');document.querySelectorAll('.spu-link,.spu-view').forEach((el,i)=>el.onclick=()=>openInfoDrawer('SPU详情',[['商品SPU',spuData[i].spu],['商品名称',spuData[i].name],['SKU数量',spuData[i].variants],['商品类目',spuData[i].category],['商品状态',spuData[i].status]]));document.querySelectorAll('.spu-edit').forEach((el,i)=>el.onclick=()=>showForm('spu',spuData[i]));document.querySelectorAll('.spu-log').forEach((el,i)=>el.onclick=()=>openInfoDrawer('SPU日志',[['商品SPU',spuData[i].spu],['商品名称',spuData[i].name],['操作类型','SPU信息维护'],['操作人','2051'],['操作时间',spuData[i].record.split('|').pop().replace('更新时间：','')],['变更内容','商品基础信息、包装信息及刊登信息']]));}
@@ -2689,7 +2689,32 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 .global-change-log-table th:nth-child(1){width:138px}.global-change-log-table th:nth-child(2){width:110px}
 .global-change-log-table th:last-child,.global-change-log-table td:last-child{border-right:0}
 .global-change-log-table tbody tr:last-child td{border-bottom:0}
+#partsView .part-detail,#partsView .part-edit,#partsView .part-log{display:inline-block;margin:0 5px;white-space:nowrap}
 </style>
+<script>
+(function(){
+  function enhancePartsDetail(){
+    var view=document.getElementById('partsView');if(!view)return;
+    view.querySelectorAll('tbody tr').forEach(function(row,index){
+      var edit=row.querySelector('.part-edit');if(!edit||row.querySelector('.part-detail'))return;
+      edit.insertAdjacentHTML('beforebegin','<span class="link part-detail" data-index="'+index+'">详情</span>');
+    });
+  }
+  document.addEventListener('click',function(e){
+    var detail=e.target.closest&&e.target.closest('.part-detail');if(!detail)return;
+    e.preventDefault();e.stopImmediatePropagation();var p=partsData[Number(detail.dataset.index)];if(!p)return;
+    openInfoDrawer('配件详情',[['配件SKU',p.code],['配件名称',p.name],['关联商品SKU',p.sku],['配件类型',p.type],['规格型号',p.spec],['配件重量',p.weight+' g'],['基本单位',p.unit],['状态',p.status]]);
+  },true);
+  document.addEventListener('click',function(e){
+    var detail=e.target.closest&&e.target.closest('#productTableCard .view');if(!detail)return;
+    e.preventDefault();e.stopImmediatePropagation();var index=Array.prototype.indexOf.call(document.querySelectorAll('#productTableCard .view'),detail),p=data[index];if(!p)return;
+    openInfoDrawer('商品详情',[['商品SKU',p.sku],['商品名称',p.name],['型号',p.model],['商品类型',p.type],['销售方式',p.salesMethod],['是否组合商品',p.combo],['商品状态',p.productStatus],['更新时间','2026-10-30 13:20']]);
+  },true);
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#sidePartsItem,#productSubnav [data-side-key="sidePartsItem"]'))setTimeout(enhancePartsDetail,0);});
+  new MutationObserver(enhancePartsDetail).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('load',enhancePartsDetail);
+})();
+</script>
 <script>
 (function(){
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
