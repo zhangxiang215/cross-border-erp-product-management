@@ -2346,9 +2346,9 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #purchaseView .purchase-order-status.accepted{color:#047857;background:#ecfdf5}
 #purchaseView .purchase-order-status.returned{color:#dc2626;background:#fef2f2}
 #purchaseView .purchase-order-status.completed{color:#15803d;background:#f0fdf4}
-#purchaseView .purchase-order-actions{white-space:nowrap}
-#purchaseView .purchase-order-actions .full-link{margin-right:16px}
-#purchaseView .purchase-order-actions .full-link:last-child{margin-right:0}
+#purchaseView .purchase-full-table th:last-child,#purchaseView .purchase-full-table td:last-child{width:180px;min-width:180px;white-space:nowrap;overflow:visible}
+#purchaseView .purchase-order-actions{display:flex;align-items:center;justify-content:center;gap:14px;white-space:nowrap;overflow:visible}
+#purchaseView .purchase-order-actions .full-link{margin:0}
 #purchaseView .purchase-order-table{min-width:1780px;table-layout:fixed}
 #purchaseView .purchase-order-table th,#purchaseView .purchase-order-table td{padding-left:8px;padding-right:8px}
 #purchaseView .purchase-order-table td{height:auto;min-height:104px}
