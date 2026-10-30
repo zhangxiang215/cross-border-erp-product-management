@@ -2374,6 +2374,21 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 .purchase-order-plan-number[hidden]{display:none!important}
 .purchase-order-notes{grid-column:1/-1}
 .purchase-order-form-draft{border-color:#2878ef!important;color:#2878ef!important;background:#fff!important}
+.purchase-readonly-section{padding:30px 32px!important}
+.purchase-readonly-section>h3{margin:30px -32px 20px!important;padding:18px 32px!important}
+.purchase-readonly-section>h3:first-child{margin-top:-30px!important}
+.purchase-readonly-section .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:64px;row-gap:12px;padding:4px 0 12px}
+.purchase-readonly-section .detail-row{display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;min-height:38px;line-height:1.5}
+.purchase-readonly-section .detail-row label{width:auto;color:#9aa4ae}
+.purchase-readonly-section .detail-row span{min-width:0;color:#465464;overflow-wrap:anywhere}
+.purchase-detail-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:0 0 6px;border:1px solid #e5eaf0;border-radius:8px;overflow:hidden}
+.purchase-detail-table th,.purchase-detail-table td{padding:16px 18px;text-align:left;vertical-align:middle;border-right:1px solid #edf0f4;border-bottom:1px solid #edf0f4;line-height:1.55;overflow-wrap:anywhere}
+.purchase-detail-table th{background:#f7f9fc;color:#465260;font-weight:650;white-space:nowrap}
+.purchase-detail-table td{color:#526071;background:#fff}
+.purchase-detail-table th:last-child,.purchase-detail-table td:last-child{border-right:0}
+.purchase-detail-table tbody tr:last-child td{border-bottom:0}
+.purchase-detail-table th:nth-child(1){width:22%}.purchase-detail-table th:nth-child(2){width:34%}.purchase-detail-table th:nth-child(3){width:14%}.purchase-detail-table th:nth-child(4){width:18%}.purchase-detail-table th:nth-child(5){width:12%}
+.purchase-readonly-section .detail-note{padding:18px 20px;border:1px solid #e5eaf0;border-radius:8px;background:#f8fafc;color:#526071;line-height:1.75}
 @media(max-width:1100px){.purchase-order-edit-item{grid-template-columns:1fr 1fr}.purchase-order-edit-item .purchase-order-remove-item{grid-column:2}}
 </style>
 <style>
