@@ -2690,6 +2690,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   };
   document.addEventListener('click',function(e){
     var target=e.target&&e.target.closest?e.target.closest('button,a,.link,.full-link,.inventory-action,.warehouse-link,.supply-pro-action'):null;if(!target)return;
+    if(target.classList&&target.classList.contains('global-log-close'))return;
     var text=(target.textContent||'').trim(),classes=String(target.className||'');
     if(!(text==='日志'||text==='操作日志'||/(^|[-_])log($|[-_])/.test(classes)))return;
     e.preventDefault();e.stopImmediatePropagation();var ctx=contextFrom(target);window.__openGlobalChangeLog(ctx.module,ctx.identifier);
