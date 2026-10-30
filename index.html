@@ -2421,7 +2421,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     p.querySelectorAll('label').forEach(function(label){
       if(label.textContent.includes('上传鲜采采购合同')){
         label.firstChild.nodeValue='上传盖章采购合同';
-        label.querySelector('.purchase-order-contract-upload').innerHTML='<input class="form-input" value="支持PDF、WORD文档" readonly><button type="button" class="action-btn purchase-order-upload">上传</button>';
+        label.closest('.form-item').querySelector('.purchase-order-contract-upload').innerHTML='<input class="form-input" value="支持PDF、WORD文档" readonly><button type="button" class="action-btn purchase-order-upload">上传</button>';
       }
       if(label.textContent.trim()==='计划编号'||label.textContent.trim()==='采购单总价')label.closest('.form-item').remove();
     });
