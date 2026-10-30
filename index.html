@@ -2402,6 +2402,22 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #productTableCard .data-table col:nth-child(6){width:140px!important}
 #productTableCard .data-table col:nth-child(7){width:140px!important}
 #productTableCard .data-table col:nth-child(8){width:202px!important}
+.purchase-detail-layout{padding:22px 36px 40px}
+.purchase-detail-section{margin-bottom:18px;padding:0 22px 22px;background:#fff;border-radius:8px;box-shadow:var(--shadow)}
+.purchase-detail-section h3{margin:0 -22px 20px;padding:17px 22px;border-bottom:1px solid #edf1f5;color:#2e3a46;font-size:16px}
+.purchase-detail-section h3:before{content:"";display:inline-block;width:4px;height:18px;margin-right:10px;background:var(--blue);vertical-align:-3px}
+.purchase-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:18px 32px}
+.purchase-detail-field{min-width:0}
+.purchase-detail-field label{display:block;margin-bottom:7px;color:#98a3af;font-size:12px}
+.purchase-detail-field span{display:block;color:#455363;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+.purchase-contract-view{display:inline-block!important;color:var(--blue)!important;cursor:pointer}
+.purchase-detail-table-wrap{overflow:auto;border:1px solid #e5eaf0;border-radius:7px}
+.purchase-detail-table{width:100%;min-width:980px;border-collapse:collapse;table-layout:fixed}
+.purchase-detail-table th,.purchase-detail-table td{height:48px;padding:8px 12px;border-right:1px solid #edf1f5;border-bottom:1px solid #edf1f5;text-align:center;color:#4c5967}
+.purchase-detail-table th{background:#f7f9fc;color:#566372;font-weight:650}
+.purchase-detail-table th:last-child,.purchase-detail-table td:last-child{border-right:0}.purchase-detail-table tr:last-child td{border-bottom:0}
+.purchase-detail-note{padding:14px 16px;border-radius:6px;background:#f7f9fc;color:#596675;line-height:1.7}
+@media(max-width:1500px){.purchase-detail-grid{grid-template-columns:repeat(3,minmax(180px,1fr))}}
 </style>
 <script>
 (function(){
@@ -2426,19 +2442,15 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     return '<div class="purchase-source-head"><h1>'+(editing?'编辑采购单':'新增采购单')+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><section class="form-section"><h3>采购基础信息</h3><div class="form-grid"><div class="form-item"><label>采购单号</label><input class="form-input" value="'+current.no+'" placeholder="系统自动生成"></div><div class="form-item"><label>供应商名称</label><input class="form-input" value="'+current.supplier+'" placeholder="请选择供应商名称"></div><div class="form-item"><label>签合同日期</label><input class="form-input" type="date" value="'+(current.created||'')+'"></div><div class="form-item"><label>预计到货时间</label><input class="form-input" type="date" value="'+(current.delivery||'')+'"></div><div class="form-item"><label>采购负责人</label><input class="form-input" value="'+current.owner+'" placeholder="请输入采购负责人"></div><div class="form-item"><label>上传鲜采采购合同</label><div class="purchase-order-contract-upload"><button type="button" class="action-btn purchase-order-upload">上传合同</button><span class="purchase-order-contract-tip">支持 PDF、Word、图片</span></div></div><div class="form-item"><label>订单来源</label><select class="form-select purchase-order-source-select">'+purchaseOrderOptions(['采样','比样','自动补货','计划补货','紧急补货'],source)+'</select></div><div class="form-item purchase-order-plan-number" '+(source==='计划补货'?'':'hidden')+'><label>计划编号</label><input class="form-input" placeholder="请选择补货计划编号"></div><div class="form-item"><label>国内尾程物流</label><select class="form-select">'+purchaseOrderOptions(['国际物流商上门收货','供应商帮忙叫货代','自己收货'],'国际物流商上门收货')+'</select></div><div class="form-item"><label>物流价格</label><input class="form-input" placeholder="请输入物流价格"></div><div class="form-item"><label>能否开票</label><select class="form-select"><option>是</option><option>否</option></select></div><div class="form-item"><label>采购单总价</label><input class="form-input" value="'+current.amount.replace('¥','')+'" placeholder="系统自动汇总" readonly></div><div class="form-item"><label>状态</label><select class="form-select">'+purchaseOrderOptions(['草稿','待下单','待付款','生产中','已收货','已验收','退换货','已完成'],current.status||'草稿')+'</select></div><div class="form-item purchase-order-notes"><label>下单备注</label><textarea class="form-textarea" placeholder="请输入下单备注"></textarea></div></div></section><section class="form-section"><div class="purchase-order-item-heading"><h3>商品明细</h3><button type="button" class="action-btn primary purchase-order-add-item">＋ 增加商品SKU</button></div><div class="purchase-order-edit-items">'+current.items.map(purchaseOrderItemEditor).join('')+'</div></section></div><div class="purchase-source-foot"><button class="action-btn purchase-order-form-cancel">取消</button><button class="action-btn purchase-order-form-draft">保存草稿</button><button class="action-btn primary purchase-order-form-save">保存</button></div>';
   }
   function purchaseOrderMoney(value){var amount=Number(String(value||'').replace(/[^0-9.]/g,''));return isFinite(amount)?'¥'+amount.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'-';}
+  function purchaseDetailEsc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function purchaseDetailField(label,value){return '<div class="purchase-detail-field"><label>'+purchaseDetailEsc(label)+'</label><span>'+purchaseDetailEsc(value)+'</span></div>';}
   function openPurchaseOrderDetail(row){
-    var detailRows=[
-      ['采购单号',row.no],['供应商名称',row.supplier],['创建日期',row.created],['约定交货日期',row.delivery],
-      ['交货时间状态',row.deliveryTiming],['采购金额',row.amount],['签合同日期',row.created],['预计到货时间',row.delivery],
-      ['采购负责人',row.owner],['上传盖章采购合同','<span class="link purchase-contract-view">查看合同</span>'],
-      ['订单来源',row.source],['国内尾程物流',row.tailLogistics||'国际物流商上门收货'],['物流价格',row.logisticsPrice||'¥680.00'],
-      ['能否开票',row.invoice||'是'],['状态',row.status],['下单备注',row.note||'请按约定日期交货，外箱及商品标签须保持完整。']
-    ];
-    row.items.forEach(function(item,index){
-      var n=index+1,unit=item.unitPrice,quantity=Number(item.quantity)||0,unitNumber=Number(String(unit||'').replace(/[^0-9.]/g,''))||0;
-      detailRows.push(['商品SKU '+n,item.sku],['采购数量 '+n,item.quantity],['SKU单价 '+n,unit],['采购单价（含税）'+n,unit],['税点 '+n,'13%'],['单SKU总价 '+n,purchaseOrderMoney(quantity*unitNumber)]);
-    });
-    openInfoDrawer('采购单详情',detailRows);
+    var drawer=document.querySelector('.drawer'),mask=document.getElementById('drawerMask');
+    var basic=[['采购单号',row.no],['供应商名称',row.supplier],['创建日期',row.created],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status],['采购金额',row.amount],['能否开票',row.invoice||'是']];
+    var fulfillment=[['签合同日期',row.created],['预计到货时间',row.delivery],['约定交货日期',row.delivery],['交货时间状态',row.deliveryTiming],['国内尾程物流',row.tailLogistics||'国际物流商上门收货'],['物流价格',row.logisticsPrice||'¥680.00']];
+    var skuRows=row.items.map(function(item){var quantity=Number(item.quantity)||0,unitNumber=Number(String(item.unitPrice||'').replace(/[^0-9.]/g,''))||0;return '<tr><td>'+purchaseDetailEsc(item.sku)+'</td><td>'+purchaseDetailEsc(item.quantity)+'</td><td>'+purchaseDetailEsc(item.unitPrice)+'</td><td>'+purchaseDetailEsc(item.unitPrice)+'</td><td>13%</td><td>'+purchaseDetailEsc(purchaseOrderMoney(quantity*unitNumber))+'</td></tr>';}).join('');
+    drawer.innerHTML='<div class="drawer-title"><span>采购单详情</span><button class="close purchase-detail-close">×</button></div><div class="purchase-detail-layout"><section class="purchase-detail-section"><h3>采购基础信息</h3><div class="purchase-detail-grid">'+basic.map(function(x){return purchaseDetailField(x[0],x[1]);}).join('')+'</div></section><section class="purchase-detail-section"><h3>合同与履约信息</h3><div class="purchase-detail-grid">'+fulfillment.map(function(x){return purchaseDetailField(x[0],x[1]);}).join('')+'<div class="purchase-detail-field"><label>上传盖章采购合同</label><span class="purchase-contract-view">查看合同</span></div></div></section><section class="purchase-detail-section"><h3>商品明细</h3><div class="purchase-detail-table-wrap"><table class="purchase-detail-table"><thead><tr><th>商品SKU</th><th>采购数量</th><th>SKU单价</th><th>采购单价（含税）</th><th>税点</th><th>单SKU总价</th></tr></thead><tbody>'+skuRows+'</tbody></table></div></section><section class="purchase-detail-section"><h3>下单备注</h3><div class="purchase-detail-note">'+purchaseDetailEsc(row.note||'请按约定日期交货，外箱及商品标签须保持完整。')+'</div></section></div>';
+    mask.classList.add('show');drawer.querySelector('.purchase-detail-close').onclick=function(){mask.classList.remove('show');};
     var contract=document.querySelector('.purchase-contract-view');
     if(contract)contract.onclick=function(){openInfoDrawer('采购合同',[['合同名称',row.no+'-盖章采购合同.pdf'],['合同类型','PDF文档'],['签合同日期',row.created],['合同状态','已上传'],['文件操作','<span class="link">在线预览</span>']]);};
   }
