@@ -518,7 +518,7 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
     if(!action)return;
     var isAdd=action.classList.contains('audit-add'),isEdit=action.classList.contains('audit-row-edit')||action.classList.contains('audit-edit'),isLog=action.classList.contains('audit-row-log')||action.classList.contains('audit-log');
     var module=action.closest('#supplyView')?'供应':action.closest('#warehouseView')?'仓储':'模块';
-    e.preventDefault();e.stopImmediatePropagation();genericModulePage((isAdd?'新增':isEdit?'编辑':isLog?'日志':'详情')+module,isAdd||isEdit?'edit':'detail');
+    e.preventDefault();e.stopImmediatePropagation();if(isLog){window.__openGlobalChangeLog(module,'当前记录');return;}genericModulePage((isAdd?'新增':isEdit?'编辑':'详情')+module,isAdd||isEdit?'edit':'detail');
   },true);
   window.addEventListener('click',function(e){var action=e.target.closest&&e.target.closest('.audit-add,.audit-row-detail,.audit-row-edit,.audit-row-log,.audit-search,.audit-reset,.audit-export');if(action&&typeof action.onclick==='function'){e.preventDefault();action.onclick.call(action,e);e.stopImmediatePropagation();return;}var item=e.target.closest&&e.target.closest('.simple-side-item,.module-side-item,.purchase-side-item,.product-subitem');if(!item)return;if(item.classList.contains('product-subitem')){setTimeout(hideSidebars,0);return;}if(dispatch(item)){e.preventDefault();e.stopImmediatePropagation();}},true);
   window.addEventListener('click',function(e){
@@ -2459,11 +2459,11 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
         var row=purchaseOrderRows[Number(action.dataset.row)];
         var type=action.dataset.orderAction;
         if(type==='edit'){openPurchaseOrderForm(row);return;}
+        if(type==='log'){window.__openGlobalChangeLog('采购单管理',row.no);return;}
         var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
         row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
         detailRows.push(['采购金额',row.amount],['创建日期',row.created],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
-        if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
-        openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
+        openInfoDrawer('采购单详情',detailRows);
       };
     });
   }
@@ -2520,11 +2520,11 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       event.preventDefault();event.stopImmediatePropagation();
       var row=purchaseOrderRows[Number(action.dataset.row)],type=action.dataset.orderAction;
       if(type==='edit'){openPurchaseOrderForm(row);return;}
+      if(type==='log'){window.__openGlobalChangeLog('采购单管理',row.no);return;}
       var detailRows=[['采购单号',row.no],['供应商名称',row.supplier]];
       row.items.forEach(function(item,index){detailRows.push(['SKU '+(index+1),item.sku],['采购数量 '+(index+1),item.quantity],['SKU单价 '+(index+1),item.unitPrice]);});
       detailRows.push(['采购金额',row.amount],['创建日期',row.created],['约定交货日期',row.delivery+'（'+row.deliveryTiming+'）'],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status]);
-      if(type==='log')detailRows.push(['操作记录',row.created+' 创建采购单']);
-      openInfoDrawer(type==='log'?'采购单日志':'采购单详情',detailRows);
+      openInfoDrawer('采购单详情',detailRows);
     }
   },true);
   new MutationObserver(normalizePurchaseOrderView).observe(document.body,{childList:true,subtree:true});
@@ -2648,12 +2648,52 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       var i=Number(target.dataset.i),row=rows()[i];
       if(target.classList.contains('supply-pro-detail'))return openPage(current==='tracking'?'物流轨迹详情':configs[current].title.replace('管理','')+'详情',detailBody(current,row),false);
       if(target.classList.contains('supply-pro-edit'))return openPage('编辑'+configs[current].title.replace('管理',''),formBody(current,row),true,function(page){saveRow(current,i,page);});
-      if(target.classList.contains('supply-pro-log'))return openPage('操作日志','<section class="form-section"><h3>操作记录</h3><div class="detail-row"><label>2026-10-28 14:20</label><span>'+esc(row.name||row.no)+' 信息已更新</span></div><div class="detail-row"><label>2026-10-27 09:10</label><span>记录创建，操作人：夏景舟</span></div></section>',false);
+      if(target.classList.contains('supply-pro-log'))return window.__openGlobalChangeLog(configs[current].title,row.name||row.no);
       if(target.classList.contains('supply-pro-toggle')){if(current==='tracking'){row.status=row.status==='异常'?'运输中':'异常';row.updated='2026-10-28 15:30';row.events.unshift([row.updated,row.status==='异常'?'人工标记异常':'异常已解除',row.status==='异常'?'等待运营人员处理':'物流恢复正常']);}else{row.status=/启用|合作中/.test(row.status)?(current==='supplier'?'停用':'暂停合作'):(current==='supplier'?'启用':'合作中');}render(current);return toast('状态已更新');}
     }
     if(e.target.closest&&e.target.closest('#supplyNavToggle'))setTimeout(function(){rebuildSide();render(current);},0);
   },true);
   window.addEventListener('load',rebuildSide);
+})();
+</script>
+<style>
+.global-change-log{padding:2px 0 8px}
+.global-change-log-context{margin-bottom:16px;padding:12px 14px;border-radius:7px;background:#f5f8fc;color:#5b6877;line-height:1.6}
+.global-change-log-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;table-layout:fixed}
+.global-change-log-table th,.global-change-log-table td{padding:12px 10px;border-right:1px solid #edf1f5;border-bottom:1px solid #edf1f5;text-align:left;vertical-align:top;line-height:1.55;overflow-wrap:anywhere}
+.global-change-log-table th{background:#f7f9fc;color:#526071;font-weight:650}
+.global-change-log-table td{color:#5d6977;background:#fff}
+.global-change-log-table th:nth-child(1){width:138px}.global-change-log-table th:nth-child(2){width:110px}
+.global-change-log-table th:last-child,.global-change-log-table td:last-child{border-right:0}
+.global-change-log-table tbody tr:last-child td{border-bottom:0}
+</style>
+<script>
+(function(){
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function contextFrom(target){
+    var row=target&&target.closest?target.closest('tr'):null;
+    var code=row&&row.querySelector('.full-code,.sku-link,.spu-link,.inventory-sku,.supply-pro-code,.warehouse-code,b');
+    var identifier=(code&&code.textContent.trim())||(row&&row.cells&&row.cells[1]&&row.cells[1].textContent.trim())||'当前记录';
+    var view=target&&target.closest?target.closest('#productPages,#inventoryView,#purchaseView,#supplyView,#warehouseView'):null;
+    var heading=view&&view.querySelector('h2,.purchase-tab.active,.supply-pro-tab.active,.warehouse-tab.active,.module-page-head h2');
+    return {module:(heading&&heading.textContent.trim())||'业务信息',identifier:identifier};
+  }
+  window.__openGlobalChangeLog=function(module,identifier){
+    var drawer=document.querySelector('.drawer'),mask=document.getElementById('drawerMask');if(!drawer||!mask)return;
+    var records=[
+      ['2026-10-30 10:12:36','ERP2051','更新'+module+'信息：状态、负责人及备注已修改'],
+      ['2026-10-29 16:48:12','ERP1028','更新'+module+'信息：基础资料已修改'],
+      ['2026-10-28 09:20:05','ERP0001','创建记录并保存初始信息']
+    ];
+    drawer.innerHTML='<div class="drawer-title"><span>'+esc(module)+'变更日志</span><button class="close global-log-close">×</button></div><div class="detail-section global-change-log"><div class="global-change-log-context">记录对象：'+esc(identifier)+'<br>日志仅记录信息新增、修改及状态变更。</div><table class="global-change-log-table"><thead><tr><th>操作时间</th><th>操作账号</th><th>更改内容</th></tr></thead><tbody>'+records.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>';}).join('')+'</tbody></table></div>';
+    mask.classList.add('show');drawer.querySelector('.global-log-close').onclick=function(){mask.classList.remove('show');};
+  };
+  document.addEventListener('click',function(e){
+    var target=e.target&&e.target.closest?e.target.closest('button,a,.link,.full-link,.inventory-action,.warehouse-link,.supply-pro-action'):null;if(!target)return;
+    var text=(target.textContent||'').trim(),classes=String(target.className||'');
+    if(!(text==='日志'||text==='操作日志'||/(^|[-_])log($|[-_])/.test(classes)))return;
+    e.preventDefault();e.stopImmediatePropagation();var ctx=contextFrom(target);window.__openGlobalChangeLog(ctx.module,ctx.identifier);
+  },true);
 })();
 </script>
 </body>
