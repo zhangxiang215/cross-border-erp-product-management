@@ -2693,6 +2693,16 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 </style>
 <script>
 (function(){
+  function removeSupplierDisableActions(){
+    document.querySelectorAll('#supplyView .supplier-compact .supply-pro-toggle').forEach(function(action){if(action.textContent.trim()==='停用')action.remove();});
+  }
+  new MutationObserver(removeSupplierDisableActions).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('load',removeSupplierDisableActions);
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#supplyNavToggle,#supplySideSubnav'))setTimeout(removeSupplierDisableActions,0);});
+})();
+</script>
+<script>
+(function(){
   function enhancePartsDetail(){
     var view=document.getElementById('partsView');if(!view)return;
     view.querySelectorAll('tbody tr').forEach(function(row,index){
