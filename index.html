@@ -2446,8 +2446,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   function purchaseDetailField(label,value){return '<div class="purchase-detail-field"><label>'+purchaseDetailEsc(label)+'</label><span>'+purchaseDetailEsc(value)+'</span></div>';}
   function openPurchaseOrderDetail(row){
     var drawer=document.querySelector('.drawer'),mask=document.getElementById('drawerMask');
-    var basic=[['采购单号',row.no],['供应商名称',row.supplier],['创建日期',row.created],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status],['采购金额',row.amount],['能否开票',row.invoice||'是']];
-    var fulfillment=[['签合同日期',row.created],['预计到货时间',row.delivery],['约定交货日期',row.delivery],['交货时间状态',row.deliveryTiming],['国内尾程物流',row.tailLogistics||'国际物流商上门收货'],['物流价格',row.logisticsPrice||'¥680.00']];
+    var basic=[['创建日期',row.created],['采购单号',row.no],['供应商名称',row.supplier],['采购负责人',row.owner],['订单来源',row.source],['状态',row.status],['采购金额',row.amount],['能否开票',row.invoice||'是']];
+    var fulfillment=[['签合同日期',row.created],['预计到货时间',row.delivery],['交货时间状态',row.deliveryTiming],['国内尾程物流',row.tailLogistics||'国际物流商上门收货'],['物流价格',row.logisticsPrice||'¥680.00']];
     var skuRows=row.items.map(function(item){var quantity=Number(item.quantity)||0,unitNumber=Number(String(item.unitPrice||'').replace(/[^0-9.]/g,''))||0;return '<tr><td>'+purchaseDetailEsc(item.sku)+'</td><td>'+purchaseDetailEsc(item.quantity)+'</td><td>'+purchaseDetailEsc(item.unitPrice)+'</td><td>'+purchaseDetailEsc(item.unitPrice)+'</td><td>13%</td><td>'+purchaseDetailEsc(purchaseOrderMoney(quantity*unitNumber))+'</td></tr>';}).join('');
     drawer.innerHTML='<div class="drawer-title"><span>采购单详情</span><button class="close purchase-detail-close">×</button></div><div class="purchase-detail-layout"><section class="purchase-detail-section"><h3>采购基础信息</h3><div class="purchase-detail-grid">'+basic.map(function(x){return purchaseDetailField(x[0],x[1]);}).join('')+'</div></section><section class="purchase-detail-section"><h3>合同与履约信息</h3><div class="purchase-detail-grid">'+fulfillment.map(function(x){return purchaseDetailField(x[0],x[1]);}).join('')+'<div class="purchase-detail-field"><label>上传盖章采购合同</label><span class="purchase-contract-view">查看合同</span></div></div></section><section class="purchase-detail-section"><h3>商品明细</h3><div class="purchase-detail-table-wrap"><table class="purchase-detail-table"><thead><tr><th>商品SKU</th><th>采购数量</th><th>SKU单价</th><th>采购单价（含税）</th><th>税点</th><th>单SKU总价</th></tr></thead><tbody>'+skuRows+'</tbody></table></div></section><section class="purchase-detail-section"><h3>下单备注</h3><div class="purchase-detail-note">'+purchaseDetailEsc(row.note||'请按约定日期交货，外箱及商品标签须保持完整。')+'</div></section></div>';
     mask.classList.add('show');drawer.querySelector('.purchase-detail-close').onclick=function(){mask.classList.remove('show');};
@@ -2470,7 +2470,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       if(label.textContent.trim()==='计划编号'||label.textContent.trim()==='采购单总价')label.closest('.form-item').remove();
     });
     var baseGrid=p.querySelector('.form-grid'),supplierField=baseGrid&&baseGrid.children[1];
-    if(supplierField)supplierField.insertAdjacentHTML('afterend','<div class="form-item"><label>创建日期</label><input class="form-input" type="date" value="'+current.created+'"></div><div class="form-item"><label>约定交货日期</label><input class="form-input" type="date" value="'+current.delivery+'"></div><div class="form-item"><label>交货时间状态</label><select class="form-select">'+purchaseOrderOptions(['提前','准时','延迟'],current.deliveryTiming||'准时')+'</select></div><div class="form-item"><label>采购金额</label><input class="form-input" value="'+current.amount.replace('¥','')+'" placeholder="根据SKU明细自动计算"></div>');
+    if(supplierField)baseGrid.insertAdjacentHTML('afterbegin','<div class="form-item"><label>创建日期</label><input class="form-input" type="date" value="'+current.created+'"></div><div class="form-item"><label>预计到货时间</label><input class="form-input" type="date" value="'+current.delivery+'"></div><div class="form-item"><label>交货时间状态</label><select class="form-select">'+purchaseOrderOptions(['提前','准时','延迟'],current.deliveryTiming||'准时')+'</select></div><div class="form-item"><label>采购金额</label><input class="form-input" value="'+current.amount.replace('¥','')+'" placeholder="根据SKU明细自动计算"></div>');
     var sourceSelect=p.querySelector('.purchase-order-source-select');
     p.classList.add('active');document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('purchaseView')?.classList.remove('active');document.getElementById('productTopTab').style.display='flex';document.getElementById('productTopTab').querySelector('.x').previousSibling.textContent=(editing?'编辑采购单':'新增采购单')+' ';
     function close(){p.classList.remove('active');window.renderPurchaseFull('order',0);}
@@ -2823,6 +2823,36 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   window.__erpWarehouseMount=render;
   window.__closeWarehouseSide=closeWarehouseSide;
   document.addEventListener('click',function(e){var side=e.target.closest&&e.target.closest('#warehouseSideSubnav .simple-side-item');if(side&&['transfer','overseas','fba'].includes(side.dataset.sideKey)){e.preventDefault();e.stopImmediatePropagation();render(side.dataset.sideKey);setTimeout(closeWarehouseSide,0);return;}if(e.target.closest&&e.target.closest('#warehouseNavToggle'))setTimeout(function(){var box=document.getElementById('warehouseSideSubnav');if(box)box.style.removeProperty('display');rebuildSide();},0);},true);
+})();
+</script>
+<script>
+(function(){
+  function alignPurchaseOrderColumns(){
+    var table=document.querySelector('#purchaseView .purchase-order-table');
+    if(!table||table.dataset.dateOrderAligned)return;
+    var header=table.querySelector('thead tr'),firstRow=table.querySelector('tbody tr');
+    if(!header||!firstRow)return;
+    var createdIndex=Array.from(header.children).findIndex(function(cell){return cell.textContent.trim()==='创建日期';});
+    if(createdIndex>1){
+      header.insertBefore(header.children[createdIndex],header.children[1]);
+      table.querySelectorAll('tbody tr').forEach(function(row){
+        var createdCell=row.children[createdIndex],timingTag=createdCell&&createdCell.querySelector('.purchase-time-status');
+        if(timingTag)timingTag.remove();
+        row.insertBefore(createdCell,row.children[1]);
+      });
+    }
+    Array.from(header.children).forEach(function(cell){if(cell.textContent.trim()==='约定交货日期')cell.textContent='预计到货时间';});
+    table.dataset.dateOrderAligned='1';
+  }
+  function alignPurchaseOrderForm(){
+    var fields=Array.from(document.querySelectorAll('.purchase-source-body .form-item')).filter(function(field){
+      var label=field.querySelector('label');return label&&label.textContent.trim()==='预计到货时间';
+    });
+    fields.slice(1).forEach(function(field){field.remove();});
+  }
+  new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();}).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#purchaseNavToggle,.purchase-order-create,.purchase-edit-action,[data-order-action]'))setTimeout(alignPurchaseOrderColumns,0);});
+  window.addEventListener('load',function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();});
 })();
 </script>
 </body>
