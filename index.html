@@ -1378,6 +1378,13 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
   document.addEventListener('click',e=>{if(e.target.closest('.supply-report')){e.preventDefault();e.stopImmediatePropagation();openRiskReport();}},true);
 })();
 </script>
+<style>
+.purchase-order-items-in-basic{margin:0 0 22px;padding:16px;border:1px solid #e3e8ef;border-radius:10px;background:#fafbfd}
+.purchase-order-items-in-basic .purchase-order-item-heading{margin-bottom:14px}
+.purchase-order-items-in-basic .purchase-order-total{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:14px;color:#334155;font-weight:600}
+.purchase-order-items-in-basic .purchase-order-total label{font-size:14px}
+.purchase-order-items-in-basic .purchase-order-total .form-input{width:220px;background:#f8fafc;font-weight:600;color:#1d4ed8}
+</style>
 <script>
 (function(){
   const renameReporter=root=>{if(!root)return;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{if(node.nodeValue.includes('申报人'))node.nodeValue=node.nodeValue.replaceAll('申报人','填报人');});};
@@ -2868,9 +2875,40 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       }
     });
   }
-  new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();}).observe(document.body,{childList:true,subtree:true});
+  function arrangePurchaseOrderItems(){
+    var page=document.querySelector('#purchaseActionPage.purchase-order-form.active');
+    if(!page)return;
+    var body=page.querySelector('.purchase-source-body'),base=body&&body.querySelector('.form-section'),items=page.querySelector('.purchase-order-edit-items');
+    if(!base||!items)return;
+    var block=page.querySelector('.purchase-order-items-in-basic');
+    if(!block){
+      var sourceSection=items.closest('.form-section'),heading=sourceSection&&sourceSection.querySelector('.purchase-order-item-heading');
+      block=document.createElement('div');block.className='purchase-order-items-in-basic';
+      if(heading)block.appendChild(heading);
+      block.appendChild(items);
+      base.insertBefore(block,base.querySelector('.form-grid'));
+      if(sourceSection)sourceSection.remove();
+    }
+    var rows=Array.from(items.querySelectorAll('.purchase-order-edit-item'));
+    rows.forEach(function(row){
+      var read=function(label){var field=Array.from(row.querySelectorAll('.form-item')).find(function(x){var l=x.querySelector('label');return l&&l.textContent.trim()===label;});return field&&field.querySelector('input');};
+      var quantity=Number((read('采购数量')||{}).value)||0,price=Number(String((read('采购单价（含税）')||{}).value||'').replace(/[^0-9.]/g,''))||0,total=quantity*price,totalInput=read('单SKU总价');
+      if(totalInput)totalInput.value=quantity&&price?'¥'+total.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+      row.querySelectorAll('input').forEach(function(input){if(!input.dataset.purchaseTotalBound){input.dataset.purchaseTotalBound='1';input.addEventListener('input',arrangePurchaseOrderItems);}});
+    });
+    var totalField=block.querySelector('.purchase-order-total');
+    if(!totalField){
+      totalField=document.createElement('div');totalField.className='purchase-order-total';
+      totalField.innerHTML='<label>采购总价</label><input class="form-input" readonly>';
+      block.appendChild(totalField);
+    }
+    var total=rows.reduce(function(sum,row){var quantityField=Array.from(row.querySelectorAll('.form-item')).find(function(x){var l=x.querySelector('label');return l&&l.textContent.trim()==='采购数量';}),priceField=Array.from(row.querySelectorAll('.form-item')).find(function(x){var l=x.querySelector('label');return l&&l.textContent.trim()==='采购单价（含税）';}),quantity=Number((quantityField&&quantityField.querySelector('input')||{}).value)||0,price=Number(String((priceField&&priceField.querySelector('input')||{}).value||'').replace(/[^0-9.]/g,''))||0;return sum+quantity*price;},0);
+    totalField.hidden=rows.length<2;
+    totalField.querySelector('input').value=rows.length>1?'¥'+total.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+  }
+  new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();}).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#purchaseNavToggle,.purchase-order-create,.purchase-edit-action,[data-order-action]'))setTimeout(alignPurchaseOrderColumns,0);});
-  window.addEventListener('load',function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();});
+  window.addEventListener('load',function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();});
 })();
 </script>
 </body>
