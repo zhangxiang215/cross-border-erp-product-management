@@ -898,8 +898,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
       document.querySelectorAll('#formMask .form-content input,#formMask .form-content textarea').forEach(control=>{if(/checkbox|radio/.test(control.type))control.disabled=true;else control.readOnly=true;});
       document.querySelectorAll('#formMask .form-content select,#formMask .form-content button').forEach(control=>control.disabled=true);
       document.querySelector('.product-form')?.classList.add('detail-mode');
-      $('submitForm').hidden=false;$('submitForm').textContent=isSpu?'编辑SPU':'编辑商品';$('cancelForm').textContent='返回列表';
-      $('submitForm').onclick=()=>window.showForm(isSpu?'spu':'edit',p);
+      $('submitForm').hidden=true;$('cancelForm').textContent='返回列表';
     }else{document.querySelector('.product-form')?.classList.remove('detail-mode');$('submitForm').hidden=false;$('submitForm').textContent=mode==='edit'||(mode==='spu'&&p)?'保存':'提交';$('cancelForm').textContent='取消';if(window.__saveProductForm)$('submitForm').onclick=window.__saveProductForm;}
   };
   document.querySelectorAll('.view').forEach((element,index)=>element.onclick=()=>window.showForm('view',data[index]));
