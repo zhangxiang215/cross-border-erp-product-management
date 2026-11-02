@@ -2853,6 +2853,22 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       var label=field.querySelector('label');
       if(label&&label.textContent.trim()==='采购金额')field.remove();
     });
+    Array.from(document.querySelectorAll('.purchase-source-body .form-item')).forEach(function(field){
+      var label=field.querySelector('label'),select=field.querySelector('select');
+      if(label&&label.textContent.trim()==='能否开票'&&select){
+        var legacyValue=select.value;
+        label.textContent='开票信息';
+        select.innerHTML='<option>联合开票</option><option>单独开票</option><option>不开票</option>';
+        select.value=legacyValue==='否'?'不开票':'联合开票';
+      }
+    });
+    Array.from(document.querySelectorAll('.purchase-detail-field')).forEach(function(field){
+      var label=field.querySelector('label'),value=field.querySelector('span');
+      if(label&&label.textContent.trim()==='能否开票'){
+        label.textContent='开票信息';
+        if(value)value.textContent=value.textContent.trim()==='否'?'不开票':'联合开票';
+      }
+    });
   }
   new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();}).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#purchaseNavToggle,.purchase-order-create,.purchase-edit-action,[data-order-action]'))setTimeout(alignPurchaseOrderColumns,0);});
