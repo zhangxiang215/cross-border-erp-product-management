@@ -1385,6 +1385,7 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 .purchase-order-items-in-basic .purchase-order-total[hidden]{display:none!important}
 .purchase-order-items-in-basic .purchase-order-total label{font-size:14px}
 .purchase-order-items-in-basic .purchase-order-total .form-input{width:180px!important;min-width:180px;max-width:180px;flex:0 0 180px;background:#f8fafc;font-weight:600;color:#1d4ed8}
+.purchase-basic-subheading{margin:22px 0 16px;padding-left:10px;border-left:4px solid #2f80ed;font-size:16px;line-height:24px;color:#263548}
 </style>
 <script>
 (function(){
@@ -2890,6 +2891,14 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       base.insertBefore(block,base.querySelector('.form-grid'));
       if(sourceSection)sourceSection.remove();
     }
+    var topTitle=Array.from(base.children).find(function(node){return node.tagName==='H3';});
+    if(topTitle&&topTitle.textContent.trim()!=='采购信息')topTitle.textContent='采购信息';
+    var grid=base.querySelector('.form-grid'),subheading=base.querySelector('.purchase-basic-subheading');
+    if(grid&&!subheading){
+      subheading=document.createElement('h3');subheading.className='purchase-basic-subheading';subheading.textContent='基础信息';
+      base.insertBefore(subheading,grid);
+    }
+    page.querySelector('.purchase-order-form-draft')?.remove();
     var rows=Array.from(items.querySelectorAll('.purchase-order-edit-item'));
     rows.forEach(function(row){
       var read=function(label){var field=Array.from(row.querySelectorAll('.form-item')).find(function(x){var l=x.querySelector('label');return l&&l.textContent.trim()===label;});return field&&field.querySelector('input');};
