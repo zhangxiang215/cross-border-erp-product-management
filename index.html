@@ -1385,6 +1385,11 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 .purchase-order-items-in-basic .purchase-order-total[hidden]{display:none!important}
 .purchase-order-items-in-basic .purchase-order-total label{font-size:14px}
 .purchase-order-items-in-basic .purchase-order-total .form-input{width:180px!important;min-width:180px;max-width:180px;flex:0 0 180px;background:#f8fafc;font-weight:600;color:#1d4ed8}
+.purchase-order-two-column{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:20px;align-items:start}
+.purchase-order-two-column>.form-section{margin:0;padding:20px;border:1px solid #e3e8ef;border-radius:10px;background:#fff}
+.purchase-order-two-column .purchase-order-items-in-basic{margin:0;height:100%;box-sizing:border-box}
+.purchase-order-two-column .form-grid{grid-template-columns:1fr}
+@media(max-width:1100px){.purchase-order-two-column{grid-template-columns:1fr}.purchase-order-two-column>.form-section{padding:16px}}
 </style>
 <script>
 (function(){
@@ -2890,6 +2895,17 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       base.insertBefore(block,base.querySelector('.form-grid'));
       if(sourceSection)sourceSection.remove();
     }
+    var title=base.querySelector('h3');
+    if(title&&title.textContent.trim()!=='采购信息')title.textContent='采购信息';
+    var layout=body.querySelector('.purchase-order-two-column');
+    if(!layout){
+      layout=document.createElement('div');layout.className='purchase-order-two-column';
+      block.remove();
+      body.insertBefore(layout,base);
+      layout.appendChild(block);
+      layout.appendChild(base);
+    }
+    page.querySelector('.purchase-order-form-draft')?.remove();
     var rows=Array.from(items.querySelectorAll('.purchase-order-edit-item'));
     rows.forEach(function(row){
       var read=function(label){var field=Array.from(row.querySelectorAll('.form-item')).find(function(x){var l=x.querySelector('label');return l&&l.textContent.trim()===label;});return field&&field.querySelector('input');};
