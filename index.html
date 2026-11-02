@@ -1382,8 +1382,9 @@ document.getElementById('supplyNavToggle')?.addEventListener('click',()=>supplyM
 .purchase-order-items-in-basic{margin:0 0 22px;padding:16px;border:1px solid #e3e8ef;border-radius:10px;background:#fafbfd}
 .purchase-order-items-in-basic .purchase-order-item-heading{margin-bottom:14px}
 .purchase-order-items-in-basic .purchase-order-total{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:14px;color:#334155;font-weight:600}
+.purchase-order-items-in-basic .purchase-order-total[hidden]{display:none!important}
 .purchase-order-items-in-basic .purchase-order-total label{font-size:14px}
-.purchase-order-items-in-basic .purchase-order-total .form-input{width:220px;background:#f8fafc;font-weight:600;color:#1d4ed8}
+.purchase-order-items-in-basic .purchase-order-total .form-input{width:180px!important;min-width:180px;max-width:180px;flex:0 0 180px;background:#f8fafc;font-weight:600;color:#1d4ed8}
 </style>
 <script>
 (function(){
