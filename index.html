@@ -2856,10 +2856,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     Array.from(document.querySelectorAll('.purchase-source-body .form-item')).forEach(function(field){
       var label=field.querySelector('label'),select=field.querySelector('select');
       if(label&&label.textContent.trim()==='能否开票'&&select){
-        var legacyValue=select.value;
         label.textContent='开票信息';
-        select.innerHTML='<option>联合开票</option><option>单独开票</option><option>不开票</option>';
-        select.value=legacyValue==='否'?'不开票':'联合开票';
+        select.innerHTML='<option value="" selected disabled>请选择开票信息</option><option>联合开票</option><option>单独开票</option><option>不开票</option>';
       }
     });
     Array.from(document.querySelectorAll('.purchase-detail-field')).forEach(function(field){
