@@ -2849,6 +2849,10 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
       var label=field.querySelector('label');return label&&label.textContent.trim()==='预计到货时间';
     });
     fields.slice(1).forEach(function(field){field.remove();});
+    Array.from(document.querySelectorAll('.purchase-source-body .form-item')).forEach(function(field){
+      var label=field.querySelector('label');
+      if(label&&label.textContent.trim()==='采购金额')field.remove();
+    });
   }
   new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();}).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#purchaseNavToggle,.purchase-order-create,.purchase-edit-action,[data-order-action]'))setTimeout(alignPurchaseOrderColumns,0);});
