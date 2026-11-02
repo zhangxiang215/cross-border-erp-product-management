@@ -318,6 +318,97 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
   color:#fff;
 }
 </style>
+<style>
+/* 全局新增、编辑、详情页统一采用“新增商品”的信息层级与内容密度。 */
+.purchase-source-page.unified-operation-page,
+.drawer.unified-detail-page{background:#f5f7fa}
+.purchase-source-page.unified-operation-page .purchase-source-head,
+.drawer.unified-detail-page .drawer-title{
+  height:72px;
+  padding:0 28px;
+  background:#2876ed;
+  color:#fff;
+}
+.purchase-source-page.unified-operation-page .purchase-source-head h1,
+.drawer.unified-detail-page .drawer-title{font-size:24px;font-weight:650}
+.purchase-source-page.unified-operation-page .purchase-source-body{
+  padding:24px 36px 84px;
+  background:#f5f7fa;
+}
+.purchase-source-page.unified-operation-page .form-section,
+.purchase-source-page.unified-operation-page .unified-page-card,
+.drawer.unified-detail-page .detail-section{
+  margin:0 0 16px;
+  padding:0 24px 24px;
+  background:#fff;
+  border:0;
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(25,43,60,.05);
+}
+.purchase-source-page.unified-operation-page .form-section h3,
+.purchase-source-page.unified-operation-page .unified-page-card h3,
+.drawer.unified-detail-page .detail-section h3{
+  margin:0 -24px 20px;
+  padding:18px 24px;
+  border-bottom:1px solid #edf1f5;
+  color:#293540;
+  font-size:17px;
+  font-weight:650;
+}
+.purchase-source-page.unified-operation-page .form-section h3:before,
+.purchase-source-page.unified-operation-page .unified-page-card h3:before,
+.drawer.unified-detail-page .detail-section h3:before{
+  content:"";
+  display:inline-block;
+  width:4px;
+  height:20px;
+  margin-right:12px;
+  background:#2876ed;
+  vertical-align:-4px;
+}
+.purchase-source-page.unified-operation-page .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:36px;row-gap:16px}
+.purchase-source-page.unified-operation-page .form-item{min-height:42px}
+.purchase-source-page.unified-operation-page .form-item label{width:118px;padding-right:14px;color:#526071}
+.purchase-source-page.unified-operation-page .form-input,
+.purchase-source-page.unified-operation-page .form-select,
+.purchase-source-page.unified-operation-page .form-textarea{min-height:42px;border-color:#d8e0ea;border-radius:7px}
+.purchase-source-page.unified-operation-page .form-textarea{height:84px;padding-top:10px}
+.purchase-source-page.unified-operation-page .purchase-source-foot{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  background:#fff;
+  border-top:1px solid #e4eaf0;
+}
+.purchase-source-page.unified-operation-page .purchase-source-foot .action-btn{min-width:104px;height:40px;border-radius:7px}
+.drawer.unified-detail-page .detail-section{margin:24px 36px 0}
+.drawer.unified-detail-page .detail-section h3{margin-bottom:18px}
+.drawer.unified-detail-page .detail-row,
+.drawer.unified-detail-page .warehouse-detail-item{
+  min-height:40px;
+  display:grid;
+  grid-template-columns:138px minmax(0,1fr);
+  align-items:center;
+  line-height:1.55;
+}
+.drawer.unified-detail-page .detail-row label,
+.drawer.unified-detail-page .warehouse-detail-item label{width:auto;color:#8b98a6}
+.drawer.unified-detail-page .detail-row span,
+.drawer.unified-detail-page .warehouse-detail-item span{color:#455466;font-weight:500}
+.purchase-source-page.unified-operation-page [class*="detail-grid"],
+.drawer.unified-detail-page [class*="detail-grid"]{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:42px;
+  row-gap:8px;
+}
+@media(max-width:1450px){
+  .purchase-source-page.unified-operation-page .purchase-source-body{padding:20px 26px 78px}
+  .drawer.unified-detail-page .detail-section{margin-left:26px;margin-right:26px}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -2916,9 +3007,16 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     totalField.hidden=rows.length<2;
     totalField.querySelector('input').value=rows.length>1?'¥'+total.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
   }
-  new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();}).observe(document.body,{childList:true,subtree:true});
+  function normalizeOperationPages(){
+    document.querySelectorAll('.purchase-source-page.active').forEach(function(page){
+      page.classList.add('unified-operation-page');
+      page.querySelectorAll('.purchase-source-body > .form-section,.purchase-source-body > .detail-section').forEach(function(section){section.classList.add('unified-page-card');});
+    });
+    document.querySelectorAll('.drawer-mask.show .drawer').forEach(function(drawer){drawer.classList.add('unified-detail-page');});
+  }
+  new MutationObserver(function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();normalizeOperationPages();}).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#purchaseNavToggle,.purchase-order-create,.purchase-edit-action,[data-order-action]'))setTimeout(alignPurchaseOrderColumns,0);});
-  window.addEventListener('load',function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();});
+  window.addEventListener('load',function(){alignPurchaseOrderColumns();alignPurchaseOrderForm();arrangePurchaseOrderItems();normalizeOperationPages();});
 })();
 </script>
 </body>
