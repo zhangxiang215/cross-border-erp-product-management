@@ -782,10 +782,11 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     document.addEventListener('click',()=>document.querySelectorAll('.multi-select.open').forEach(x=>x.classList.remove('open')));
     const listingPlatformRows=$('listingPlatformRows');
     if(listingPlatformRows){
-      const syncListingPlatformRow=row=>{const selected=row.querySelector('.listing-platform-select')?.value;const fields=row.querySelector('.listing-platform-fields');if(fields)fields.hidden=!selected;};
+      const removePlatformPriceFields=row=>{if(listingPlatformRows.dataset.hidePricing==='true')row.querySelectorAll('.listing-category-field').forEach(field=>{if(field.querySelector('span')?.textContent.includes('平台限价'))field.remove();});};
+      const syncListingPlatformRow=row=>{removePlatformPriceFields(row);const selected=row.querySelector('.listing-platform-select')?.value;const fields=row.querySelector('.listing-platform-fields');if(fields)fields.hidden=!selected;};
       const renumberListingPlatforms=()=>{[...listingPlatformRows.children].forEach((row,index)=>{const number=index+1;row.dataset.platformIndex=number;row.querySelector(':scope > label').textContent=index===0?'上架平台':`上架平台${number}`;const line=row.querySelector('.listing-platform-line');const oldRemove=line.querySelector('.remove-listing-platform');if(index===0){oldRemove?.remove();}else if(!oldRemove){line.insertAdjacentHTML('beforeend','<button type="button" class="listing-platform-btn remove-listing-platform" aria-label="删除上架平台">−</button>');}});};
       listingPlatformRows.addEventListener('change',event=>{if(event.target.matches('.listing-platform-select'))syncListingPlatformRow(event.target.closest('.listing-platform-row'));});
-      listingPlatformRows.addEventListener('click',event=>{const add=event.target.closest('.add-listing-platform'),remove=event.target.closest('.remove-listing-platform');if(add){listingPlatformRows.insertAdjacentHTML('beforeend',listingPlatformRow(listingPlatformRows.children.length+1));renumberListingPlatforms();}if(remove&&listingPlatformRows.children.length>1){remove.closest('.listing-platform-row').remove();renumberListingPlatforms();}});
+      listingPlatformRows.addEventListener('click',event=>{const add=event.target.closest('.add-listing-platform'),remove=event.target.closest('.remove-listing-platform');if(add){listingPlatformRows.insertAdjacentHTML('beforeend',listingPlatformRow(listingPlatformRows.children.length+1));removePlatformPriceFields(listingPlatformRows.lastElementChild);renumberListingPlatforms();}if(remove&&listingPlatformRows.children.length>1){remove.closest('.listing-platform-row').remove();renumberListingPlatforms();}});
       [...listingPlatformRows.children].forEach(syncListingPlatformRow);renumberListingPlatforms();
     }
     const hasPartSelect=$('hasPartSelect'),partRows=$('partRows');
@@ -859,13 +860,12 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
 
   window.buildSpuForm=function(){
     const body=document.querySelector('.product-form .form-body');
-    body.innerHTML=sectionNav('SPU管理',[['spuBase','SPU基础信息'],['spuDesc','商品描述'],['spuPackage','基准包装信息'],['spuListing','刊登信息'],['spuSales','销售与利润'],['spuHistory','操作记录']])+`<div class="form-content">
+    body.innerHTML=sectionNav('SPU管理',[['spuBase','SPU基础信息'],['spuDesc','商品描述'],['spuPackage','基准包装信息'],['spuListing','刊登信息'],['spuSales','销售与利润']])+`<div class="form-content">
       <section class="form-section section-anchor" id="spuBase"><h3>SPU基础信息</h3><div class="form-grid">${input('商品编码','请输入或生成商品编码',true)}${input('商品名称（中文）','请输入商品名称',true)}${input('商品名称（英文）','请输入英文名称')}${select('商品状态',['开发中','试卖','在售','停售'])}${item('商品目录','<input class="form-input" placeholder="请选择商品目录">')}${item('关联SKU','<input class="form-input" placeholder="可关联多个 SKU">')}${item('商品图片',upload('商品图片',true))}${textarea('SPU备注','请输入SPU备注',false,true)}</div></section>
       <section class="form-section section-anchor" id="spuDesc"><h3>商品描述</h3><div class="form-grid">${textarea('商品卖点','请输入商品卖点描述',false,true)}${textarea('商品详情','请输入商品详情描述',false,true)}${input('材质','请输入材质')}${input('颜色','请输入颜色')}${input('适用场景','请输入适用场景')}${input('关键词','请输入搜索关键词')}</div></section>
       <section class="form-section section-anchor" id="spuPackage"><h3>基准包装信息</h3><div class="form-grid">${input('基准包装尺寸','长 × 宽 × 高 cm')}${input('基准包装毛重','请输入包装毛重 kg')}${input('装箱规格','请输入装箱数量 PCS')}${select('包装形态',['标准包装','裸装','组合包装'])}${input('包装材质','请输入包装材质')}${textarea('包装备注','请输入包装备注',false,true)}</div></section>
-      <section class="form-section section-anchor" id="spuListing"><h3>刊登信息</h3><div class="form-grid"><div class="listing-platform-rows" id="listingPlatformRows">${listingPlatformRow(1)}</div>${textarea('刊登备注','请输入刊登备注',false,true)}</div></section>
+      <section class="form-section section-anchor" id="spuListing"><h3>刊登信息</h3><div class="form-grid"><div class="listing-platform-rows" id="listingPlatformRows" data-hide-pricing="true">${listingPlatformRow(1)}</div>${textarea('刊登备注','请输入刊登备注',false,true)}</div></section>
       <section class="form-section section-anchor" id="spuSales"><h3>销售与利润</h3><div class="form-grid">${input('近期售价','请输入售价')}${input('近期毛利','请输入毛利')}${input('目标售价','请输入目标售价')}${input('目标毛利率','请输入目标毛利率')}${input('采购链接','请输入采购链接')}${input('参考链接','请输入参考链接')}</div></section>
-      <section class="form-section section-anchor" id="spuHistory"><h3>操作记录</h3><div class="detail-row"><label>记录范围</label><span>商品名称、商品目录、包装信息、刊登信息、销售与利润</span></div><div class="detail-row"><label>保存规则</label><span>提交后记录创建时间、更新时间和操作人</span></div></section>
     </div>`;bindEnhancedForm();
   };
 
