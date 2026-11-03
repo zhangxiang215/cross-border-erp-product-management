@@ -3061,6 +3061,16 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     var cells=row.querySelectorAll('td'),text=function(index){return (cells[index]&&cells[index].innerText||'').trim().split('\n')[0];};
     return {no:text(1),supplier:text(2),sku:text(3),quantity:text(4),unitPrice:text(5),amount:text(6),created:text(7),delivery:text(8),owner:text(9),source:text(10)||'计划补货',status:text(11)||'草稿'};
   }
+  function refreshPurchaseUnifiedTotal(){
+    var section=document.getElementById('purchaseItemsUnified'),items=section&&Array.from(section.querySelectorAll('.purchase-unified-item')),total=section&&section.querySelector('.purchase-unified-total');
+    if(!items||!total)return;
+    var amount=items.reduce(function(sum,item){var read=function(label){var field=Array.from(item.querySelectorAll('.form-item')).find(function(node){return node.querySelector('label')?.textContent.trim()===label;});return field&&field.querySelector('input');};var quantity=Number(read('采购数量')?.value)||0,price=Number(String(read('采购单价（含税）')?.value||read('SKU单价')?.value||'').replace(/[^0-9.]/g,''))||0;var skuTotal=read('单SKU总价');if(skuTotal)skuTotal.value=quantity&&price?'¥'+(quantity*price).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'';return sum+quantity*price;},0);
+    total.hidden=items.length<2;total.querySelector('input').value=items.length>1?'¥'+amount.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+  }
+  function bindPurchaseUnifiedItem(item){
+    item.querySelectorAll('input:not([readonly])').forEach(function(field){field.addEventListener('input',refreshPurchaseUnifiedTotal);});
+    item.querySelector('.purchase-unified-remove')?.addEventListener('click',function(){var items=document.querySelectorAll('#purchaseItemsUnified .purchase-unified-item');if(items.length===1){toast('采购单至少保留一条商品明细');return;}item.remove();refreshPurchaseUnifiedTotal();toast('已删除该商品SKU明细');});
+  }
   function openPurchaseUnified(mode,current){
     var isView=mode==='view',mask=document.getElementById('formMask'),body=document.querySelector('.product-form .form-body'),title=document.getElementById('formTitle');
     if(!mask||!body)return;
@@ -3070,7 +3080,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     body.innerHTML='<nav class="form-nav"><div class="form-nav-title">采购管理</div><div class="form-nav-item active" data-target="purchaseItemsUnified">商品明细</div><div class="form-nav-item" data-target="purchaseBasicUnified">基础信息</div><div class="form-nav-item" data-target="purchaseDeliveryUnified">交付与合同</div></nav><div class="form-content">'
       +'<section class="form-section section-anchor" id="purchaseItemsUnified"><div class="purchase-unified-section-head"><h3>商品明细</h3>'+(isView?'':'<button class="tool primary" type="button" id="purchaseUnifiedAddItem">＋ 增加商品SKU</button>')+'</div><div class="purchase-unified-item">'
       +input('商品SKU',current.sku,'请选择商品SKU',true,isView)+input('采购数量',current.quantity,'请输入数量',true,isView)+input('SKU单价',current.unitPrice.replace('¥',''),'请输入SKU单价',true,isView)+input('采购单价（含税）',current.unitPrice.replace('¥',''),'请输入含税单价',false,isView)+input('税点','13%','请输入税点',false,isView)+input('单SKU总价',current.amount,'系统自动计算',false,true)
-      +'</div></section>'
+      +'</div><div class="purchase-unified-total" hidden><label>采购总价</label><input class="form-input" placeholder="系统自动汇总" readonly></div></section>'
       +'<section class="form-section section-anchor" id="purchaseBasicUnified"><h3>基础信息</h3><div class="form-grid">'
       +input('采购单号',current.no,'系统自动生成',false,true)+select('供应商名称',['深圳市恒温电器有限公司','义乌市优品供应链','龙泉市庄欣电子商务有限公司'],current.supplier,true)+input('创建日期',current.created,'请选择创建日期',false,isView)+select('采购负责人',['夏景舟','毛鸿雁','王娜','刘露'],current.owner,false)+select('订单来源',['采样','比样','自动补货','计划补货','紧急补货'],current.source,false)+select('状态',['草稿','待下单','待付款','生产中','已收货','已验收','退换货','已完成'],current.status,false)+purchaseField('下单备注','<textarea class="form-textarea" placeholder="请输入下单备注" '+(isView?'readonly':'')+'>请按约定日期交货，外箱及商品标签须保持完整。</textarea>',false,true)
       +'</div></section>'
@@ -3085,7 +3095,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     var cancel=document.getElementById('cancelForm'),save=document.getElementById('submitForm'),close=function(){mask.classList.remove('show');document.querySelector('.product-form')?.classList.remove('detail-mode');};
     cancel.textContent=isView?'返回列表':'取消';cancel.onclick=close;document.getElementById('closeForm').onclick=close;
     save.hidden=isView;save.textContent='保存';save.onclick=function(){close();toast(mode==='edit'?'采购单修改已保存':'采购单已新增');};
-    document.getElementById('purchaseUnifiedAddItem')?.addEventListener('click',function(){var items=document.querySelectorAll('#purchaseItemsUnified .purchase-unified-item'),template=items[items.length-1];if(!template)return;var next=template.cloneNode(true);next.querySelectorAll('input').forEach(function(field){var fieldLabel=field.closest('.form-item')?.querySelector('label')?.textContent||'';field.value=fieldLabel.includes('税点')?'13%':'';});next.insertAdjacentHTML('beforeend','<button type="button" class="tool reset purchase-unified-remove">删除</button>');document.getElementById('purchaseItemsUnified').appendChild(next);next.querySelector('.purchase-unified-remove').onclick=function(){if(document.querySelectorAll('#purchaseItemsUnified .purchase-unified-item').length===1){toast('采购单至少保留一条商品明细');return;}next.remove();toast('已删除该商品明细');};toast('已增加一条商品SKU明细');});
+    document.querySelectorAll('#purchaseItemsUnified .purchase-unified-item').forEach(bindPurchaseUnifiedItem);refreshPurchaseUnifiedTotal();
+    document.getElementById('purchaseUnifiedAddItem')?.addEventListener('click',function(){var items=document.querySelectorAll('#purchaseItemsUnified .purchase-unified-item'),template=items[items.length-1];if(!template)return;var next=template.cloneNode(true);next.querySelectorAll('input').forEach(function(field){var fieldLabel=field.closest('.form-item')?.querySelector('label')?.textContent||'';field.value=fieldLabel.includes('税点')?'13%':'';});next.insertAdjacentHTML('beforeend','<button type="button" class="tool reset purchase-unified-remove">删除</button>');document.getElementById('purchaseItemsUnified').insertBefore(next,document.querySelector('#purchaseItemsUnified .purchase-unified-total'));bindPurchaseUnifiedItem(next);refreshPurchaseUnifiedTotal();toast('已增加一条商品SKU明细');});
     document.querySelector('.purchase-contract-preview')?.addEventListener('click',function(){toast('已打开采购合同预览');});
   }
   document.addEventListener('click',function(event){
@@ -3101,6 +3112,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 <style>
 .purchase-unified-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.purchase-unified-section-head h3{margin:0!important}
 .purchase-unified-item{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:18px;border:1px solid #e5ebf2;border-radius:8px;background:#fafcff}.purchase-unified-item .form-item{margin:0}
+.purchase-unified-item .purchase-unified-remove{justify-self:end;align-self:center;width:auto;min-width:76px;height:36px;padding:0 18px;border-color:#ff7875;color:#f0524d;background:#fff}
+.purchase-unified-total{display:flex;align-items:center;gap:14px;margin-top:16px;padding:0 18px}.purchase-unified-total label{color:#505b67;font-weight:600;white-space:nowrap}.purchase-unified-total .form-input{flex:0 0 260px;max-width:260px;background:#f8fafc}
 .purchase-contract-control{display:flex;gap:10px;align-items:center}.purchase-contract-control .form-input{flex:1}.purchase-contract-control .tool{flex:0 0 auto}
 @media(max-width:1180px){.purchase-unified-item{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
