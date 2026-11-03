@@ -2667,13 +2667,20 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   ];
   var fields=[['no','计划单号'],['name','计划名称'],['sku','商品SKU'],['type','计划类型'],['quantity','计划数量'],['owner','负责人'],['status','状态'],['date','计划创建日期']];
   function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];});}
-  function openPlanForm(row){
-    var page=document.getElementById('purchasePlanPage');
-    if(!page){page=document.createElement('section');page.id='purchasePlanPage';page.className='purchase-source-page';document.querySelector('.main').appendChild(page);}
-    var editing=!!row,title=editing?'编辑计划':'新增计划';
-    page.innerHTML='<div class="purchase-source-head"><h1>'+title+'</h1><button class="purchase-source-close">×</button></div><div class="purchase-source-body"><section class="form-section"><h3>计划信息</h3><div class="form-grid">'+fields.map(function(field){return '<div class="form-item"><label>'+field[1]+'</label><input class="form-input" value="'+esc(row?.[field[0]]||'')+'" placeholder="请输入'+field[1]+'"></div>';}).join('')+'</div></section></div><div class="purchase-source-foot"><button class="action-btn purchase-plan-cancel">取消</button><button class="action-btn primary purchase-plan-save">保存</button></div>';
-    page.classList.add('active');document.getElementById('purchaseView')?.classList.remove('active');var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.querySelector('.x').previousSibling.textContent=title+' ';}
-    var back=function(){page.classList.remove('active');window.__renderPurchasePlanFinal();};page.querySelector('.purchase-source-close').onclick=back;page.querySelector('.purchase-plan-cancel').onclick=back;page.querySelector('.purchase-plan-save').onclick=function(){back();toast(editing?'计划已更新':'计划已新增');};
+  function openPlanForm(row,mode){
+    var isView=mode==='view',editing=mode==='edit'||(!mode&&!!row),title=isView?'计划详情':editing?'编辑计划':'新增计划';
+    var mask=document.getElementById('formMask'),body=document.querySelector('.product-form .form-body'),head=document.getElementById('formTitle');
+    if(!mask||!body)return;
+    row=row||{};head.textContent=title;
+    function input(field,readonly){return '<div class="form-item"><label>'+field[1]+'</label><input class="form-input" value="'+esc(row[field[0]]||'')+'" placeholder="请输入'+field[1]+'" '+(readonly||isView?'readonly':'')+'></div>';}
+    function select(field,options){return '<div class="form-item"><label>'+field[1]+'</label><select class="form-select" '+(isView?'disabled':'')+'><option value="">请选择'+field[1]+'</option>'+options.map(function(option){return '<option '+(row[field[0]]===option?'selected':'')+'>'+option+'</option>';}).join('')+'</select></div>';}
+    body.innerHTML='<nav class="form-nav"><div class="form-nav-title">计划管理</div><div class="form-nav-item active" data-target="planBaseInfo">计划信息</div></nav><div class="form-content"><section class="form-section section-anchor" id="planBaseInfo"><h3>计划信息</h3><div class="form-grid">'
+      +input(fields[0],false)+input(fields[1],false)+input(fields[2],false)+select(fields[3],['常规补货','季节备货','紧急补货'])+input(fields[4],false)+input(fields[5],false)+select(fields[6],['待执行','执行中','已完成'])+input(fields[7],false)
+      +'</div></section></div>';
+    mask.classList.add('show');document.querySelector('.left-rail')?.classList.add('product-open');document.querySelector('.product-form')?.classList.toggle('detail-mode',isView);
+    document.querySelectorAll('#formMask .form-nav-item').forEach(function(item){item.onclick=function(){document.querySelectorAll('#formMask .form-nav-item').forEach(function(nav){nav.classList.remove('active');});item.classList.add('active');document.getElementById(item.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});};});
+    var close=function(){mask.classList.remove('show');document.querySelector('.product-form')?.classList.remove('detail-mode');window.__renderPurchasePlanFinal();};
+    var cancel=document.getElementById('cancelForm'),save=document.getElementById('submitForm');cancel.textContent=isView?'返回列表':'取消';cancel.onclick=close;document.getElementById('closeForm').onclick=close;save.hidden=isView;save.textContent='保存';save.onclick=function(){close();toast(editing?'计划修改已保存':'计划已新增');};
   }
   window.__renderPurchasePlanFinal=function(){
     var view=document.getElementById('purchaseView');if(!view)return;
@@ -2681,7 +2688,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     view.classList.add('active');view.hidden=false;document.getElementById('homePanel').hidden=true;document.getElementById('productPages').hidden=true;document.getElementById('inventoryView')?.classList.remove('active');document.getElementById('supplyView')?.classList.remove('active');document.getElementById('warehouseView')?.classList.remove('active');var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.querySelector('.x').previousSibling.textContent='采购 ';top.classList.add('active');}
     view.querySelector('.plan-log-list')?.remove();
     view.querySelector('.plan-add').onclick=function(){openPlanForm();};view.querySelector('.plan-export').onclick=function(){toast('计划列表导出任务已创建');};view.querySelector('.plan-search').onclick=function(){toast('计划筛选结果已刷新');};view.querySelector('.plan-reset').onclick=function(){view.querySelectorAll('input').forEach(function(input){input.value='';});view.querySelectorAll('select').forEach(function(select){select.selectedIndex=0;});toast('筛选条件已重置');};
-    view.querySelectorAll('.plan-detail').forEach(function(action){action.onclick=function(){var row=planRows[Number(action.dataset.index)];openInfoDrawer('计划详情',fields.map(function(field){return [field[1],row[field[0]]];}));};});view.querySelectorAll('.plan-edit').forEach(function(action){action.onclick=function(){openPlanForm(planRows[Number(action.dataset.index)]);};});view.querySelectorAll('.plan-log').forEach(function(action){action.onclick=function(){var row=planRows[Number(action.dataset.index)];openInfoDrawer('计划日志',[['计划单号',row.no],['计划名称',row.name],['操作时间',row.date+' 14:32'],['操作人',row.owner],['操作记录','计划信息已更新']]);};});
+    view.querySelectorAll('.plan-detail').forEach(function(action){action.onclick=function(){openPlanForm(planRows[Number(action.dataset.index)],'view');};});view.querySelectorAll('.plan-edit').forEach(function(action){action.onclick=function(){openPlanForm(planRows[Number(action.dataset.index)],'edit');};});view.querySelectorAll('.plan-log').forEach(function(action){action.onclick=function(){var row=planRows[Number(action.dataset.index)];openInfoDrawer('计划日志',[['计划单号',row.no],['计划名称',row.name],['操作时间',row.date+' 14:32'],['操作人',row.owner],['操作记录','计划信息已更新']]);};});
   };
   var syncingPlan=false;
   function enforcePlanView(){var view=document.getElementById('purchaseView');if(syncingPlan||!view||view.querySelector('.purchase-tab')?.textContent.trim()!=='计划管理'||view.querySelector('.plan-add'))return;syncingPlan=true;window.__renderPurchasePlanFinal();syncingPlan=false;}
