@@ -873,7 +873,7 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
     const body=document.querySelector('.product-form .form-body');
     body.innerHTML=sectionNav('配件SKU管理',[['partBase','关联商品'],['partSku','配件信息'],['partSupplier','配件供应商'],['partPackage','包装资料'],['partQuality','品控检测']])+`<div class="form-content">
       <section class="form-section" id="partBase"><h3>关联商品</h3><div class="form-grid">${input('关联商品SKU','请选择商品 SKU',true)}${input('关联数量','请输入单个商品配件数量')}</div></section>
-      <section class="form-section" id="partSku"><h3>配件信息</h3><div class="form-grid">${input('配件SKU','系统生成或输入配件 SKU',true)}${input('配件名称','请输入配件名称',true)}${select('配件类型',['插头配件','结构配件','包装配件','其他'],true)}${select('状态',['启用','停用'])}${input('配件重量','请输入配件重量')}</div></section>
+      <section class="form-section" id="partSku"><h3>配件信息</h3><div class="form-grid">${input('配件SKU','系统生成或输入配件 SKU',true)}${input('配件名称','请输入配件名称',true)}${select('配件类型',['插头配件','结构配件','包装配件','其他'],true)}${input('规格型号','请输入规格型号')}${select('状态',['启用','停用'])}${input('配件重量','请输入配件重量')}</div></section>
       <section class="form-section" id="partSupplier"><h3>配件供应商</h3><div class="form-grid">${select('供应商',['请选择供应商'])}${input('采购价','请输入采购价')}${input('起订量','请输入起订量')}${input('生产周期','请输入生产周期')}${input('联系方式','请输入联系方式')}${textarea('备注','请输入备注',false,true)}</div></section>
       <section class="form-section" id="partPackage"><h3>包装资料</h3><div class="form-grid">${select('包装形态',['标准包装','裸装'])}${input('包装尺寸','长 × 宽 × 高 cm')}${input('包装毛重','请输入包装毛重 g')}${select('基本单位',['个','件'])}</div></section>
       <section class="form-section" id="partQuality"><h3>品控检测</h3><div class="form-grid">${select('检测等级',['B','A'])}${select('检验方式',['抽检','全检'])}${textarea('检验标准','请输入配件检查标准',false,true)}</div></section>
@@ -883,14 +883,16 @@ document.getElementById('collapseBtn').onclick=()=>{const card=document.getEleme
   window.showForm=function(mode,p){
     enterProductPage();
     const isSpu=mode==='spu'||mode==='spu-view';
-    if(mode==='part')buildPartForm();else if(isSpu)buildSpuForm();else buildMvpForm();
-    const isView=mode==='view'||mode==='spu-view';
+    const isPart=mode==='part'||mode==='part-view';
+    if(isPart)buildPartForm();else if(isSpu)buildSpuForm();else buildMvpForm();
+    const isView=mode==='view'||mode==='spu-view'||mode==='part-view';
     window.__productFormContext={mode:mode,product:p||null,isSpu:isSpu};
-    $('formTitle').textContent=mode==='part'?'新增 / 编辑配件SKU':mode==='spu-view'?'SPU详情':mode==='spu'?(p?'编辑SPU':'新增SPU'):isView?'商品详情':mode==='edit'?'编辑商品':'新增商品';
-    $('formMask').classList.add('show');document.querySelector('.left-rail').classList.add('product-open');$('sideListItem').classList.toggle('active',mode!=='part');$('sidePartsItem').classList.toggle('active',mode==='part');$('sideMaterialItem')?.classList.remove('active');
+    $('formTitle').textContent=mode==='part-view'?'配件详情':mode==='part'?'新增 / 编辑配件SKU':mode==='spu-view'?'SPU详情':mode==='spu'?(p?'编辑SPU':'新增SPU'):isView?'商品详情':mode==='edit'?'编辑商品':'新增商品';
+    $('formMask').classList.add('show');document.querySelector('.left-rail').classList.add('product-open');$('sideListItem').classList.toggle('active',!isPart);$('sidePartsItem').classList.toggle('active',isPart);$('sideMaterialItem')?.classList.remove('active');
     const findItem=label=>[...document.querySelectorAll('#formMask .form-item')].find(item=>(item.querySelector(':scope > label')?.textContent||'').replace('*','').replace(/\s/g,'')===label.replace(/\s/g,''));
-    const setField=(label,value)=>{const control=findItem(label)?.querySelector('input,select,textarea');if(control&&value!=null){control.value=value;control.dispatchEvent(new Event('change',{bubbles:true}));}};
+    const setField=(label,value)=>{const control=findItem(label)?.querySelector('input,select,textarea');if(control&&value!=null){if(control.tagName==='SELECT'){const option=[...control.options].find(item=>item.textContent.trim()===String(value).trim());if(option)control.selectedIndex=option.index;else control.value=value;}else control.value=value;control.dispatchEvent(new Event('change',{bubbles:true}));}};
     if(p&&isSpu){setField('商品编码',p.spu);setField('商品名称（中文）',p.name);setField('商品目录',p.category);setField('关联SKU',p.variants);setField('近期售价',p.price);setField('近期毛利',p.margin);}
+    else if(p&&isPart){setField('关联商品SKU',p.sku);setField('关联数量','1');setField('配件SKU',p.code);setField('配件名称',p.name);setField('配件类型',p.type);setField('规格型号',p.spec);setField('状态',p.status);setField('配件重量',p.weight);setField('基本单位',p.unit);}
     else if(p){setField('产品名称（中文）',p.name);setField('SKU',p.sku);setField('自定义型号',p.model);setField('出厂型号',p.model);setField('产品状态',p.productStatus);}
     if(mode==='spu-view'||(mode==='spu'&&p)){$('spuHistory')?.remove();document.querySelector('.form-nav-item[data-target="spuHistory"]')?.remove();}
     if((mode==='edit'||mode==='view')&&p?.sku)window.__populateAccessoryWeightRows?.(p.sku);
@@ -2828,7 +2830,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   document.addEventListener('click',function(e){
     var detail=e.target.closest&&e.target.closest('.part-detail');if(!detail)return;
     e.preventDefault();e.stopImmediatePropagation();var p=partsData[Number(detail.dataset.index)];if(!p)return;
-    openInfoDrawer('配件详情',[['配件SKU',p.code],['配件名称',p.name],['关联商品SKU',p.sku],['配件类型',p.type],['规格型号',p.spec],['配件重量',p.weight+' g'],['基本单位',p.unit],['状态',p.status]]);
+    window.showForm('part-view',p);
   },true);
   document.addEventListener('click',function(e){
     var detail=e.target.closest&&e.target.closest('#productTableCard .view');if(!detail)return;
