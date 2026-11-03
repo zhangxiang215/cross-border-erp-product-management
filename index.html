@@ -3211,7 +3211,8 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     if(/详情$/.test(formTitle()))form.classList.add('detail-mode');
     resetCreateForm();
   }
-  new MutationObserver(syncFormState).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  var mask=document.getElementById('formMask');
+  if(mask)new MutationObserver(syncFormState).observe(mask,{attributes:true,attributeFilter:['class']});
   window.addEventListener('load',syncFormState);
 })();
 </script>
