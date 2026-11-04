@@ -635,7 +635,7 @@ main:has(#inventoryView.active) #homePanel{display:none!important}
   <div class="workspace">
     <header class="topbar"><div class="tabs"><div class="home-tab active" id="homeTopTab">主页</div><div class="tab" id="productTopTab">商品管理 <span class="x">×</span></div><div style="width:55px;display:grid;place-items:center"><svg class="top-icon" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.7"/><path d="m16 16 5 5"/></svg></div></div></header>
     <main class="main">
-      <section class="home-panel" id="homePanel"><div class="home-panel-head"><div><div class="home-kicker">主页</div><h1>欢迎使用跨境电商 ERP</h1><p>请从左侧“产品”栏目选择商品管理功能。</p></div></div><div class="home-panel-grid"><div class="home-card"><span>商品管理</span><b>商品档案、规格与素材</b><small>点击左侧二级菜单进入</small></div><div class="home-card"><span>库存管理</span><b>库存与库位数据</b><small>后续模块</small></div><div class="home-card"><span>物流管理</span><b>包装、计费重与运输</b><small>后续模块</small></div></div></section>
+      <section class="home-panel" id="homePanel"><div class="home-panel-head"><div><div class="home-kicker">主页</div><h1>欢迎使用跨境电商 ERP</h1></div></div><div class="home-panel-grid" aria-label="业务模块介绍"><button class="home-card" type="button" data-home-module="product"><span>商品管理</span><b>商品档案、规格与素材</b><small>管理商品、配件与物料信息</small></button><button class="home-card" type="button" data-home-module="inventory"><span>库存管理</span><b>库存与库位数据</b><small>查看实时库存与仓库库存</small></button><button class="home-card" type="button" data-home-module="purchase"><span>采购管理</span><b>货源、计划与采购订单</b><small>覆盖采购全流程协同</small></button><button class="home-card" type="button" data-home-module="supply"><span>供应管理</span><b>供应商与物流服务</b><small>维护供应商及承运资源</small></button><button class="home-card" type="button" data-home-module="warehouse"><span>仓储管理</span><b>收货、质检与发运</b><small>跟进仓储节点与处理进度</small></button></div></section>
       <div id="productPages" class="product-pages" hidden>
       <section class="filter-card" id="filterCard"><div class="filters" id="filters"></div><div class="filter-actions"><div class="collapse" id="collapseBtn"><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><span>展开全部</span></div><button class="action-btn primary" id="searchBtn">搜索</button><button class="action-btn reset" id="resetBtn">重置</button></div></section>
       <section class="table-card"><div class="table-toolbar"><button class="tool primary" data-tab="SKU">SKU</button><button class="tool" data-tab="SPU">SPU</button><button class="tool manage-btn" id="addProductBtn">＋ 新增商品</button><button class="tool">SKU标签批量打印</button><button class="tool">GPSR标签批量打印</button><button class="tool primary">导出 <span class="down">⌄</span></button><button class="tool">下载队列</button><button class="tool">刊登文件下载队列</button><button class="tool">批量更新⌄</button><div class="table-tools-right"><svg viewBox="0 0 24 24" id="refreshBtn"><path d="M20 11a8 8 0 1 0 1 4"/><path d="M20 5v6h-6"/></svg><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="10" cy="19" r="2"/></svg></div></div><div class="table-wrap"><table class="data-table"><colgroup><col style="width:60px"><col style="width:285px"><col style="width:255px"><col style="width:200px"><col style="width:240px"><col style="width:235px"><col style="width:185px"><col style="width:240px"></colgroup><thead><tr><th><span class="check" id="allCheck"></span></th><th>商品SKU</th><th>商品名称</th><th>商品图片</th><th>产品状态</th><th>销售状态</th><th>是否组合商品</th><th>操作</th></tr></thead><tbody id="tbody"></tbody></table></div><div class="footer-page"><span class="count" id="count">共 97,941 条</span><span class="page arrow">‹</span><span class="page active">1</span><span class="page">2</span><span class="page">3</span><span class="page">4</span><span class="page">5</span><span>…</span><span class="page">9795</span><span class="page arrow">›</span><select class="page-size"><option>10</option><option>20</option><option>50</option></select><span>跳至</span><input style="width:45px;height:34px;border:1px solid #d7dce3;border-radius:6px"/><span>页</span></div></section></div>
@@ -3294,6 +3294,27 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   new MutationObserver(schedule).observe(document.querySelector('.main'),{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden','data-mode']});
   document.addEventListener('click',function(event){if(event.target.closest('.simple-side-item,.product-subitem,[data-purchase-module],[data-purchase-sub]'))setTimeout(schedule,0);},true);
   window.addEventListener('load',schedule);
+})();
+</script>
+<style>
+/* 主页：五大模块介绍卡片。 */
+.home-panel h1{margin-bottom:0}.home-panel-grid{max-width:900px}.home-card{align-items:flex-start;text-align:left;font:inherit;cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s}.home-card:hover{border-color:#9cc6fb;box-shadow:0 6px 16px rgba(35,133,247,.1);transform:translateY(-2px)}.home-card:focus-visible{outline:2px solid #2876ed;outline-offset:2px}
+</style>
+<script>
+/* 主页模块卡片快捷进入对应的默认子模块。 */
+(function(){
+  var routes={
+    product:function(){window.switchModule?.('product');},
+    inventory:function(){window.__erpInventoryMount?.('realtime');},
+    purchase:function(){window.renderPurchaseFull?.('source',0);},
+    supply:function(){window.__erpSupplyMount?.('supplier');},
+    warehouse:function(){window.__erpWarehouseMount?.('inbound');}
+  };
+  document.addEventListener('click',function(event){
+    var card=event.target.closest('[data-home-module]');
+    if(!card)return;
+    routes[card.dataset.homeModule]?.();
+  });
 })();
 </script>
 </body>
