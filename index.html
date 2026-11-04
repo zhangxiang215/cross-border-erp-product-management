@@ -3217,5 +3217,52 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   window.addEventListener('load',syncFormState);
 })();
 </script>
+<style>
+/* 全局详情附件展示：详情页只展示已上传文件或图片，未上传时保留留白。 */
+.product-form.detail-mode .detail-attachment{display:flex;align-items:center;gap:10px;min-height:40px;color:#536579}
+.product-form.detail-mode .detail-attachment:empty{min-height:40px}
+.product-form.detail-mode .attachment-file{display:inline-flex;align-items:center;gap:8px;max-width:100%;min-height:34px;padding:0 12px;border:1px solid #dbe4ef;border-radius:6px;background:#f8fbff;color:#246bfe;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-form.detail-mode .attachment-file:before{content:"▤";font-size:16px;color:#4e8cff}.product-form.detail-mode .attachment-image{width:76px;height:56px;border:1px solid #dbe4ef;border-radius:6px;background:linear-gradient(135deg,#eaf3ff,#f8fbff);display:flex;align-items:center;justify-content:center;color:#4e8cff;font-size:12px;overflow:hidden}
+.product-form.detail-mode .attachment-image:before{content:"图片"}
+/* 运输方式为多选控件，详情态改为只读输入框呈现当前值。 */
+#formMask .product-form.detail-mode .carrier-mode-trigger{display:flex!important;pointer-events:none;color:#465568;background:#f8fafc;border-color:#dbe3ec}
+#formMask .product-form.detail-mode .carrier-mode-trigger span:last-child{display:none}
+</style>
+<script>
+/* 统一将详情态的上传控件转换为附件预览；没有真实文件名时不渲染占位输入框。 */
+(function(){
+  function clean(value){return String(value||'').replace(/\s+/g,' ').trim();}
+  function fileName(item){
+    var input=item.querySelector('.document-file-display,[data-key="license"],.supplier-license-upload input,.purchase-contract-control input');
+    var value=clean(input&&input.value);
+    if(value&&!/^(支持|点击选择|请选择|请输入)/.test(value))return value;
+    var trigger=item.querySelector('.file-trigger span,.upload-box span');
+    var text=clean(trigger&&trigger.textContent);
+    return text&&/\.(pdf|docx?|png|jpe?g|webp)$/i.test(text)?text.split(' ')[0]:'';
+  }
+  function preview(item,name,forceDocument){
+    var label=clean(item.querySelector(':scope > label')?.textContent),isImage=!forceDocument&&(/图片|图片|标识图|底图/.test(label)||/\.(png|jpe?g|webp|gif)$/i.test(name));
+    item.querySelectorAll('.supplier-license-upload,.document-upload,.upload-group,.purchase-contract-control,.upload-box,.purchase-contract-preview').forEach(function(node){node.remove();});
+    var result=document.createElement('div');result.className='detail-attachment';
+    if(name){var file=document.createElement('span');file.className=isImage?'attachment-image':'attachment-file';file.title=name;if(!isImage)file.textContent=name;result.appendChild(file);}
+    item.appendChild(result);
+  }
+  function normalize(root){
+    if(!root||!root.classList.contains('detail-mode'))return;
+    root.querySelectorAll('.form-item').forEach(function(item){
+      if(item.dataset.attachmentNormalized)return;
+      var label=clean(item.querySelector(':scope > label')?.textContent);
+      var upload=item.querySelector('.supplier-license-upload,.document-upload,.upload-group,.upload-box,.purchase-contract-control,.purchase-contract-preview');
+      if(!upload&&!/上传|附件|文件|合同|证书|执照|资质|图片|图$/.test(label))return;
+      item.dataset.attachmentNormalized='true';
+      preview(item,fileName(item),upload&&upload.classList.contains('purchase-contract-preview')?'盖章采购合同.pdf':'');
+    });
+  }
+  function sync(){normalize(document.querySelector('#formMask .product-form'));}
+  var mask=document.getElementById('formMask');
+  if(mask)new MutationObserver(function(){setTimeout(sync,0);}).observe(mask,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('load',sync);
+})();
+</script>
 </body>
 </html>
