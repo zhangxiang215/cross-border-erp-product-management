@@ -2775,9 +2775,9 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 <script>
 (function(){
   var supplierRows=[
-    {code:'SUP-0001',name:'中粤德利科技有限公司',product:'8L速热热水宝',category:'家居园艺',contact:'陈经理 / 138****2368',settlement:'月结30天',lead:'15天',status:'启用',owner:'夏景舟'},
-    {code:'SUP-0002',name:'莆田锐亚电子商务有限公司',product:'便携式衣物护理机',category:'小家电',contact:'林女士 / 139****5812',settlement:'现结',lead:'10天',status:'新增',owner:'毛鸿雁'},
-    {code:'SUP-0003',name:'东莞市波丝电器有限公司',product:'汽车收纳配件',category:'汽摩配件',contact:'周经理 / 136****9071',settlement:'预付30%',lead:'20天',status:'停用',owner:'夏景舟'}
+    {code:'SUP-0001',name:'中粤德利科技有限公司',product:'8L速热热水宝',skus:'JZETLQ-0090000US、JZETLQ-0090001US',category:'家居园艺',contact:'陈经理 / 138****2368',settlement:'月结30天',lead:'15天',status:'启用',owner:'夏景舟',paymentMethod:'银行转账',payee:'中粤德利科技有限公司',payeeAccount:'6222 **** 8899',payeeBank:'中国工商银行深圳分行'},
+    {code:'SUP-0002',name:'莆田锐亚电子商务有限公司',product:'便携式衣物护理机',skus:'SKU-20261015-001',category:'小家电',contact:'林女士 / 139****5812',settlement:'现结',lead:'10天',status:'新增',owner:'毛鸿雁',paymentMethod:'银行转账',payee:'莆田锐亚电子商务有限公司',payeeAccount:'6214 **** 5821',payeeBank:'中国建设银行莆田分行'},
+    {code:'SUP-0003',name:'东莞市波丝电器有限公司',product:'汽车收纳配件',skus:'SKU-20261015-002',category:'汽摩配件',contact:'周经理 / 136****9071',settlement:'预付30%',lead:'20天',status:'停用',owner:'夏景舟',paymentMethod:'银行转账',payee:'东莞市波丝电器有限公司',payeeAccount:'6228 **** 9071',payeeBank:'中国银行东莞分行'}
   ];
   var carrierRows=[
     {code:'LOG-001',name:'海桥国际物流',route:'中国→美国',mode:'海运/卡派',billing:'按体积重',contact:'李经理 / 137****6129',days:'28-35天',status:'合作中'},
@@ -2790,7 +2790,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     {no:'TRK20261026003',order:'PO202610160019',carrier:'泛亚跨境物流',route:'宁波→东京',node:'资料待补充',eta:'2026-11-06',status:'异常',updated:'2026-10-28 09:20',events:[['2026-10-28 09:20','东京','清关资料缺少材质说明，待补充'],['2026-10-26 16:10','宁波','物流商已揽收']]}
   ];
   var configs={
-    supplier:{title:'供应商管理',add:'新增供应商',filters:['供应商编号｜请输入','供应商名称｜请输入','供应商状态'],cols:[['code','供应商编号'],['name','供应商名称'],['product','供应商品名称'],['category','主营品类'],['contact','联系人'],['settlement','结算方式'],['lead','平均交期'],['owner','开发人'],['status','供应商状态']]},
+    supplier:{title:'供应商管理',add:'新增供应商',filters:['供应商编号｜请输入','供应商名称｜请输入','供应商状态'],cols:[['code','供应商编号'],['name','供应商名称'],['skus','商品SKU'],['category','主营品类'],['contact','联系人'],['settlement','结算方式'],['lead','平均交期'],['owner','对接人'],['paymentMethod','收款方式'],['payee','收款人'],['payeeAccount','收款账户'],['payeeBank','收款银行'],['status','供应商状态']]},
     carrier:{title:'国际物流商管理',add:'新增物流商',filters:['物流商名称/编码｜请输入','服务线路','合作状态'],cols:[['code','物流商编码'],['name','物流商名称'],['route','服务线路'],['mode','运输方式'],['billing','计费方式'],['days','参考时效'],['contact','联系人'],['status','状态']]},
     tracking:{title:'物流轨迹管理',add:'新增运单',filters:['运单号/采购单号｜请输入','物流商','运输状态'],cols:[['no','运单号'],['order','采购单号'],['carrier','物流商'],['route','运输线路'],['node','最新节点'],['eta','预计到达'],['status','状态'],['updated','更新时间']]}
   };
@@ -3336,15 +3336,19 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 .home-panel h1{margin-bottom:0}.home-panel-grid{max-width:900px}.home-card{align-items:flex-start;text-align:left}
 </style>
 <style>
-/* 供应商基础信息：供应商品以独立 SKU 列表展示。 */
+/* 供应商基础信息：营业执照上传框与商品 SKU 明细。 */
+#formMask .supplier-license-upload{flex:0 0 560px;max-width:560px}
+#formMask .supplier-license-upload .form-input{width:440px;flex:0 1 440px}
 #formMask .supplier-sku-section{margin-top:18px}
+#formMask .supplier-sku-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+#formMask .supplier-sku-heading h3{margin:0}
 #formMask .supplier-sku-list{display:flex;flex-direction:column;gap:10px}
-#formMask .supplier-sku-row{display:flex;align-items:center;gap:20px;min-height:40px;padding:0 18px;border:1px solid #e5ebf2;border-radius:6px;background:#fafcff;color:#475569}
-#formMask .supplier-sku-row label{width:78px;flex:0 0 78px;color:#697789;text-align:right}
-#formMask .supplier-sku-empty{min-height:40px}
+#formMask .supplier-sku-row{display:grid;grid-template-columns:78px minmax(260px,520px) auto;align-items:center;gap:12px;min-height:40px;padding:10px 18px;border:1px solid #e5ebf2;border-radius:6px;background:#fafcff;color:#475569}
+#formMask .supplier-sku-row label{color:#697789;text-align:right}
+#formMask .supplier-sku-remove{height:34px;min-width:72px;padding:0 15px;border-color:#ff7875;color:#f0524d;background:#fff}
 </style>
 <script>
-/* 供应商商品不再以名称字段录入，改为独立的商品 SKU 列表展示。 */
+/* 供应商商品不再以名称字段录入，改为可增删的商品 SKU 明细。 */
 (function(){
   var skuMap={
     'SUP-0001':['JZETLQ-0090000US','JZETLQ-0090001US'],
@@ -3354,12 +3358,18 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   function mountSupplierSkuList(){
     var mask=document.getElementById('formMask'),form=mask&&mask.querySelector('.product-form');
     if(!mask||!form||!mask.classList.contains('show'))return;
-    var nav=form.querySelector('.form-nav-title'),content=form.querySelector('.form-content');
+    var nav=form.querySelector('.form-nav-title'),content=form.querySelector('.form-content'),isView=form.classList.contains('detail-mode');
     if(!nav||nav.textContent.trim()!=='供应商管理'||!content||content.querySelector('.supplier-sku-section'))return;
-    var code=content.querySelector('[data-key="code"]')?.value||'',skus=skuMap[code]||[];
+    var code=content.querySelector('[data-key="code"]')?.value||'',stored=content.querySelector('[data-key="skus"]')?.value||'',skus=stored?stored.split('、').filter(Boolean):(skuMap[code]||[]);
+    if(!skus.length)skus=[''];
     var section=document.createElement('section');section.className='form-section supplier-sku-section';
-    section.innerHTML='<h3>供应商品列表</h3><div class="supplier-sku-list">'+(skus.length?skus.map(function(sku){return '<div class="supplier-sku-row"><label>商品SKU</label><span>'+sku+'</span></div>';}).join(''):'<div class="supplier-sku-empty"></div>')+'</div>';
+    section.innerHTML='<div class="supplier-sku-heading"><h3>供应商品列表</h3>'+(isView?'':'<button type="button" class="tool primary supplier-sku-add">＋ 新增商品SKU</button>')+'</div><input type="hidden" data-key="skus"><div class="supplier-sku-list"></div>';
     content.appendChild(section);
+    var list=section.querySelector('.supplier-sku-list'),hidden=section.querySelector('[data-key="skus"]');
+    function sync(){hidden.value=Array.from(list.querySelectorAll('.supplier-sku-input')).map(function(input){return input.value.trim();}).filter(Boolean).join('、');}
+    function addRow(value,index){var row=document.createElement('div');row.className='supplier-sku-row';row.innerHTML='<label>商品SKU</label><input class="form-input supplier-sku-input" placeholder="请输入商品SKU" value="'+String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" '+(isView?'readonly':'')+'>'+(isView?'':'<button type="button" class="tool supplier-sku-remove" '+(index===0?'hidden':'')+'>删除</button>');list.appendChild(row);row.querySelector('.supplier-sku-input').oninput=sync;row.querySelector('.supplier-sku-remove')?.addEventListener('click',function(){row.remove();sync();});}
+    skus.forEach(addRow);sync();
+    section.querySelector('.supplier-sku-add')?.addEventListener('click',function(){addRow('',list.children.length);sync();});
   }
   var mask=document.getElementById('formMask');
   if(mask)new MutationObserver(function(){setTimeout(mountSupplierSkuList,0);}).observe(mask,{attributes:true,childList:true,subtree:true,attributeFilter:['class']});
