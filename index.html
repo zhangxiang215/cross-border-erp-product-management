@@ -3379,5 +3379,33 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   window.addEventListener('load',mountSupplierSkuList);
 })();
 </script>
+<script>
+/* 采购子模块使用唯一入口路由，避免旧采购页面渲染器覆盖计划或采购单页面。 */
+(function(){
+  function markPurchaseSide(key){
+    document.querySelectorAll('#purchaseSideSubnav .simple-side-item').forEach(function(item){item.classList.toggle('active',item.dataset.sideKey===key);});
+  }
+  function routePurchase(key){
+    key=key==='plan'?'plan':'order';
+    markPurchaseSide(key);
+    if(key==='plan')window.__renderPurchasePlanFinal?.();else window.renderPurchaseFull?.('order',0);
+    setTimeout(function(){
+      var view=document.getElementById('purchaseView'),title=view?.querySelector('.purchase-tab.active')?.textContent.trim();
+      markPurchaseSide(key);
+      if(key==='plan'&&title!=='计划管理')window.__renderPurchasePlanFinal?.();
+      if(key==='order'&&title!=='采购单管理')window.renderPurchaseFull?.('order',0);
+    },0);
+  }
+  window.addEventListener('click',function(event){
+    var item=event.target.closest&&event.target.closest('#purchaseSideSubnav .simple-side-item,.purchase-side-subnav .simple-side-item');
+    if(!item)return;
+    var key=item.dataset.sideKey,label=item.textContent.replace(/^•/,'').trim();
+    if(key!=='plan'&&key!=='order')key=label==='计划管理'?'plan':label==='采购单管理'?'order':'';
+    if(!key)return;
+    event.preventDefault();event.stopImmediatePropagation();event.stopPropagation();
+    routePurchase(key);
+  },true);
+})();
+</script>
 </body>
 </html>
