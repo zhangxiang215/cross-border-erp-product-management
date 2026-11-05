@@ -2808,7 +2808,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   function rebuildSide(){var box=document.getElementById('supplySideSubnav');if(!box)return;box.innerHTML='<span class="simple-side-title">供应</span><div class="simple-side-item '+(current==='supplier'?'active':'')+'" data-side-key="supplier">供应商管理</div><div class="simple-side-item '+(current==='carrier'?'active':'')+'" data-side-key="carrier">国际物流商管理</div><div class="simple-side-item '+(current==='tracking'?'active':'')+'" data-side-key="tracking">物流轨迹管理</div>';}
   function openPage(title,body,editable,onSave){
     var mask=document.getElementById('formMask'),form=mask&&mask.querySelector('.product-form'),content=form&&form.querySelector('.form-body');if(!mask||!form||!content)return;
-    var isView=!editable,navTitle=configs[current].title,navItems=['基础信息'];if(current==='tracking'&&isView)navItems.push('物流轨迹');
+    var isView=!editable,navTitle=configs[current].title,navItems=['基础信息'];if(current==='supplier')navItems.push('供应商品列表');if(current==='tracking'&&isView)navItems.push('物流轨迹');
     document.getElementById('formTitle').textContent=title;
     content.innerHTML='<nav class="form-nav"><div class="form-nav-title">'+esc(navTitle)+'</div>'+navItems.map(function(label,index){return '<div class="form-nav-item '+(index===0?'active':'')+'" data-target="supplyFormSection'+index+'">'+label+'</div>';}).join('')+'</nav><div class="form-content">'+body+'</div>';
     content.querySelectorAll('.form-section').forEach(function(section,index){section.id='supplyFormSection'+index;});
@@ -3365,7 +3365,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     if(!nav||nav.textContent.trim()!=='供应商管理'||!content||content.querySelector('.supplier-sku-section'))return;
     var code=content.querySelector('[data-key="code"]')?.value||'',stored=content.querySelector('[data-key="skus"]')?.value||'',skus=stored?stored.split('、').filter(Boolean):(skuMap[code]||[]);
     if(!skus.length)skus=[''];
-    var section=document.createElement('section');section.className='form-section supplier-sku-section';
+    var section=document.createElement('section');section.className='form-section supplier-sku-section';section.id='supplyFormSection1';
     section.innerHTML='<div class="supplier-sku-heading"><h3>供应商品列表</h3>'+(isView?'':'<button type="button" class="tool primary supplier-sku-add">＋ 新增商品SKU</button>')+'</div><input type="hidden" data-key="skus"><div class="supplier-sku-list"></div>';
     content.appendChild(section);
     var list=section.querySelector('.supplier-sku-list'),hidden=section.querySelector('[data-key="skus"]');
