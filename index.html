@@ -3345,7 +3345,10 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #formMask .supplier-sku-list{display:flex;flex-direction:column;gap:10px}
 #formMask .supplier-sku-row{display:grid;grid-template-columns:78px minmax(260px,520px) auto;align-items:center;gap:12px;min-height:40px;padding:10px 18px;border:1px solid #e5ebf2;border-radius:6px;background:#fafcff;color:#475569}
 #formMask .supplier-sku-row label{color:#697789;text-align:right}
-#formMask .supplier-sku-remove{height:34px;min-width:72px;padding:0 15px;border-color:#ff7875;color:#f0524d;background:#fff}
+#formMask .supplier-sku-remove{width:76px;min-width:76px;max-width:76px;height:34px;padding:0;border-color:#ff7875;color:#f0524d;background:#fff;justify-self:start;flex:none}
+/* 动态明细删除操作统一为紧凑尺寸，避免被网格剩余空间拉伸。 */
+.plan-sku-item .plan-sku-remove{width:76px!important;min-width:76px!important;max-width:76px!important;padding:0!important;justify-self:start!important;flex:none!important}
+.purchase-unified-item .purchase-unified-remove{width:76px!important;min-width:76px!important;max-width:76px!important;padding:0!important;flex:none!important}
 </style>
 <script>
 /* 供应商商品不再以名称字段录入，改为可增删的商品 SKU 明细。 */
