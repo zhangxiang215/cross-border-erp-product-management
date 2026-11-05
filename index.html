@@ -3085,6 +3085,14 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   function purchaseField(label,control,required,full){return '<div class="form-item'+(full?' full':'')+'"><label>'+(required?'<span class="required">':'')+label+(required?'</span>':'')+'</label>'+control+'</div>';}
   function input(label,value,placeholder,required,readonly){return purchaseField(label,'<input class="form-input" value="'+purchaseEscape(value)+'" placeholder="'+placeholder+'" '+(readonly?'readonly':'')+'>',required);}
   function select(label,options,value,required){return purchaseField(label,'<select class="form-select">'+purchaseOptions(options,value)+'</select>',required);}
+  function purchaseUnifiedItemMarkup(item,isView){
+    item=item||{};
+    var unitPrice=String(item.unitPrice||'').replace('¥',''),quantity=item.quantity||'',total=Number(quantity||0)*Number(String(unitPrice).replace(/[^0-9.]/g,''));
+    return '<div class="purchase-unified-item">'
+      +input('商品SKU',item.sku||'','请选择商品SKU',true,isView)+input('采购数量',quantity,'请输入数量',true,isView)+input('SKU单价',unitPrice,'请输入SKU单价',true,isView)+input('采购单价（含税）',unitPrice,'请输入含税单价',false,isView)+input('税点',item.taxRate||'13%','请输入税点',false,isView)+input('单SKU总价',total?'¥'+total.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}):'','系统自动计算',false,true)
+      +(!isView?'<button type="button" class="tool reset purchase-unified-remove">删除</button>':'')
+      +'</div>';
+  }
   function rowData(row){
     if(!row)return {no:'',supplier:'',sku:'',quantity:'',unitPrice:'',amount:'',created:'',delivery:'',owner:'',source:'计划补货',status:'草稿'};
     var cells=row.querySelectorAll('td'),text=function(index){return (cells[index]&&cells[index].innerText||'').trim().split('\n')[0];};
@@ -3104,12 +3112,19 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     var isView=mode==='view',mask=document.getElementById('formMask'),body=document.querySelector('.product-form .form-body'),title=document.getElementById('formTitle');
     if(!mask||!body)return;
     current=current||rowData();
-    if(current.items){var firstItem=current.items[0]||{};current={no:current.no||'',supplier:current.supplier||'',sku:firstItem.sku||'',quantity:firstItem.quantity||'',unitPrice:firstItem.unitPrice||'',amount:current.amount||'',created:current.created||'',delivery:current.delivery||'',owner:current.owner||'',source:current.source||'计划补货',status:current.status||'草稿'};}
+    var itemRows=Array.isArray(current.items)&&current.items.length?current.items.slice():[];
+    if(!itemRows.length&&mode!=='create'&&current.sku){
+      itemRows=[
+        {sku:current.sku,quantity:current.quantity,unitPrice:current.unitPrice,taxRate:'13%'},
+        {sku:'JZETLQ-0090001US',quantity:'64',unitPrice:'¥86.50',taxRate:'13%'}
+      ];
+    }
+    if(!itemRows.length)itemRows=[{sku:'',quantity:'',unitPrice:'',taxRate:'13%'}];
+    var firstItem=itemRows[0]||{};
+    current={no:current.no||'',supplier:current.supplier||'',sku:firstItem.sku||'',quantity:firstItem.quantity||'',unitPrice:firstItem.unitPrice||'',amount:current.amount||'',created:current.created||'',delivery:current.delivery||'',owner:current.owner||'',source:current.source||'计划补货',status:current.status||'草稿',items:itemRows};
     title.textContent=isView?'采购单详情':mode==='edit'?'编辑采购单':'新增采购单';
     body.innerHTML='<nav class="form-nav"><div class="form-nav-title">采购管理</div><div class="form-nav-item active" data-target="purchaseItemsUnified">商品明细</div><div class="form-nav-item" data-target="purchaseBasicUnified">基础信息</div><div class="form-nav-item" data-target="purchaseDeliveryUnified">交付与合同</div></nav><div class="form-content">'
-      +'<section class="form-section section-anchor" id="purchaseItemsUnified"><div class="purchase-unified-section-head"><h3>商品明细</h3>'+(isView?'':'<button class="tool primary" type="button" id="purchaseUnifiedAddItem">＋ 增加商品SKU</button>')+'</div><div class="purchase-unified-item">'
-      +input('商品SKU',current.sku,'请选择商品SKU',true,isView)+input('采购数量',current.quantity,'请输入数量',true,isView)+input('SKU单价',current.unitPrice.replace('¥',''),'请输入SKU单价',true,isView)+input('采购单价（含税）',current.unitPrice.replace('¥',''),'请输入含税单价',false,isView)+input('税点','13%','请输入税点',false,isView)+input('单SKU总价',current.amount,'系统自动计算',false,true)
-      +'</div><div class="purchase-unified-total" hidden><label>采购总价</label><input class="form-input" placeholder="系统自动汇总" readonly></div></section>'
+      +'<section class="form-section section-anchor" id="purchaseItemsUnified"><div class="purchase-unified-section-head"><h3>商品明细</h3>'+(isView?'':'<button class="tool primary" type="button" id="purchaseUnifiedAddItem">＋ 增加商品SKU</button>')+'</div>'+current.items.map(function(item){return purchaseUnifiedItemMarkup(item,isView);}).join('')+'<div class="purchase-unified-total" hidden><label>采购总价</label><input class="form-input" placeholder="系统自动汇总" readonly></div></section>'
       +'<section class="form-section section-anchor" id="purchaseBasicUnified"><h3>基础信息</h3><div class="form-grid">'
       +input('采购单号',current.no,'系统自动生成',false,true)+select('供应商名称',['深圳市恒温电器有限公司','义乌市优品供应链','龙泉市庄欣电子商务有限公司'],current.supplier,true)+input('创建日期',current.created,'请选择创建日期',false,isView)+select('采购负责人',['夏景舟','毛鸿雁','王娜','刘露'],current.owner,false)+select('订单来源',['采样','比样','自动补货','计划补货','紧急补货'],current.source,false)+select('状态',['草稿','待下单','待付款','生产中','已收货','已验收','退换货','已完成'],current.status,false)+purchaseField('下单备注','<textarea class="form-textarea" placeholder="请输入下单备注" '+(isView?'readonly':'')+'>请按约定日期交货，外箱及商品标签须保持完整。</textarea>',false,true)
       +'</div></section>'
