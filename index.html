@@ -3343,9 +3343,10 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 #formMask .supplier-sku-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 #formMask .supplier-sku-heading h3{margin:0}
 #formMask .supplier-sku-list{display:flex;flex-direction:column;gap:10px}
-#formMask .supplier-sku-row{display:grid;grid-template-columns:78px minmax(260px,520px) auto;align-items:center;gap:12px;min-height:40px;padding:10px 18px;border:1px solid #e5ebf2;border-radius:6px;background:#fafcff;color:#475569}
-#formMask .supplier-sku-row label{color:#697789;text-align:right}
-#formMask .supplier-sku-remove{width:76px;min-width:76px;max-width:76px;height:34px;padding:0;border-color:#ff7875;color:#f0524d;background:#fff;justify-self:start;flex:none}
+#formMask .supplier-sku-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:12px;min-height:40px;padding:14px 18px;border:1px solid #e5ebf2;border-radius:6px;background:#fafcff;color:#475569}
+#formMask .supplier-sku-field{display:flex;align-items:center;gap:10px;min-width:0}
+#formMask .supplier-sku-field label{width:64px;flex:none;color:#697789;text-align:right}
+#formMask .supplier-sku-remove{width:76px;min-width:76px;max-width:76px;height:34px;padding:0;border-color:#ff7875;color:#f0524d;background:#fff;grid-column:1 / -1;justify-self:end;flex:none}
 /* 动态明细删除操作统一为紧凑尺寸，避免被网格剩余空间拉伸。 */
 .plan-sku-item .plan-sku-remove{width:76px!important;min-width:76px!important;max-width:76px!important;padding:0!important;grid-column:1 / -1!important;justify-self:end!important;flex:none!important}
 .purchase-unified-item .purchase-unified-remove{width:76px!important;min-width:76px!important;max-width:76px!important;padding:0!important;flex:none!important}
@@ -3357,6 +3358,12 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     'SUP-0001':['JZETLQ-0090000US','JZETLQ-0090001US'],
     'SUP-0002':['SKU-20261015-001'],
     'SUP-0003':['SKU-20261015-002']
+  };
+  var skuSpecs={
+    'JZETLQ-0090000US':{color:'白色',size:'28 × 18 × 14 cm',capacity:'8L',weight:'2.60 kg'},
+    'JZETLQ-0090001US':{color:'黑色',size:'30 × 20 × 15 cm',capacity:'10L',weight:'2.85 kg'},
+    'SKU-20261015-001':{color:'灰色',size:'32 × 22 × 16 cm',capacity:'12L',weight:'3.10 kg'},
+    'SKU-20261015-002':{color:'深蓝色',size:'35 × 24 × 18 cm',capacity:'15L',weight:'3.45 kg'}
   };
   function mountSupplierSkuList(){
     var mask=document.getElementById('formMask'),form=mask&&mask.querySelector('.product-form');
@@ -3370,7 +3377,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
     content.appendChild(section);
     var list=section.querySelector('.supplier-sku-list'),hidden=section.querySelector('[data-key="skus"]');
     function sync(){hidden.value=Array.from(list.querySelectorAll('.supplier-sku-input')).map(function(input){return input.value.trim();}).filter(Boolean).join('、');}
-    function addRow(value,index){var row=document.createElement('div');row.className='supplier-sku-row';row.innerHTML='<label>商品SKU</label><input class="form-input supplier-sku-input" placeholder="请输入商品SKU" value="'+String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" '+(isView?'readonly':'')+'>'+(isView?'':'<button type="button" class="tool supplier-sku-remove" '+(index===0?'hidden':'')+'>删除</button>');list.appendChild(row);row.querySelector('.supplier-sku-input').oninput=sync;row.querySelector('.supplier-sku-remove')?.addEventListener('click',function(){row.remove();sync();});}
+    function addRow(value,index){var row=document.createElement('div'),spec=skuSpecs[value]||{},safe=function(v){return String(v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');},field=function(label,className,current,placeholder){return '<div class="supplier-sku-field"><label>'+label+'</label><input class="form-input '+className+'" placeholder="'+placeholder+'" value="'+safe(current)+'" '+(isView?'readonly':'')+'></div>';};row.className='supplier-sku-row';row.innerHTML=field('商品SKU','supplier-sku-input',value,'请输入商品SKU')+field('颜色','supplier-sku-color',spec.color,'请输入颜色')+field('尺寸','supplier-sku-size',spec.size,'请输入尺寸')+field('容量','supplier-sku-capacity',spec.capacity,'请输入容量')+field('重量','supplier-sku-weight',spec.weight,'请输入重量')+(isView?'':'<button type="button" class="tool supplier-sku-remove" '+(index===0?'hidden':'')+'>删除</button>');list.appendChild(row);row.querySelector('.supplier-sku-input').oninput=sync;row.querySelector('.supplier-sku-remove')?.addEventListener('click',function(){row.remove();sync();});}
     skus.forEach(addRow);sync();
     section.querySelector('.supplier-sku-add')?.addEventListener('click',function(){addRow('',list.children.length);sync();});
   }
