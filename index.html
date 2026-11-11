@@ -2793,7 +2793,7 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   var configs={
     supplier:{title:'供应商管理',add:'新增供应商',filters:['供应商编号｜请输入','供应商名称｜请输入','供应商状态'],cols:[['code','供应商编号'],['name','供应商名称'],['skus','商品SKU'],['category','主营品类'],['contact','联系人'],['settlement','结算方式'],['lead','平均交期'],['owner','对接人'],['paymentMethod','收款方式'],['payee','收款人'],['payeeAccount','收款账户'],['payeeBank','收款银行'],['status','供应商状态']]},
     carrier:{title:'国际物流商管理',add:'新增物流商',filters:['物流商名称/编码｜请输入','服务线路','合作状态'],cols:[['code','物流商编码'],['name','物流商名称'],['route','服务线路'],['mode','运输方式'],['billing','计费方式'],['days','参考时效'],['contact','联系人'],['status','状态']]},
-    tracking:{title:'物流轨迹管理',add:'新增运单',filters:['运单号/采购单号｜请输入','物流商','运输状态'],cols:[['no','运单号'],['order','采购单号'],['carrier','物流商'],['route','运输线路'],['node','最新节点'],['eta','预计到达'],['status','状态'],['updated','更新时间']]}
+    tracking:{title:'物流轨迹管理',add:'新增运单',filters:['运单号/采购单号｜请输入','物流商','运输状态'],cols:[['no','运单号'],['carrier','物流商'],['route','运输线路'],['node','最新节点'],['eta','预计到达'],['status','状态'],['updated','更新时间']]}
   };
   var schemas={
     supplier:[['code','供应商编号'],['name','供应商名称'],['category','主营品类'],['contact','联系人及电话'],['settlement','结算方式'],['lead','平均交期'],['owner','对接人'],['status','供应商状态'],['paymentMethod','收款方式'],['payee','收款人'],['payeeAccount','收款账户'],['payeeBank','收款银行'],['address','经营地址'],['license','营业执照/资质'],['remark','备注']],
