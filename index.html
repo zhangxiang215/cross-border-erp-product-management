@@ -2795,9 +2795,9 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 <script>
 (function(){
   var supplierRows=[
-    {code:'SUP-0001',name:'中粤德利科技有限公司',product:'8L速热热水宝',skus:'JZETLQ-0090000US、JZETLQ-0090001US',category:'家居园艺',contact:'陈经理 / 138****2368',settlement:'月结30天',lead:'15天',status:'启用',owner:'夏景舟',paymentMethod:'银行转账',payee:'中粤德利科技有限公司',payeeAccount:'6222 **** 8899',payeeBank:'中国工商银行深圳分行'},
-    {code:'SUP-0002',name:'莆田锐亚电子商务有限公司',product:'便携式衣物护理机',skus:'SKU-20261015-001',category:'小家电',contact:'林女士 / 139****5812',settlement:'现结',lead:'10天',status:'新增',owner:'毛鸿雁',paymentMethod:'银行转账',payee:'莆田锐亚电子商务有限公司',payeeAccount:'6214 **** 5821',payeeBank:'中国建设银行莆田分行'},
-    {code:'SUP-0003',name:'东莞市波丝电器有限公司',product:'汽车收纳配件',skus:'SKU-20261015-002',category:'汽摩配件',contact:'周经理 / 136****9071',settlement:'预付30%',lead:'20天',status:'停用',owner:'夏景舟',paymentMethod:'银行转账',payee:'东莞市波丝电器有限公司',payeeAccount:'6228 **** 9071',payeeBank:'中国银行东莞分行'}
+    {code:'SUP-0001',name:'中粤德利科技有限公司',product:'8L速热热水宝',skus:'JZETLQ-0090000US、JZETLQ-0090001US',items:[{sku:'JZETLQ-0090000US'},{sku:'JZETLQ-0090001US'}],category:'家居园艺',contact:'陈经理 / 138****2368',settlement:'月结30天',lead:'15天',status:'启用',owner:'夏景舟',paymentMethod:'银行转账',payee:'中粤德利科技有限公司',payeeAccount:'6222 **** 8899',payeeBank:'中国工商银行深圳分行'},
+    {code:'SUP-0002',name:'莆田锐亚电子商务有限公司',product:'便携式衣物护理机',skus:'SKU-20261015-001',items:[{sku:'SKU-20261015-001'}],category:'小家电',contact:'林女士 / 139****5812',settlement:'现结',lead:'10天',status:'新增',owner:'毛鸿雁',paymentMethod:'银行转账',payee:'莆田锐亚电子商务有限公司',payeeAccount:'6214 **** 5821',payeeBank:'中国建设银行莆田分行'},
+    {code:'SUP-0003',name:'东莞市波丝电器有限公司',product:'汽车收纳配件',skus:'SKU-20261015-002',items:[{sku:'SKU-20261015-002'}],category:'汽摩配件',contact:'周经理 / 136****9071',settlement:'预付30%',lead:'20天',status:'停用',owner:'夏景舟',paymentMethod:'银行转账',payee:'东莞市波丝电器有限公司',payeeAccount:'6228 **** 9071',payeeBank:'中国银行东莞分行'}
   ];
   var carrierRows=[
     {code:'LOG-001',name:'海桥国际物流',route:'中国→美国',mode:'海运/卡派',billing:'按体积重',contact:'李经理 / 137****6129',days:'28-35天',status:'合作中',quote:'海桥国际物流报价表.xlsx'},
