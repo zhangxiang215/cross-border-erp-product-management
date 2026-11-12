@@ -3023,6 +3023,26 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 })();
 </script>
 <script>
+/* 海外仓详情补齐接口地址，沿用详情页的只读字段样式。 */
+(function(){
+  var apiByWarehouse={
+    'OW-US-001':'https://api.ekeda.com/us/v1',
+    'OW-DE-018':'https://api.ekeda.com/de/v1',
+    'OW-UK-006':'https://api.ukwarehouse.com/v1'
+  };
+  function addApiAddress(){
+    var mask=document.getElementById('formMask'),title=document.getElementById('formTitle'),grid=document.querySelector('#overseasBasic .form-grid');
+    if(!mask||!mask.classList.contains('show')||!title||title.textContent!=='海外仓详情'||!grid||grid.querySelector('[data-overseas-api-address]'))return;
+    var code=grid.querySelector('input')?.value||'',api=apiByWarehouse[code]||'';
+    var field=document.createElement('div');field.className='form-item';field.dataset.overseasApiAddress='1';field.innerHTML='<label>API地址</label><input class="form-input" readonly value="'+api+'">';
+    var apiStatus=Array.from(grid.querySelectorAll('.form-item')).find(function(item){return item.querySelector('label')?.textContent==='API状态';});
+    if(apiStatus)apiStatus.insertAdjacentElement('afterend',field);else grid.appendChild(field);
+  }
+  var mask=document.getElementById('formMask');
+  if(mask)new MutationObserver(addApiAddress).observe(mask,{attributes:true,childList:true,subtree:true});
+})();
+</script>
+<script>
 (function(){
   function alignPurchaseOrderColumns(){
     var table=document.querySelector('#purchaseView .purchase-order-table');
