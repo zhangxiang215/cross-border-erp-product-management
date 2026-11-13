@@ -3487,47 +3487,41 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
 })();
 </script>
 <script>
-/* 隔离历史一级菜单监听器：透明点击层只负责展开侧边栏。 */
+/* 稳定一级模块入口：移除旧直绑事件，不再使用会受页面缩放影响的透明覆盖层。 */
 (function(){
   var keys=['product','inventory','purchase','supply','warehouse'];
-  function closeAll(){var rail=document.querySelector('.left-rail');keys.forEach(function(key){rail?.classList.remove(key+'-open');document.getElementById(key+'NavToggle')?.classList.remove('active');var box=document.getElementById(key+'SideSubnav');if(box)box.style.setProperty('display','none','important');});}
-  function positionLayer(layer,toggle){var rect=toggle.getBoundingClientRect();layer.style.left=rect.left+'px';layer.style.top=rect.top+'px';layer.style.width=rect.width+'px';layer.style.height=rect.height+'px';}
-  function clearChildLayers(){document.querySelectorAll('.module-child-entry-layer').forEach(function(layer){layer.remove();});}
-  function openPurchasePage(key){
-    var plan=key==='plan',view=document.getElementById('purchaseView');
-    if(!view){view=document.createElement('section');view.id='purchaseView';view.className='purchase-view';document.querySelector('.main')?.appendChild(view);}
-    var filters=plan?'<input placeholder="计划名称｜请输入"><input placeholder="商品SKU｜请输入"><select><option>计划类型</option><option>常规补货</option><option>季节备货</option></select><input placeholder="负责人｜请输入"><select><option>状态</option><option>待执行</option><option>执行中</option></select>':'<input placeholder="SKU｜请输入"><input placeholder="供应商名称｜请输入"><select><option>采购负责人</option><option>全部</option></select><select><option>状态</option><option>待处理</option><option>进行中</option></select>';
-    var head=plan?'<th>计划编号</th><th>计划名称</th><th>商品SKU</th><th>计划数量</th><th>负责人</th><th>状态</th>':'<th>采购单号</th><th>供应商</th><th>商品SKU</th><th>采购数量</th><th>采购金额</th><th>订单状态</th>';
-    var rows=plan?'<tr><td>PL202611080028</td><td>第四季度热销品补货计划</td><td>JZETLQ-0090000US</td><td>1,280</td><td>夏景舟</td><td>待执行</td></tr><tr><td>PL202611070041</td><td>欧洲仓冬季备货计划</td><td>SKU-20261015-001</td><td>860</td><td>毛鸿雁</td><td>执行中</td></tr>':'<tr><td>PO202610180028</td><td>深圳市恒温电器有限公司</td><td>JZETLQ-0090000US</td><td>128</td><td>¥30,336.00</td><td>待处理</td></tr><tr><td>PO202610170041</td><td>曹县睿翔工艺品有限公司</td><td>SKU-20261015-001</td><td>64</td><td>¥5,536.00</td><td>进行中</td></tr>';
-    view.innerHTML='<div class="purchase-full-filter">'+filters+'<div class="purchase-full-actions"><button class="action-btn primary">搜索</button><button class="action-btn reset">重置</button></div></div><div class="purchase-full-toolbar"><button class="tool primary">新增</button><button class="tool">导出</button><span class="purchase-full-count">共 2 条数据</span></div><div class="purchase-full-table"><table><thead><tr>'+head+'<th>操作</th></tr></thead><tbody>'+rows.replace(/<\/tr>/g,'<td><span class="full-link">详情</span><span class="full-link">编辑</span><span class="full-link">日志</span></td></tr>')+'</tbody></table></div>';
-    view.classList.add('active');document.getElementById('homePanel')?.setAttribute('hidden','');document.getElementById('productPages')?.setAttribute('hidden','');document.getElementById('inventoryView')?.classList.remove('active');document.getElementById('supplyView')?.classList.remove('active');document.getElementById('warehouseView')?.classList.remove('active');
-    var top=document.getElementById('productTopTab');if(top){top.style.display='flex';top.classList.add('active');var title=top.querySelector('.x')?.previousSibling;if(title)title.textContent=(plan?'计划管理':'采购单管理')+' ';}
+  var labels={product:'产品',inventory:'库存',purchase:'采购',supply:'供应',warehouse:'仓储'},entries={};
+  function boxFor(key){return document.getElementById(key+'SideSubnav')||entries[key]?.nextElementSibling;}
+  window.__openStablePurchase=function(key){
+    var view=document.getElementById('purchaseView');if(!view){view=document.createElement('section');view.id='purchaseView';view.className='purchase-view';document.querySelector('.main')?.appendChild(view);}
+    if(key==='plan'&&typeof window.__renderPurchasePlanFinal==='function')window.__renderPurchasePlanFinal();else if(typeof window.renderPurchaseFull==='function')window.renderPurchaseFull(key==='plan'?'plan':'order',0);
+    document.querySelector('.left-rail')?.classList.remove('purchase-open');var box=document.getElementById('purchaseSideSubnav');if(box)box.style.setProperty('display','none','important');
+  };
+  function prepareBox(key,box){
+    if(!box)return;
+    if(key==='purchase'){
+      box.dataset.sideModule='purchase';
+      box.innerHTML='<span class="simple-side-title">采购</span><div class="simple-side-item" data-side-key="plan" onmousedown="setTimeout(function(){window.__openStablePurchase(\'plan\')},0)">计划管理</div><div class="simple-side-item" data-side-key="order" onmousedown="setTimeout(function(){window.__openStablePurchase(\'order\')},0)">采购单管理</div>';
+      return;
+    }
+    if(key!=='warehouse')return;
+    box.dataset.sideModule='warehouse';
+    box.innerHTML='<span class="simple-side-title">仓储</span><div class="simple-side-item" data-side-key="transfer" onmousedown="setTimeout(function(){window.__erpWarehouseMount(\'transfer\');window.__closeWarehouseSide()},0)">转运仓管理</div><div class="simple-side-item" data-side-key="overseas" onmousedown="setTimeout(function(){window.__erpWarehouseMount(\'overseas\');window.__closeWarehouseSide()},0)">海外仓管理</div><div class="simple-side-item" data-side-key="fba" onmousedown="setTimeout(function(){window.__erpWarehouseMount(\'fba\');window.__closeWarehouseSide()},0)">FBA管理</div>';
   }
-  function mountChildLayers(key){
-    if(key!=='purchase')return;
-    var box=document.getElementById(key+'SideSubnav');if(!box)return;
-    box.querySelectorAll('.simple-side-item').forEach(function(item){
-      var itemKey=item.dataset.sideKey;if(!itemKey)return;
-      item.style.pointerEvents='none';
-      var layer=document.createElement('button'),rect=item.getBoundingClientRect();
-      layer.type='button';layer.className='module-child-entry-layer';layer.setAttribute('aria-label','打开'+item.textContent.trim());
-      layer.style.left=rect.left+'px';layer.style.top=rect.top+'px';layer.style.width=rect.width+'px';layer.style.height=rect.height+'px';document.body.appendChild(layer);
-      layer.addEventListener('click',function(event){
-        event.preventDefault();event.stopImmediatePropagation();event.stopPropagation();clearChildLayers();
-        openPurchasePage(itemKey);
-        box.style.setProperty('display','none','important');document.querySelector('.left-rail')?.classList.remove(key+'-open');
-      });
-    });
-  }
-  function build(){keys.forEach(function(key){var toggle=document.getElementById(key+'NavToggle');if(!toggle||document.getElementById(key+'ModuleEntryLayer'))return;toggle.style.pointerEvents='none';var layer=document.createElement('button');layer.id=key+'ModuleEntryLayer';layer.type='button';layer.className='module-entry-layer';layer.setAttribute('aria-label','展开'+({product:'产品',inventory:'库存',purchase:'采购',supply:'供应',warehouse:'仓储'}[key])+'子菜单');document.body.appendChild(layer);positionLayer(layer,toggle);layer.addEventListener('click',function(event){event.preventDefault();event.stopImmediatePropagation();event.stopPropagation();var rail=document.querySelector('.left-rail'),box=document.getElementById(key+'SideSubnav'),wasOpen=rail?.classList.contains(key+'-open');clearChildLayers();closeAll();if(wasOpen)return;rail?.classList.add(key+'-open');toggle.classList.add('active');if(box)box.style.setProperty('display','block','important');mountChildLayers(key);});});}
-  window.addEventListener('resize',function(){keys.forEach(function(key){var layer=document.getElementById(key+'ModuleEntryLayer'),toggle=document.getElementById(key+'NavToggle');if(layer&&toggle)positionLayer(layer,toggle);});});
-  build();
+  function closeAll(){var rail=document.querySelector('.left-rail');keys.forEach(function(key){rail?.classList.remove(key+'-open');entries[key]?.classList.remove('active');var box=boxFor(key);if(box)box.style.setProperty('display','none','important');});}
+  keys.forEach(function(key){
+    var legacy=document.getElementById(key+'NavToggle');if(!legacy)return;
+    var entry=legacy.cloneNode(true);entry.id=key+'ModuleEntry';entry.classList.add('stable-module-entry');entry.style.pointerEvents='auto';entry.setAttribute('role','button');entry.setAttribute('tabindex','0');entry.setAttribute('aria-label','展开'+labels[key]+'子菜单');legacy.replaceWith(entry);entries[key]=entry;
+    var alias=document.createElement('span');alias.id=key+'NavToggle';alias.hidden=true;alias.setAttribute('aria-hidden','true');document.body.appendChild(alias);
+    function toggle(){var rail=document.querySelector('.left-rail'),box=boxFor(key),wasOpen=rail?.classList.contains(key+'-open');closeAll();if(wasOpen)return;prepareBox(key,box);rail?.classList.add(key+'-open');entry.classList.add('active');if(box)box.style.setProperty('display','block','important');}
+    entry.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();toggle();});
+    entry.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();}});
+  });
+  document.addEventListener('pointerdown',function(event){var box=event.target.closest&&event.target.closest('.simple-side-subnav,.product-subnav');if(!box)return;var key=box.dataset.sideModule||box.id.replace('SideSubnav','').replace('Subnav','');setTimeout(function(){entries[key]?.classList.add('active');},0);},true);
 })();
 </script>
 <style>
-.module-entry-layer,.module-child-entry-layer{position:fixed;margin:0;padding:0;border:0;background:transparent;cursor:pointer}
-.module-entry-layer{z-index:46}
-.module-child-entry-layer{z-index:47}
+.stable-module-entry{cursor:pointer}
 /* 列表页面仅保留业务内容：一级模块名称已在侧边栏和页签中呈现。 */
 #partsView .module-page-head,
 #purchaseView .purchase-head,
