@@ -3476,5 +3476,27 @@ Final attachment audit renderer: supply and warehouse child pages must never fal
   },true);
 })();
 </script>
+<script>
+/* 一级模块仅负责展开侧边栏；业务页面只由侧边栏子模块打开。 */
+(function(){
+  var keys=['product','inventory','purchase','supply','warehouse'];
+  function closeAll(){
+    var rail=document.querySelector('.left-rail');
+    keys.forEach(function(key){rail?.classList.remove(key+'-open');document.getElementById(key+'NavToggle')?.classList.remove('active');var box=document.getElementById(key+'SideSubnav');if(box)box.style.setProperty('display','none','important');});
+  }
+  window.addEventListener('click',function(event){
+    var toggle=event.target.closest&&event.target.closest('#productNavToggle,#inventoryNavToggle,#purchaseNavToggle,#supplyNavToggle,#warehouseNavToggle');
+    if(!toggle)return;
+    var key=keys.find(function(name){return toggle.id===name+'NavToggle';});
+    if(!key)return;
+    event.preventDefault();event.stopImmediatePropagation();event.stopPropagation();
+    var rail=document.querySelector('.left-rail'),box=document.getElementById(key+'SideSubnav'),wasOpen=rail?.classList.contains(key+'-open');
+    closeAll();
+    if(wasOpen)return;
+    rail?.classList.add(key+'-open');toggle.classList.add('active');
+    if(box)box.style.setProperty('display','block','important');
+  },true);
+})();
+</script>
 </body>
 </html>
